@@ -62,20 +62,34 @@ class _BookmarksPageState extends State<BookmarksPage> {
   }
 
   void _handleComment(Status status) {
-    // TODO: Navigate to comments
-    appLogger.debug('Comment tapped: ${status.id}');
+    Navigator.pushNamed(
+      context,
+      '/statusDetail',
+      arguments: {
+        'statusId': status.id,
+        'apiService': widget.apiService,
+      },
+    );
   }
 
   void _handleShare(Status status) {
     SocialActions.shareStatus(status);
   }
 
-  void _handleBookmark(Status status) {
-    // Remove from bookmarks
+  void _handleBookmark(Status status) async {
+    // Remove from bookmarks (optimistic update)
     setState(() {
       _bookmarks.removeWhere((b) => b.id == status.id);
     });
-    // TODO: Call API to remove bookmark
+    try {
+      await widget.apiService.undoBookmarkStatus(status.id);
+    } catch (e) {
+      appLogger.error('Failed to remove bookmark', e);
+      // Revert on error
+      setState(() {
+        _bookmarks.add(status);
+      });
+    }
   }
 
   void _handleProfileTap(Status status) {

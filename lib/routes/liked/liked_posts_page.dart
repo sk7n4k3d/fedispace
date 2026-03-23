@@ -66,8 +66,14 @@ class _LikedPostsPageState extends State<LikedPostsPage> {
   }
 
   void _handleComment(Status status) {
-    // TODO: Navigate to comments
-    appLogger.debug('Comment tapped: ${status.id}');
+    Navigator.pushNamed(
+      context,
+      '/statusDetail',
+      arguments: {
+        'statusId': status.id,
+        'apiService': widget.apiService,
+      },
+    );
   }
 
   void _handleShare(Status status) {
