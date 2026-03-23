@@ -25,6 +25,21 @@ build/
 # iOS
 **/ios/Flutter/Generated.xcconfig
 **/ios/Flutter/flutter_export_environment.sh
+**/ios/Pods/
+**/ios/.symlinks/
+
+# Build outputs
+*.apk
+*.aab
+*.ipa
+
+# Coverage
+coverage/
+
+# Flutter plugins
+.flutter-plugins
+.flutter-plugins-dependencies
 
 # Misc
 *.log
+pubspec.lock
