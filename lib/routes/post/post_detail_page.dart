@@ -69,12 +69,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
           }
         }
       }
+      if (!mounted) return;
       setState(() {
         _comments = comments;
         _isLoadingComments = false;
       });
     } catch (error, stackTrace) {
       appLogger.error('Error loading comments', error, stackTrace);
+      if (!mounted) return;
       setState(() => _isLoadingComments = false);
     }
   }
@@ -82,6 +84,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   Future<void> _toggleLike() async {
     try {
       await widget.apiService.favoriteStatus(widget.post.id);
+      if (!mounted) return;
       setState(() {
         _isFavorited = !_isFavorited;
         _favoritesCount += _isFavorited ? 1 : -1;

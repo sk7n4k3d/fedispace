@@ -54,6 +54,7 @@ class _FollowersListPageState extends State<FollowersListPage> {
         );
       }
 
+      if (!mounted) return;
       setState(() {
         if (maxId == null) {
           _accounts = accounts;
@@ -65,6 +66,7 @@ class _FollowersListPageState extends State<FollowersListPage> {
       });
     } catch (error, stackTrace) {
       appLogger.error('Error loading accounts', error, stackTrace);
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });

@@ -54,18 +54,18 @@ class Account {
   ///
   factory Account.fromJson(Map<String, dynamic> data) {
     return Account(
-      id: data["id"],
-      username: data["username"],
-      displayName: data["display_name"],
-      acct: data["acct"],
-      isLocked: data["locked"] ,
-      isBot: data["bot"] ,
-      avatarUrl: data["avatar"] ,
-      headerUrl: data["header"],
-      followers_count : data["followers_count"],
-      following_count : data["following_count"],
-      statuses_count : data["statuses_count"],
-      note : data["note"],
+      id: data["id"]?.toString() ?? '',
+      username: data["username"]?.toString() ?? '',
+      displayName: data["display_name"]?.toString() ?? '',
+      acct: data["acct"]?.toString() ?? '',
+      isLocked: data["locked"] ?? false,
+      isBot: data["bot"] ?? false,
+      avatarUrl: data["avatar"]?.toString() ?? '',
+      headerUrl: data["header"]?.toString() ?? '',
+      followers_count: data["followers_count"] ?? 0,
+      following_count: data["following_count"] ?? 0,
+      statuses_count: data["statuses_count"] ?? 0,
+      note: data["note"]?.toString() ?? '',
     );
   }
 }

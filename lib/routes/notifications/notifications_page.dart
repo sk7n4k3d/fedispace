@@ -60,12 +60,14 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
         }
       }
       
+      if (!mounted) return;
       setState(() {
         _notifications = parsed;
         _isLoading = false;
       });
     } catch (error, stackTrace) {
       appLogger.error('Error loading notifications', error, stackTrace);
+      if (!mounted) return;
       setState(() => _isLoading = false);
     }
   }

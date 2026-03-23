@@ -49,8 +49,9 @@ class _Notification extends State<Notif> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final domain = widget.apiService.domainURL();
-    return WillPopScope(
-        onWillPop: _onWillPop,
+    return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, _) { if (!didPop) _onWillPop(); },
         child: FutureBuilder(
             future: getData(),
             builder: (ctx, snapshot) {
@@ -168,40 +169,40 @@ Widget _body2(domain, data, ApiService apiService) {
                         if (data[index]["type"] == "favourite") ...[
                           Container(
                             padding: const EdgeInsets.only(top: 5),
-                            child: const Text(
+                            child: Text(
                               "As liked your post",
                               style:
-                                  TextStyle(color: Colors.black, fontSize: 15),
+                                  TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color, fontSize: 15),
                             ),
                           ),
                         ],
                         if (data[index]["type"] == "follow") ...[
                           Container(
                             padding: const EdgeInsets.only(top: 5),
-                            child: const Text(
+                            child: Text(
                               "Following you",
                               style:
-                                  TextStyle(color: Colors.black, fontSize: 15),
+                                  TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color, fontSize: 15),
                             ),
                           ),
                         ],
                         if (data[index]["type"] == "follow_request") ...[
                           Container(
                             padding: const EdgeInsets.only(top: 5),
-                            child: const Text(
+                            child: Text(
                               "Requested to follow you",
                               style:
-                                  TextStyle(color: Colors.black, fontSize: 15),
+                                  TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color, fontSize: 15),
                             ),
                           ),
                         ],
                         if (data[index]["type"] == "mention") ...[
                           Container(
                             padding: const EdgeInsets.only(top: 5),
-                            child: const Text(
+                            child: Text(
                               "Mentioned you in their status",
                               style:
-                                  TextStyle(color: Colors.black, fontSize: 15),
+                                  TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color, fontSize: 15),
                             ),
                           ),
                         ],

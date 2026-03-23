@@ -42,7 +42,6 @@ class _DirectMessagesPageState extends State<DirectMessagesPage> {
       final List<dynamic> allConversations = [...inboxConversations, ...sentConversations];
       
       final Map<String, _Conversation> convByPartner = {};
-      _lastParseError = null;
       
       for (var conv in allConversations) {
         try {
@@ -97,13 +96,14 @@ class _DirectMessagesPageState extends State<DirectMessagesPage> {
            }
         } catch (e, stack) {
            appLogger.error('Error parsing conversation item', e);
-           _lastParseError = 'Item Error: $e\nStack: $stack';
+
         }
       }
       
       final sortedConversations = convByPartner.values.toList()
         ..sort((a, b) => b.lastMessageTime.compareTo(a.lastMessageTime));
 
+      if (!mounted) return;
       setState(() {
         _conversations.clear();
         _conversations.addAll(sortedConversations);
@@ -111,6 +111,7 @@ class _DirectMessagesPageState extends State<DirectMessagesPage> {
       });
     } catch (error, stackTrace) {
       appLogger.error('Error loading DMs', error, stackTrace);
+      if (!mounted) return;
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error loading DMs: $error'), backgroundColor: CyberpunkTheme.cardDark),
@@ -118,49 +119,8 @@ class _DirectMessagesPageState extends State<DirectMessagesPage> {
     }
   }
 
-  String? _lastParseError;
 
-  Future<void> _showDebugInfo() async {
-    try {
-      final res1 = await widget.apiService.debugFetch('/api/v1/conversations?scope=inbox');
-      
-      String info = '--- /api/v1/conversations?scope=inbox ---\n';
-      info += 'Status: ${res1['statusCode']}\n';
-      info += 'URL: ${res1['url']}\n';
-      if (res1['error'] != null) info += 'Error: ${res1['error']}\n';
-      final body1 = res1['body'].toString();
-      info += 'Body: ${body1.substring(0, body1.length > 200 ? 200 : body1.length)}\n\n';
-      
-      if (_lastParseError != null) {
-          info += '--- PARSING ERROR ---\n$_lastParseError\n\n';
-      } else {
-          info += '--- PARSING ---\nNo specific parsing error recorded.\nlist count: ${_conversations.length}\n';
-      }
 
-      if (!mounted) return;
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: CyberpunkTheme.cardDark,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text('Debug Info', style: TextStyle(color: CyberpunkTheme.textWhite)),
-          content: SingleChildScrollView(child: Text(info, style: const TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 12))),
-          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK', style: TextStyle(color: CyberpunkTheme.neonCyan)))],
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: CyberpunkTheme.cardDark,
-          title: const Text('Error', style: TextStyle(color: CyberpunkTheme.textWhite)),
-          content: Text(e.toString(), style: const TextStyle(color: CyberpunkTheme.textSecondary)),
-          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK', style: TextStyle(color: CyberpunkTheme.neonCyan)))],
-        ),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -174,11 +134,7 @@ class _DirectMessagesPageState extends State<DirectMessagesPage> {
            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: CyberpunkTheme.textWhite),
          ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.bug_report_outlined, color: CyberpunkTheme.textTertiary, size: 20),
-            onPressed: _showDebugInfo,
-          ),
-          IconButton(
+IconButton(
             icon: const Icon(Icons.edit_note_rounded, color: CyberpunkTheme.textWhite, size: 24),
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(

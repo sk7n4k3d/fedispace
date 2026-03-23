@@ -49,6 +49,11 @@ class ApiService {
 
   http.Client httpClient = http.Client();
 
+  /// Close the HTTP client to free resources
+  void dispose() {
+    httpClient.close();
+  }
+
   /// Performs a GET request to the specified URL through the API helper
   Future<http.Response> _apiGet(String url) async {
     return await helper!.get(url, httpClient: httpClient);
@@ -345,7 +350,7 @@ class ApiService {
   }
 
   /// Check if domain is a valid Pixelfed instance
-  Future<bool> NodeInfo(domain) async {
+  Future<bool> nodeInfo(String domain) async {
     try {
       String apiUrl;
       appLogger.debug('Checking Pixelfed instance: $domain');
@@ -362,8 +367,8 @@ class ApiService {
       
       if (resp.statusCode == 200) {
         final jsonBody = jsonDecode(resp.body);
-        if (jsonBody[0]['metadata']['nodeName'] == 'Pixelfed' &&
-            jsonBody[0]['config']['features']['mobile_apis'] == true) {
+        if (jsonBody['metadata'] != null && jsonBody['metadata']['nodeName'] == 'Pixelfed' &&
+            jsonBody['config'] != null && jsonBody['config']['features'] != null && jsonBody['config']['features']['mobile_apis'] == true) {
           appLogger.info('Valid Pixelfed instance detected: $domain');
           return true;
         }
@@ -377,7 +382,7 @@ class ApiService {
     return false;
   }
 
-  Future<String> GetRepliesBy(String id) async {
+  Future<String> getRepliesBy(String id) async {
     String apiUrl;
     apiUrl = "${instanceUrl!}/api/v1/statuses/$id/favourited_by";
     http.Response resp = await _apiGet(apiUrl);
@@ -385,19 +390,19 @@ class ApiService {
       return resp.body;
     }
     throw ApiException(
-      "Unexpected status code ${resp.statusCode} on `getStatusList`",
+      "Unexpected status code ${resp.statusCode} on getRepliesBy",
     );
   }
 
   /// Get list of statuses from timeline
-  Future<List<Status>> getStatusList(String? maxId, int limit, timeLine) async {
+  Future<List<Status>> getStatusList(String? maxId, int limit, String timeLine) async {
     String apiUrl;
     if (timeLine == 'home') {
-      apiUrl = '${instanceUrl!}/api/v1/timelines/home?limit=20';
+      apiUrl = '${instanceUrl!}/api/v1/timelines/home?limit=$limit';
     } else if (timeLine == 'local') {
-      apiUrl = '${instanceUrl!}/api/v1/timelines/public?local=true&limit=20';
+      apiUrl = '${instanceUrl!}/api/v1/timelines/public?local=true&limit=$limit';
     } else {
-      apiUrl = '${instanceUrl!}/api/v1/timelines/public?limit=20';
+      apiUrl = '${instanceUrl!}/api/v1/timelines/public?limit=$limit';
     }
     
     if (maxId != null) {
@@ -487,7 +492,7 @@ class ApiService {
   }
 
   /// Get account information for a specific user
-  Future<AccountUsers> getUserAccount(id) async {
+  Future<AccountUsers> getUserAccount(String id) async {
     final apiUrl = '${instanceUrl!}/api/v1/accounts/$id';
     appLogger.apiCall('GET', '/api/v1/accounts/$id');
     
@@ -617,7 +622,7 @@ class ApiService {
     await resetApiServiceState();
   }
 
-  Future<bool> muteUser(userId) async {
+  Future<bool> muteUser(String userId) async {
     final apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/mute";
     http.Response resp = await _apiPost(apiUrl);
     if (resp.statusCode == 200) {
@@ -632,11 +637,11 @@ class ApiService {
       return true;
     }
     throw ApiException(
-      "Unexpected status code ${resp.statusCode} on `getStatusList`",
+      "Unexpected status code ${resp.statusCode} on muteUser",
     );
   }
 
-  Future<bool> unmuteUser(userId) async {
+  Future<bool> unmuteUser(String userId) async {
     final apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/unmute";
     http.Response resp = await _apiPost(apiUrl);
     if (resp.statusCode == 200) {
@@ -651,7 +656,7 @@ class ApiService {
       return true;
     }
     throw ApiException(
-      "Unexpected status code ${resp.statusCode} on `getStatusList`",
+      "Unexpected status code ${resp.statusCode} on unmuteUser",
     );
   }
 
@@ -677,7 +682,7 @@ class ApiService {
     return [];
   }
 
-  Future<bool> followUser(userId) async {
+  Future<bool> followUser(String userId) async {
     final apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/follow";
     http.Response resp = await _apiPost(apiUrl);
     if (resp.statusCode == 200) {
@@ -692,11 +697,11 @@ class ApiService {
       return true;
     }
     throw ApiException(
-      "Unexpected status code ${resp.statusCode} on `getStatusList`",
+      "Unexpected status code ${resp.statusCode} on followUser",
     );
   }
 
-  Future<bool> unfollowUser(userId) async {
+  Future<bool> unfollowUser(String userId) async {
     final apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/unfollow";
     http.Response resp = await _apiPost(apiUrl);
     if (resp.statusCode == 200) {
@@ -711,11 +716,11 @@ class ApiService {
       return true;
     }
     throw ApiException(
-      "Unexpected status code ${resp.statusCode} on `getStatusList`",
+      "Unexpected status code ${resp.statusCode} on unfollowUser",
     );
   }
 
-  Future<bool> blockUser(userId) async {
+  Future<bool> blockUser(String userId) async {
     final apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/block";
     http.Response resp = await _apiPost(apiUrl);
     if (resp.statusCode == 200) {
@@ -730,11 +735,11 @@ class ApiService {
       return true;
     }
     throw ApiException(
-      "Unexpected status code ${resp.statusCode} on `getStatusList`",
+      "Unexpected status code ${resp.statusCode} on blockUser",
     );
   }
 
-  Future<bool> unblockUser(userId) async {
+  Future<bool> unblockUser(String userId) async {
     final apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/unblock";
     http.Response resp = await _apiPost(apiUrl);
     if (resp.statusCode == 200) {
@@ -749,7 +754,7 @@ class ApiService {
       return true;
     }
     throw ApiException(
-      "Unexpected status code ${resp.statusCode} on `getStatusList`",
+      "Unexpected status code ${resp.statusCode} on unblockUser",
     );
   }
 
@@ -804,7 +809,7 @@ class ApiService {
   }
 
   /// Get user's statuses
-  Future getUserStatus(userId, pageIndex, String? minId) async {
+  Future getUserStatus(String userId, int pageIndex, String? minId) async {
     final String apiUrl;
     if (pageIndex > 1) {
       apiUrl =
@@ -1410,42 +1415,7 @@ class ApiService {
     }
   }
 
-  /// Send a direct message
-  /// Mastodon API: POST /api/v1/statuses with visibility='direct'
-  Future<dynamic> sendDirectMessage({
-    required String recipientUsername,
-    required String content,
-    List<String>? mediaIds,
-  }) async {
-    try {
-      // Pixelfed Specific: Send via /api/v1/direct/thread/send
-      // Fallback: If this fails, we might need another approach, but "visibility: direct" 400s.
-      
-      final uri = '${instanceUrl!}/api/v1/direct/thread/send';
-      
-      // Try mapping common parameters for "DirectMessageController@create"
-      // Likely: recipient_id, message (or text)
-      // I'll send multiple keys to be safe if it ignores extras.
-      
-      // NOTE: We need recipient_id. I'm adding it as a parameter, but for now assuming it's passed or resolvable?
-      // Wait, the signature didn't change in my edit yet. I need to update the signature to accept recipientId.
-      // But to avoid breaking other calls (if any), I'll make it optional or derived?
-      // Actually, I can't derive ID from username easily without a search.
-      // User passed recipientId in the map if calling new method?
-      // No, let's update the signature. 
-      // Oops, I can't update signature here easily without breaking call sites... 
-      // BUT call sites are updated in previous steps?
-      
-      // WAIT: I updated the call site in ConversationDetailPage to PASS recipientId to the Widget, 
-      // but I didn't update the CALL to ApiService.sendDirectMessage yet.
-      // So I should update ApiService.sendDirectMessage signature OR add a new method.
-      // Adding a new method is safer.
-      
-      throw UnimplementedError("Use sendChatDirectMessage instead");
-    } catch (err, stackTrace) {
-        return null;
-    }
-  }
+
 
   Future<dynamic> sendChatDirectMessage({
       required String recipientId,
@@ -1558,52 +1528,12 @@ class ApiService {
     }
   }
 
-  // Deprecated or fallback
-  Future<dynamic> sendDirectMessageOld({
-    required String recipientUsername,
-    required String content,
-    List<String>? mediaIds,
-  }) async {
-    try {
-        // Old logic here if needed, or just return null
-        return null;
-    } catch (err, stackTrace) {
-      appLogger.error('Error sending direct message', err, stackTrace);
-      return null;
-    }
-  }
+
 
   /// Sanitize instance URL to remove trailing slash
   String get _baseUrl => instanceUrl?.replaceAll(RegExp(r'/$'), '') ?? '';
 
-  /// Debug fetch to inspect raw response
-  Future<Map<String, dynamic>> debugFetch(String path) async {
-    try {
-       final tokenResponse = await helper!.getTokenFromStorage();
-       final token = tokenResponse?.accessToken;
-       
-       final uri = Uri.parse('$_baseUrl$path');
-       
-       appLogger.apiCall('DEBUG', uri.toString());
-       
-       final response = await http.get(
-          uri,
-          headers: {
-             'Authorization': 'Bearer $token',
-             'Accept': 'application/json',
-          },
-       );
-       
-       return {
-          'statusCode': response.statusCode,
-          'body': response.body,
-          'headers': response.headers,
-          'url': uri.toString(),
-       };
-    } catch (e) {
-       return {'error': e.toString()};
-    }
-  }
+
 
   // ══════════════════════════════════════════════════════════════════
   // HIGH-PRIORITY ENDPOINTS (batch added)
@@ -1875,7 +1805,7 @@ class ApiService {
       if (!enabled) return null;
       
       final endpoint = prefs.getString('openai_translate_endpoint') ?? 'https://api.openai.com/v1/chat/completions';
-      final apiKey = prefs.getString('openai_translate_api_key') ?? '';
+      final apiKey = await secureStorage.read(key: 'openai_translate_api_key') ?? '';
       if (apiKey.isEmpty) return null;
       
       final langName = targetLang;

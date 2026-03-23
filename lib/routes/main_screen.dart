@@ -69,7 +69,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => sendPosts(apiService: widget.apiService),
+          builder: (context) => SendPosts(apiService: widget.apiService),
         ),
       );
       return;

@@ -40,6 +40,7 @@ class _LikedPostsPageState extends State<LikedPostsPage> {
       
       final List<Status> posts = response;
 
+      if (!mounted) return;
       setState(() {
         if (maxId == null) {
           _likedPosts = posts;
@@ -51,6 +52,7 @@ class _LikedPostsPageState extends State<LikedPostsPage> {
       });
     } catch (error, stackTrace) {
       appLogger.error('Error loading liked posts', error, stackTrace);
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });

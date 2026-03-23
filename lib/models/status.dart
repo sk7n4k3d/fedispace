@@ -85,6 +85,15 @@ class Status {
     required this.blurhash,
   });
 
+  factory Status.empty() => Status(
+    id: '', content: '', account: Account(id: '', username: '', displayName: '', acct: '', isLocked: false, isBot: false, avatarUrl: '', headerUrl: '', followers_count: 0, following_count: 0, statuses_count: 0, note: ''),
+    favorited: false, reblogged: false, visibility: '', uri: '', url: '',
+    in_reply_to_id: '', in_reply_to_account_id: '', muted: false, sensitive: false,
+    spoiler_text: '', language: '', avatar: '', acct: '', attach: '', preview_url: '',
+    created_at: '', favourites_count: 0, replies_count: 0, reblogs_count: 0,
+    attachement: [], blurhash: '',
+  );
+
   factory Status.fromJson(Map<String, dynamic> data) {
     final mediaAttachments = data['media_attachments'] as List<dynamic>? ?? [];
     final firstMedia = mediaAttachments.isNotEmpty 

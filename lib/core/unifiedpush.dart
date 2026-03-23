@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:unifiedpush/unifiedpush.dart';
 import 'package:fedispace/core/api.dart';
 import 'package:fedispace/core/logger.dart';
+import 'package:fedispace/core/notification_service.dart';
 
 class UnifiedPushService {
   final String instance = "fedispace_main";
@@ -253,89 +254,9 @@ class UnifiedPushService {
     );
   }
 
-  /// Initialize notification channels
+  /// Initialize notification channels (delegates to shared NotificationPollingService)
   void _initNotifications() {
-    AwesomeNotifications().initialize('resource://drawable/logo', [
-      NotificationChannel(
-        channelGroupKey: 'Story notifications',
-        channelKey: 'stories',
-        channelName: 'Story',
-        channelDescription: 'Notification channel for stories',
-        channelShowBadge: true,
-        importance: NotificationImportance.High,
-        enableVibration: true,
-      ),
-      NotificationChannel(
-        channelGroupKey: 'mention notifications',
-        channelKey: 'mention',
-        channelName: 'Mention',
-        channelDescription: 'Notification channel for mention',
-        defaultColor: Colors.redAccent,
-        ledColor: Colors.white,
-        channelShowBadge: true,
-        importance: NotificationImportance.High,
-      ),
-      NotificationChannel(
-        channelGroupKey: 'favourite notifications',
-        channelKey: 'favourite',
-        channelName: 'Favourite',
-        channelDescription: 'Notification channel for favourite',
-        defaultColor: Colors.redAccent,
-        ledColor: Colors.white,
-        channelShowBadge: true,
-        importance: NotificationImportance.High,
-      ),
-      NotificationChannel(
-        channelGroupKey: 'follow notifications',
-        channelKey: 'follow',
-        channelName: 'Follow',
-        channelDescription: 'Notification channel for follow',
-        defaultColor: Colors.redAccent,
-        ledColor: Colors.white,
-        channelShowBadge: true,
-        importance: NotificationImportance.High,
-      ),
-      NotificationChannel(
-        channelGroupKey: 'follow_request notifications',
-        channelKey: 'follow_request',
-        channelName: 'Follow request',
-        channelDescription: 'Notification channel for follow request',
-        defaultColor: Colors.redAccent,
-        ledColor: Colors.white,
-        channelShowBadge: true,
-        importance: NotificationImportance.High,
-      ),
-      NotificationChannel(
-        channelGroupKey: 'reblog notifications',
-        channelKey: 'reblog',
-        channelName: 'Reblog',
-        channelDescription: 'Notification channel for reblog',
-        defaultColor: Colors.redAccent,
-        ledColor: Colors.white,
-        channelShowBadge: true,
-        importance: NotificationImportance.High,
-      ),
-      NotificationChannel(
-        channelGroupKey: 'status notifications',
-        channelKey: 'status',
-        channelName: 'Status',
-        channelDescription: 'Notification channel for status',
-        defaultColor: Colors.redAccent,
-        ledColor: Colors.white,
-        channelShowBadge: true,
-        importance: NotificationImportance.High,
-      ),
-      NotificationChannel(
-        channelGroupKey: 'Internal notifications',
-        channelKey: 'internal',
-        channelName: 'Internal',
-        channelDescription: 'Internal notification channel',
-        defaultColor: const Color(0xFF00F3FF),
-        ledColor: Colors.white,
-        channelShowBadge: true,
-        importance: NotificationImportance.High,
-      ),
-    ]);
+    NotificationPollingService().initializeNotifications();
   }
 
   /// Unregister from push notifications
