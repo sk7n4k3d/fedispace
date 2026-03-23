@@ -12,8 +12,6 @@ import 'package:flutter_html/flutter_html.dart' as html;
 import 'package:video_player/video_player.dart';
 
 
-var UserAccount;
-
 class Profile extends StatefulWidget {
   final ApiService apiService;
 
@@ -27,6 +25,7 @@ class _Profile extends State<Profile> {
   final apiService = ApiService();
   int page = 1;
   Account? account;
+  dynamic _userAccount;
   AccountUsers? accountUsers;
 
   late Object jsonData;
@@ -49,11 +48,11 @@ class _Profile extends State<Profile> {
     if (arguments["id"] != null) {
       AccountUsers currentAccount =
           (await widget.apiService.getUserAccount(arguments["id"].toString()));
-      UserAccount = currentAccount;
+      _userAccount = currentAccount;
       return accountUsers = currentAccount;
     } else {
       Account currentAccount = await widget.apiService.getAccount();
-      UserAccount = currentAccount;
+      _userAccount = currentAccount;
       return account = currentAccount;
     }
   }
@@ -66,9 +65,9 @@ class _Profile extends State<Profile> {
     if (isPageLoading == true || (isPageLoading == false && page == 1)) {
       final responseDic;
       if (arrayOfProducts.length == 0) {
-        responseDic = await widget.apiService.getUserStatus(UserAccount.id, page, "0");
+        responseDic = await widget.apiService.getUserStatus(_userAccount.id, page, "0");
       } else {
-        responseDic = await widget.apiService.getUserStatus(UserAccount.id, page, arrayOfProducts[arrayOfProducts.length - 1]["id"]);
+        responseDic = await widget.apiService.getUserStatus(_userAccount.id, page, arrayOfProducts[arrayOfProducts.length - 1]["id"]);
       }
       List<Map<String, dynamic>> temArr = List<Map<String, dynamic>>.from(responseDic);
       if (page == 1) {
@@ -83,10 +82,10 @@ class _Profile extends State<Profile> {
 
   String avatarUrl() {
     var domain = widget.apiService.domainURL();
-    if (UserAccount!.avatarUrl.contains("://")) {
-      return UserAccount!.avatarUrl.toString();
+    if (_userAccount!.avatarUrl.contains("://")) {
+      return _userAccount!.avatarUrl.toString();
     } else {
-      return domain.toString() + UserAccount!.avatarUrl;
+      return domain.toString() + _userAccount!.avatarUrl;
     }
   }
 
@@ -199,20 +198,20 @@ class _Profile extends State<Profile> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  _buildStatItem(S.of(context).posts, UserAccount.statuses_count),
+                                  _buildStatItem(S.of(context).posts, _userAccount.statuses_count),
                                   GestureDetector(
                                     onTap: () => Navigator.pushNamed(context, '/FollowersList', arguments: {
-                                      'userId': UserAccount.id,
+                                      'userId': _userAccount.id,
                                       'type': 'followers',
                                     }),
-                                    child: _buildStatItem(S.of(context).followers, UserAccount.followers_count),
+                                    child: _buildStatItem(S.of(context).followers, _userAccount.followers_count),
                                   ),
                                   GestureDetector(
                                     onTap: () => Navigator.pushNamed(context, '/FollowersList', arguments: {
-                                      'userId': UserAccount.id,
+                                      'userId': _userAccount.id,
                                       'type': 'following',
                                     }),
-                                    child: _buildStatItem(S.of(context).following, UserAccount.following_count),
+                                    child: _buildStatItem(S.of(context).following, _userAccount.following_count),
                                   ),
                                 ],
                               ),
@@ -224,7 +223,7 @@ class _Profile extends State<Profile> {
 
                         // Display name
                         Text(
-                          UserAccount?.displayName ?? 'User',
+                          _userAccount?.displayName ?? 'User',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -236,7 +235,7 @@ class _Profile extends State<Profile> {
 
                         // Username
                         Text(
-                          '@${UserAccount?.acct ?? ''}',
+                          '@${_userAccount?.acct ?? ''}',
                           style: const TextStyle(
                             fontSize: 14,
                             color: CyberpunkTheme.textSecondary,
@@ -244,11 +243,11 @@ class _Profile extends State<Profile> {
                         ),
 
                         // Bio
-                        if (UserAccount?.note != null && UserAccount.note.toString().isNotEmpty)
+                        if (_userAccount?.note != null && _userAccount.note.toString().isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(top: 10),
                             child: html.Html(
-                              data: UserAccount.note,
+                              data: _userAccount.note,
                               style: {
                                 "body": html.Style(
                                   margin: html.Margins.zero,

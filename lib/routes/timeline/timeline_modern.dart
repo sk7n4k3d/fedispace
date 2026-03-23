@@ -185,8 +185,9 @@ class _TimelineState extends State<Timeline> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     // If not the home screen, show a single timeline without tabs
     if (widget.typeTimeLine != 'home') {
-      return WillPopScope(
-        onWillPop: _onWillPop,
+      return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, _) { if (!didPop) _onWillPop(); },
         child: Scaffold(
           backgroundColor: CyberpunkTheme.backgroundBlack,
           body: _TimelineFeed(

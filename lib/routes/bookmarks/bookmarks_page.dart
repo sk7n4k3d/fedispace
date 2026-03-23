@@ -40,6 +40,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
         limit: 20,
       );
 
+      if (!mounted) return;
       setState(() {
         if (maxId == null) {
           _bookmarks = bookmarks;
@@ -51,6 +52,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
       });
     } catch (error, stackTrace) {
       appLogger.error('Error loading bookmarks', error, stackTrace);
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });

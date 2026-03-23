@@ -60,7 +60,7 @@ class _StatusCardState extends State<StatusCard> {
   }
 
   Future<List<Favourited>> fetchFavour(id) async {
-    final response = await widget.apiService.GetRepliesBy(id);
+    final response = await widget.apiService.getRepliesBy(id);
     final parsedJson = json.decode(response).cast<Map<String, dynamic>>();
     return parsedJson
         .map<Favourited>((json) => Favourited.fromJson(json))

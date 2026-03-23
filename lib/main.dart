@@ -221,16 +221,16 @@ class MyAppState extends State<MyApp> {
         },
         '/DirectMessages': (context) => DirectMessagesPage(apiService: widget.apiService),
         '/TimeLine': (context) =>
-            Timeline(apiService: widget.apiService, typeTimeLine: "home"),
+            TimelineLegacy(apiService: widget.apiService, typeTimeLine: "home"),
         '/Local': (context) =>
-            Timeline(apiService: widget.apiService, typeTimeLine: "public"),
+            TimelineLegacy(apiService: widget.apiService, typeTimeLine: "public"),
         '/Photo': (context) =>
-            Timeline(apiService: widget.apiService, typeTimeLine: "home"),
+            TimelineLegacy(apiService: widget.apiService, typeTimeLine: "home"),
         '/Bookmark': (context) =>
             BookmarksPage(apiService: widget.apiService),
         '/Profile': (context) => Profile(apiService: widget.apiService),
         '/Live': (context) =>
-            Timeline(apiService: widget.apiService, typeTimeLine: "public"),
+            TimelineLegacy(apiService: widget.apiService, typeTimeLine: "public"),
         '/Camera': (context) => CameraScreen(apiService: widget.apiService),
         '/StoryViewer': (context) => StoryViewer(
             story: (ModalRoute.of(context)!.settings.arguments as Map)['story'],
@@ -241,8 +241,8 @@ class MyAppState extends State<MyApp> {
         '/Search': (context) =>
             SearchPage(apiService: widget.apiService),
         '/Desc': (context) => Desc(apiService: widget.apiService),
-        '/sendPosts': (context) => sendPosts(apiService: widget.apiService),
-        '/presentation': (context) => const presentation(),
+        '/sendPosts': (context) => SendPosts(apiService: widget.apiService),
+        '/presentation': (context) => const Presentation(),
         '/TagTimeline': (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return TagTimeline(apiService: widget.apiService, tag: args['tag']);

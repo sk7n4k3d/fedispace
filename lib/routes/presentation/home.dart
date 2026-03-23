@@ -2,14 +2,14 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:fedispace/l10n/app_localizations.dart';
 
-class presentation extends StatefulWidget {
-  const presentation({Key? key}) : super(key: key);
+class Presentation extends StatefulWidget {
+  const Presentation({Key? key}) : super(key: key);
 
   @override
-  State<presentation> createState() => _presentationState();
+  State<Presentation> createState() => _PresentationState();
 }
 
-class _presentationState extends State<presentation>
+class _PresentationState extends State<Presentation>
     with TickerProviderStateMixin {
   late PageController _pageController;
   late AnimationController _bgController;

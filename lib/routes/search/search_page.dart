@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fedispace/core/api.dart';
 import 'package:fedispace/core/logger.dart';
 import 'package:fedispace/l10n/app_localizations.dart';
+import 'package:fedispace/models/account.dart';
 import 'package:fedispace/models/accountUsers.dart';
 import 'package:fedispace/models/status.dart';
 import 'package:fedispace/themes/cyberpunk_theme.dart';
@@ -58,61 +59,52 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 
   Future<void> _loadDiscover() async {
     try {
-      final trending = await widget.apiService.getTrendingPosts(limit: 20);
-      final discover = await widget.apiService.discoverPosts(limit: 30);
-      // For popular accounts, we get Account objects but our UI uses AccountUsers
-      // We'll handle this by fetching popular accounts and converting
-      List<AccountUsers> popular = [];
-      try {
-        final accounts = await widget.apiService.discoverPopularAccounts(limit: 10);
-        popular = accounts.map((a) => AccountUsers(
-          id: a.id ?? '',
-          username: a.username ?? '',
-          displayName: a.display_name ?? '',
-          acct: a.username ?? '',
-          isLocked: false,
-          isBot: false,
-          avatarUrl: a.avatar ?? '',
-          headerUrl: '',
-          note: a.note ?? '',
-          followers_count: a.followers_count ?? 0,
-          following_count: a.following_count ?? 0,
-          statuses_count: a.statuses_count ?? 0,
-        )).toList();
-      } catch (e) {
-        appLogger.error('Error loading popular accounts', e);
-      }
+      // Parallelize independent API calls
+      final results = await Future.wait([
+        widget.apiService.getTrendingPosts(limit: 20),
+        widget.apiService.discoverPosts(limit: 30),
+        widget.apiService.discoverPopularAccounts(limit: 10).catchError((e) { appLogger.error('Error loading popular accounts', e); return <Account>[]; }),
+        widget.apiService.discoverTrendingHashtags(limit: 10).catchError((e) { appLogger.error('Error loading trending hashtags', e); return <Map<String, dynamic>>[]; }),
+        widget.apiService.getSuggestions(limit: 8).catchError((e) { appLogger.error('Error loading suggestions', e); return <Account>[]; }),
+      ]);
 
-      // Load trending hashtags
-      List<Map<String, dynamic>> hashtags = [];
-      try {
-        hashtags = await widget.apiService.discoverTrendingHashtags(limit: 10);
-      } catch (e) {
-        appLogger.error('Error loading trending hashtags', e);
-      }
+      final trending = results[0] as List<Status>;
+      final discover = results[1] as List<Status>;
+      final popularAccounts = results[2] as List<Account>;
+      final hashtags = results[3] as List<Map<String, dynamic>>;
+      final suggestionAccounts = results[4] as List<Account>;
 
-      // Load follow suggestions
-      List<AccountUsers> suggestions = [];
-      try {
-        final suggestionAccounts = await widget.apiService.getSuggestions(limit: 8);
-        suggestions = suggestionAccounts.map((a) => AccountUsers(
-          id: a.id ?? '',
-          username: a.username ?? '',
-          displayName: a.display_name ?? '',
-          acct: a.username ?? '',
-          isLocked: false,
-          isBot: false,
-          avatarUrl: a.avatar ?? '',
-          headerUrl: '',
-          note: a.note ?? '',
-          followers_count: a.followers_count ?? 0,
-          following_count: a.following_count ?? 0,
-          statuses_count: a.statuses_count ?? 0,
-        )).toList();
-      } catch (e) {
-        appLogger.error('Error loading suggestions', e);
-      }
+      final popular = popularAccounts.map((a) => AccountUsers(
+        id: a.id ?? '',
+        username: a.username ?? '',
+        displayName: a.display_name ?? '',
+        acct: a.username ?? '',
+        isLocked: false,
+        isBot: false,
+        avatarUrl: a.avatar ?? '',
+        headerUrl: '',
+        note: a.note ?? '',
+        followers_count: a.followers_count ?? 0,
+        following_count: a.following_count ?? 0,
+        statuses_count: a.statuses_count ?? 0,
+      )).toList();
 
+      final suggestions = suggestionAccounts.map((a) => AccountUsers(
+        id: a.id ?? '',
+        username: a.username ?? '',
+        displayName: a.display_name ?? '',
+        acct: a.username ?? '',
+        isLocked: false,
+        isBot: false,
+        avatarUrl: a.avatar ?? '',
+        headerUrl: '',
+        note: a.note ?? '',
+        followers_count: a.followers_count ?? 0,
+        following_count: a.following_count ?? 0,
+        statuses_count: a.statuses_count ?? 0,
+      )).toList();
+
+      if (!mounted) return;
       setState(() {
         _trendingPosts = trending;
         _discoverPosts = discover;
@@ -185,6 +177,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
         }
       }
 
+      if (!mounted) return;
       setState(() {
         _accountResults = accounts;
         _statusResults = statuses;

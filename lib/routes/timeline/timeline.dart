@@ -12,23 +12,23 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import '/widgets/bottomWidget.dart';
 
-class Timeline extends StatefulWidget implements PreferredSizeWidget {
+class TimelineLegacy extends StatefulWidget implements PreferredSizeWidget {
   final ApiService apiService;
 
   String typeTimeLine;
 
   /// Main instance of the API service to use in the widget.
-  Timeline({Key? key, required this.apiService, required this.typeTimeLine})
+  TimelineLegacy({Key? key, required this.apiService, required this.typeTimeLine})
       : super(key: key);
 
   @override
-  State<Timeline> createState() => _TimelineTabsState();
+  State<TimelineLegacy> createState() => _TimelineTabsState();
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-class _TimelineTabsState extends State<Timeline> with TickerProviderStateMixin {
+class _TimelineTabsState extends State<TimelineLegacy> with TickerProviderStateMixin {
   Account? account;
   static const _pageSize = 20;
   late Animation<double> _animation;
@@ -99,9 +99,9 @@ class _TimelineTabsState extends State<Timeline> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-    return WillPopScope(
-        onWillPop: _onWillPop,
+    return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, _) { if (!didPop) _onWillPop(); },
         child: Container(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,

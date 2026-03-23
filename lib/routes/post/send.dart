@@ -17,16 +17,16 @@ import 'package:http_parser/http_parser.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class sendPosts extends StatefulWidget {
+class SendPosts extends StatefulWidget {
   final ApiService apiService;
 
-  const sendPosts({Key? key, required this.apiService}) : super(key: key);
+  const SendPosts({Key? key, required this.apiService}) : super(key: key);
 
   @override
-  State<sendPosts> createState() => _sendPostsState();
+  State<SendPosts> createState() => _SendPostsState();
 }
 
-class _sendPostsState extends State<sendPosts> {
+class _SendPostsState extends State<SendPosts> {
   final TextEditingController _captionController = TextEditingController();
   final FocusNode _captionFocus = FocusNode();
   final List<String> _selectedFiles = [];
@@ -671,8 +671,8 @@ class _sendPostsState extends State<sendPosts> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => WillPopScope(
-        onWillPop: () async => false,
+      builder: (_) => PopScope(
+        canPop: false,
         child: Center(
           child: Container(
             padding: const EdgeInsets.all(28),

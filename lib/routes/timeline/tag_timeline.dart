@@ -51,10 +51,15 @@ class _TagTimelineState extends State<TagTimeline> {
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
             color: Theme.of(context).scaffoldBackgroundColor,
-            image: const DecorationImage(
-              image: NetworkImage("https://img.freepik.com/free-vector/dark-hexagonal-background-with-gradient-color_79603-1409.jpg"), // Hex grid pattern
-              fit: BoxFit.cover,
-              opacity: 0.2, // Subtle background texture
+            // Subtle hex pattern replaced with gradient (no external images)
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                const Color(0xFF0A0A0F),
+                const Color(0xFF0D0D15),
+                const Color(0xFF0A0A0F),
+              ],
             ),
         ),
         child: Scaffold(
