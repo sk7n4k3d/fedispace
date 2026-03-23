@@ -72,7 +72,7 @@ dependencies:
   dropdown_search: ^6.0.2
   intro_slider: ^4.2.5
   image_editor_plus: ^0.2.6
-  logger: ^2.0.2+1
+  logger: ^2.7.0
   timeago: ^3.5.0
   image_picker: ^1.0.7
   google_fonts: ^8.0.1
