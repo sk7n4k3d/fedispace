@@ -9,6 +9,12 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/sk7n4k3d/fedispace/actions/workflows/ci.yml"><img src="https://github.com/sk7n4k3d/fedispace/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <img src="https://img.shields.io/badge/Flutter-3.41-blue" alt="Flutter">
+  <img src="https://img.shields.io/badge/License-MIT-green" alt="License">
+</p>
+
+<p align="center">
   <a href="https://github.com/nathan-skynet/fedispace/releases"><img src="https://img.shields.io/github/v/release/nathan-skynet/fedispace?style=for-the-badge&color=00d4ff&labelColor=0a0e1a" alt="Release"></a>
   <a href="https://github.com/nathan-skynet/fedispace/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge&color=00d4ff&labelColor=0a0e1a" alt="License"></a>
   <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white&labelColor=0a0e1a" alt="Flutter"></a>
@@ -161,7 +167,7 @@ Full multi-language support with **16 languages**:
 ## 📦 Installation
 
 ### Prerequisites
-- Flutter SDK `>=2.18.0`
+- Flutter SDK `>=3.0.0`
 - Android SDK (API 21+)
 - A Pixelfed instance account
 

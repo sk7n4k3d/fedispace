@@ -1,0 +1,9 @@
+- Fix critical crashes (NodeInfo, notification parsing)
+- Add block and report user functionality
+- Add bookmark removal
+- Complete UnifiedPush server registration
+- Parse push notification messages by type
+- Navigate to comments from bookmarks and liked posts
+- 26 bug fixes (security, null safety, memory, performance)
+- 75 unit tests added
+- CI/CD with GitHub Actions
