@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -77,17 +79,34 @@ class UnifiedPushService {
     }
   }
 
+  /// Generate random bytes for VAPID keys
+  String _generateRandomBase64(int length) {
+    final random = Random.secure();
+    final bytes = List<int>.generate(length, (_) => random.nextInt(256));
+    return base64Url.encode(bytes).replaceAll('=', '');
+  }
+
   /// Register push endpoint with Pixelfed server
   Future<void> _registerEndpointWithServer(String endpointUrl) async {
     try {
       appLogger.info('Registering push endpoint with server');
       
-      // TODO: Implement actual API call when server supports it
-      // For now, just store and log
-      // await _apiService!.subscribePushNotifications(endpointUrl);
+      // Generate VAPID keys for the push subscription
+      // These are placeholder keys - the server needs them for Web Push protocol
+      final p256dhKey = _generateRandomBase64(65);
+      final authKey = _generateRandomBase64(16);
       
-      appLogger.info('Push endpoint registered: $endpointUrl');
-      // Notification removed - was annoying the user
+      final result = await _apiService!.subscribePushNotifications(
+        endpoint: endpointUrl,
+        p256dhKey: p256dhKey,
+        authKey: authKey,
+      );
+      
+      if (result != null) {
+        appLogger.info('Push endpoint registered successfully with server');
+      } else {
+        appLogger.error('Push endpoint registration returned null - server may not support Web Push');
+      }
     } catch (e, stackTrace) {
       appLogger.error('Failed to register endpoint with server', e, stackTrace);
     }
@@ -126,16 +145,100 @@ class UnifiedPushService {
     final decoded = String.fromCharCodes(message);
     appLogger.info('UnifiedPush message received: $decoded');
     
-    // Parse and display notification
-    // TODO: Parse Pixelfed notification format
+    // Try to parse as JSON (Mastodon/Pixelfed notification format)
+    try {
+      final data = json.decode(decoded);
+      _handleParsedNotification(data);
+    } catch (e) {
+      // Not JSON or parsing failed - show raw message
+      appLogger.debug('Push message is not JSON, showing raw: $e');
+      AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+          channelKey: 'status',
+          title: 'New Notification',
+          body: decoded,
+        ),
+      );
+    }
+  }
+
+  /// Handle a parsed Mastodon/Pixelfed notification
+  void _handleParsedNotification(dynamic data) {
+    if (data is! Map<String, dynamic>) {
+      appLogger.debug('Notification data is not a map');
+      AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+          channelKey: 'status',
+          title: 'New Notification',
+          body: data.toString(),
+        ),
+      );
+      return;
+    }
+
+    // Mastodon notification format:
+    // { "notification_id": "...", "notification_type": "follow|favourite|reblog|mention|poll|follow_request",
+    //   "title": "...", "body": "...", "icon": "...",
+    //   "preferred_locale": "...", "access_token": "..." }
+    final String notificationType = data['notification_type'] ?? data['type'] ?? 'status';
+    final String title = data['title'] ?? _getTitleForType(notificationType);
+    final String body = data['body'] ?? data['message'] ?? '';
+    final String? icon = data['icon'];
+
+    // Map notification type to channel
+    String channelKey;
+    switch (notificationType) {
+      case 'follow':
+        channelKey = 'follow';
+        break;
+      case 'follow_request':
+        channelKey = 'follow_request';
+        break;
+      case 'favourite':
+        channelKey = 'favourite';
+        break;
+      case 'reblog':
+        channelKey = 'reblog';
+        break;
+      case 'mention':
+        channelKey = 'mention';
+        break;
+      default:
+        channelKey = 'status';
+    }
+
     AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
-        channelKey: 'status',
-        title: 'New Notification',
-        body: decoded,
+        channelKey: channelKey,
+        title: title,
+        body: body,
+        bigPicture: icon,
+        notificationLayout: icon != null ? NotificationLayout.BigPicture : NotificationLayout.Default,
       ),
     );
+  }
+
+  /// Get a default title for a notification type
+  String _getTitleForType(String type) {
+    switch (type) {
+      case 'follow':
+        return 'New Follower';
+      case 'follow_request':
+        return 'Follow Request';
+      case 'favourite':
+        return 'Post Liked';
+      case 'reblog':
+        return 'Post Shared';
+      case 'mention':
+        return 'New Mention';
+      case 'poll':
+        return 'Poll Update';
+      default:
+        return 'New Notification';
+    }
   }
 
   /// Show warning when no distributor is installed

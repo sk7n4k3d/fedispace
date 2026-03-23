@@ -2938,6 +2938,66 @@ class ApiService {
     }
   }
 
+
+  /// Subscribe to push notifications via Web Push API
+  /// POST /api/v1/push/subscription
+  Future<Map<String, dynamic>?> subscribePushNotifications({
+    required String endpoint,
+    required String p256dhKey,
+    required String authKey,
+  }) async {
+    final apiUrl = "${instanceUrl!}/api/v1/push/subscription";
+
+    final body = {
+      'subscription[endpoint]': endpoint,
+      'subscription[keys][p256dh]': p256dhKey,
+      'subscription[keys][auth]': authKey,
+      'data[alerts][follow]': 'true',
+      'data[alerts][favourite]': 'true',
+      'data[alerts][reblog]': 'true',
+      'data[alerts][mention]': 'true',
+      'data[alerts][poll]': 'true',
+      'data[alerts][follow_request]': 'true',
+    };
+
+    appLogger.apiCall('POST', '/api/v1/push/subscription', params: body);
+
+    try {
+      final response = await helper!.post(
+        apiUrl,
+        body: body,
+        httpClient: httpClient,
+      );
+
+      appLogger.apiResponse('/api/v1/push/subscription', response.statusCode, body: response.body);
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      }
+      appLogger.error('Push subscription failed with status ${response.statusCode}');
+      return null;
+    } catch (e, stackTrace) {
+      appLogger.error('Error subscribing to push notifications', e, stackTrace);
+      return null;
+    }
+  }
+
+  /// Delete push notification subscription
+  /// DELETE /api/v1/push/subscription
+  Future<bool> deletePushSubscription() async {
+    try {
+      final resp = await helper!.delete(
+        "${instanceUrl!}/api/v1/push/subscription",
+        httpClient: httpClient,
+      );
+      appLogger.apiCall('DELETE', '/api/v1/push/subscription');
+      return resp.statusCode == 200;
+    } catch (e, s) {
+      appLogger.error('Error deleting push subscription', e, s);
+      return false;
+    }
+  }
+
   /// Revokes all API service credentials & state variables from the
   /// device's secure storage, and sets their values as `null` in the
   /// instance.

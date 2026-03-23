@@ -166,14 +166,13 @@ class _UserProfilePageState extends State<UserProfilePage>
             icon: const Icon(Icons.more_vert),
             onSelected: (value) async {
               if (value == 'block') {
-                 // TODO: Implement block API call
-                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).block)));
+                 await widget.apiService.blockUser(widget.userId);
+                 if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).block)));
               } else if (value == 'mute') {
                  await widget.apiService.muteUser(widget.userId);
                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).mute)));
               } else if (value == 'report') {
-                 // TODO: Implement report API call
-                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).report)));
+                 _showReportDialog();
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
