@@ -261,6 +261,15 @@ class UnifiedPushService {
 
   /// Unregister from push notifications
   Future<void> unregister() async {
+    // Also delete server-side push subscription
+    if (_apiService != null) {
+      try {
+        await _apiService!.deletePushSubscription();
+        appLogger.info('Server-side push subscription deleted');
+      } catch (e) {
+        appLogger.error('Failed to delete server push subscription', e);
+      }
+    }
     await UnifiedPush.unregister(instance);
     appLogger.info('UnifiedPush unregistration requested');
   }

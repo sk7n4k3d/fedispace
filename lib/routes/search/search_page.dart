@@ -36,6 +36,8 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
   List<Map<String, dynamic>> _trendingHashtags = [];
   List<AccountUsers> _suggestions = [];
   bool _isLoadingDiscover = true;
+  List<Map<String, dynamic>> _followedTags = [];
+  List<Status> _networkTrending = [];
 
   late AnimationController _pulseController;
 
@@ -66,6 +68,8 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
         widget.apiService.discoverPopularAccounts(limit: 10).catchError((e) { appLogger.error('Error loading popular accounts', e); return <Account>[]; }),
         widget.apiService.discoverTrendingHashtags(limit: 10).catchError((e) { appLogger.error('Error loading trending hashtags', e); return <Map<String, dynamic>>[]; }),
         widget.apiService.getSuggestions(limit: 8).catchError((e) { appLogger.error('Error loading suggestions', e); return <Account>[]; }),
+        widget.apiService.getFollowedTags(limit: 20).catchError((e) { appLogger.error('Error loading followed tags', e); return <Map<String, dynamic>>[]; }),
+        widget.apiService.discoverNetworkTrending(limit: 20).catchError((e) { appLogger.error('Error loading network trending', e); return <Status>[]; }),
       ]);
 
       final trending = results[0] as List<Status>;
@@ -73,6 +77,8 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
       final popularAccounts = results[2] as List<Account>;
       final hashtags = results[3] as List<Map<String, dynamic>>;
       final suggestionAccounts = results[4] as List<Account>;
+      final followedTags = results[5] as List<Map<String, dynamic>>;
+      final networkTrending = results[6] as List<Status>;
 
       final popular = popularAccounts.map((a) => AccountUsers(
         id: a.id ?? '',
@@ -111,6 +117,8 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
         _popularAccounts = popular;
         _trendingHashtags = hashtags;
         _suggestions = suggestions;
+        _followedTags = followedTags;
+        _networkTrending = networkTrending;
         _isLoadingDiscover = false;
       });
     } catch (e, s) {
@@ -202,7 +210,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
   }
 
   void _navigateToHashtag(String tag) {
-    Navigator.pushNamed(context, '/HashtagTimeline', arguments: {'tag': tag});
+    Navigator.pushNamed(context, '/TagTimeline', arguments: {'tag': tag});
   }
 
   @override
@@ -515,8 +523,10 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
     final hasPopular = _popularAccounts.isNotEmpty;
     final hasHashtags = _trendingHashtags.isNotEmpty;
     final hasSuggestions = _suggestions.isNotEmpty;
+    final hasFollowedTags = _followedTags.isNotEmpty;
+    final hasNetworkTrending = _networkTrending.isNotEmpty;
 
-    if (!hasTrending && !hasDiscover && !hasPopular && !hasHashtags && !hasSuggestions) {
+    if (!hasTrending && !hasDiscover && !hasPopular && !hasHashtags && !hasSuggestions && !hasFollowedTags && !hasNetworkTrending) {
       return _buildEmptyState();
     }
 
@@ -527,6 +537,33 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
         children: [
+          // Followed Tags
+          if (hasFollowedTags) ...[
+            _sectionHeader('Your Tags', Icons.bookmark_outline_rounded),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _followedTags.take(12).map((t) {
+                final name = t['name'] ?? '';
+                return GestureDetector(
+                  onTap: () => Navigator.pushNamed(context, '/TagTimeline', arguments: {'tag': name}),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [CyberpunkTheme.neonPink.withOpacity(0.15), CyberpunkTheme.neonCyan.withOpacity(0.1)],
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: CyberpunkTheme.neonPink.withOpacity(0.3)),
+                    ),
+                    child: Text('#$name', style: const TextStyle(color: CyberpunkTheme.neonPink, fontSize: 13, fontWeight: FontWeight.w600)),
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 20),
+          ],
+
           // Trending Hashtags
           if (hasHashtags) ...[
             _sectionHeader('Trending Hashtags', Icons.tag_rounded),
@@ -598,6 +635,13 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
           if (hasTrending) ...[
              _sectionHeader(S.of(context).explore, Icons.trending_up_rounded),
             _buildPostGrid(_trendingPosts.take(9).toList()),
+            const SizedBox(height: 20),
+          ],
+
+          // Network Trending
+          if (hasNetworkTrending) ...[
+            _sectionHeader('Network Trending', Icons.public_rounded),
+            _buildPostGrid(_networkTrending.take(9).toList()),
             const SizedBox(height: 20),
           ],
 

@@ -43,6 +43,98 @@ class _CollectionsPageState extends State<CollectionsPage> {
     if (mounted) setState(() => _isLoading = false);
   }
 
+  void _showCollectionOptions(String collectionId, String currentTitle) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: CyberpunkTheme.surfaceDark,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(width: 40, height: 4, margin: const EdgeInsets.symmetric(vertical: 12), decoration: BoxDecoration(color: CyberpunkTheme.textTertiary, borderRadius: BorderRadius.circular(2))),
+            ListTile(
+              leading: const Icon(Icons.edit_outlined, color: CyberpunkTheme.textWhite),
+              title: const Text('Rename collection', style: TextStyle(color: CyberpunkTheme.textWhite)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _showRenameDialog(collectionId, currentTitle);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_outline, color: Colors.red),
+              title: const Text('Delete collection', style: TextStyle(color: Colors.red)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _showDeleteConfirm(collectionId);
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showRenameDialog(String collectionId, String currentTitle) {
+    final controller = TextEditingController(text: currentTitle);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: CyberpunkTheme.surfaceDark,
+        title: const Text('Rename collection', style: TextStyle(color: CyberpunkTheme.textWhite)),
+        content: TextField(
+          controller: controller,
+          style: const TextStyle(color: CyberpunkTheme.textWhite),
+          decoration: InputDecoration(
+            hintText: 'Collection name',
+            hintStyle: TextStyle(color: CyberpunkTheme.textTertiary),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(S.of(context).cancel)),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final ok = await widget.apiService.updateCollection(collectionId, title: controller.text.trim());
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(ok ? S.of(context).success : S.of(context).error)));
+                if (ok) _loadCollections();
+              }
+            },
+            child: Text(S.of(context).save, style: const TextStyle(color: CyberpunkTheme.neonCyan)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteConfirm(String collectionId) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: CyberpunkTheme.surfaceDark,
+        title: const Text('Delete collection?', style: TextStyle(color: CyberpunkTheme.textWhite)),
+        content: const Text('This cannot be undone.', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(S.of(context).cancel)),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final ok = await widget.apiService.deleteCollection(collectionId);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(ok ? S.of(context).success : S.of(context).error)));
+                if (ok) _loadCollections();
+              }
+            },
+            child: Text(S.of(context).delete, style: const TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,6 +173,7 @@ class _CollectionsPageState extends State<CollectionsPage> {
 
                       return GestureDetector(
                         onTap: () => _openCollection(col['id'].toString(), title),
+                        onLongPress: () => _showCollectionOptions(col['id'].toString(), title),
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 12),
                           decoration: BoxDecoration(
@@ -145,16 +238,22 @@ class _CollectionsPageState extends State<CollectionsPage> {
   }
 
   void _openCollection(String collectionId, String title) async {
+    // Load metadata via viewCollection and items
+    final meta = await widget.apiService.viewCollection(collectionId);
     final items = await widget.apiService.getCollectionItems(collectionId);
     if (!mounted) return;
 
+    final finalTitle = meta?['title'] ?? title;
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => _CollectionDetailPage(
-          title: title,
+          collectionId: collectionId,
+          title: finalTitle,
+          description: meta?['description'] ?? '',
           items: items,
           apiService: widget.apiService,
+          onUpdated: _loadCollections,
         ),
       ),
     );
@@ -163,11 +262,14 @@ class _CollectionsPageState extends State<CollectionsPage> {
 
 /// Detail view for a collection — shows grid of posts
 class _CollectionDetailPage extends StatelessWidget {
+  final String collectionId;
   final String title;
+  final String description;
   final List<Status> items;
   final ApiService apiService;
+  final VoidCallback? onUpdated;
 
-  const _CollectionDetailPage({required this.title, required this.items, required this.apiService});
+  const _CollectionDetailPage({required this.collectionId, required this.title, this.description = '', required this.items, required this.apiService, this.onUpdated});
 
   @override
   Widget build(BuildContext context) {

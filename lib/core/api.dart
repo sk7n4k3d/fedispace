@@ -49,6 +49,16 @@ class ApiService {
 
   http.Client httpClient = http.Client();
 
+  /// Cached custom emojis for the instance
+  List<Map<String, dynamic>>? _cachedCustomEmojis;
+
+  /// Get cached custom emojis, fetching if needed
+  Future<List<Map<String, dynamic>>> getCachedCustomEmojis() async {
+    if (_cachedCustomEmojis != null) return _cachedCustomEmojis!;
+    _cachedCustomEmojis = await getCustomEmojis();
+    return _cachedCustomEmojis!;
+  }
+
   /// Close the HTTP client to free resources
   void dispose() {
     httpClient.close();
@@ -144,7 +154,7 @@ class ApiService {
   /// 
   /// SECURITY: Fixed hardcoded values and improved error handling
   Future<int?> apiPostMedia(String description, List<String> filenames,
-      {bool sensitive = false, String visibility = 'public'}) async {
+      {bool sensitive = false, String visibility = 'public', Map<int, String>? altTexts}) async {
     try {
       List<String> mediaIds = [];
       final uri = Uri.parse('${instanceUrl!}/api/v2/media');
@@ -1769,32 +1779,7 @@ class ApiService {
 
   /// Publish a story (after uploading via createStory)
   /// POST /api/web/stories/v1/publish
-  Future<bool> publishStory({required String mediaId, int duration = 10, bool canReply = true, bool canReact = true}) async {
-    try {
-      final tokenResponse = await helper!.getTokenFromStorage();
-      final token = tokenResponse?.accessToken;
-      if (token == null) throw AuthenticationException('No access token');
-
-      final resp = await httpClient.post(
-        Uri.parse('${instanceUrl!}/api/v1.1/stories/publish'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({
-          'media_id': mediaId,
-          'duration': duration,
-          'can_reply': canReply,
-          'can_react': canReact,
-        }),
-      );
-      appLogger.apiCall('POST', '/api/v1.1/stories/publish', params: {'media_id': mediaId, 'duration': duration});
-      return resp.statusCode == 200;
-    } catch (e, s) {
-      appLogger.error('Error publishing story', e, s);
-      return false;
-    }
-  }
+  // publishStory removed — duplicate of createStory
 
   /// Translate text using OpenAI-compatible API
   /// Reads config from SharedPreferences
@@ -2073,20 +2058,7 @@ class ApiService {
 
   /// Get general trends
   /// GET /api/v1/trends
-  Future<List<Map<String, dynamic>>> getTrends() async {
-    try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1/trends');
-      appLogger.apiCall('GET', '/api/v1/trends');
-      if (resp.statusCode == 200) {
-        final List<dynamic> data = json.decode(resp.body);
-        return data.cast<Map<String, dynamic>>();
-      }
-      return [];
-    } catch (e, s) {
-      appLogger.error('Error fetching trends', e, s);
-      return [];
-    }
-  }
+  // getTrends removed — duplicate of discoverTrendingHashtags
 
   /// Get follow suggestions
   /// GET /api/v1/suggestions
@@ -2317,22 +2289,7 @@ class ApiService {
     }
   }
 
-  /// Get own story carousel
-  /// GET /api/v1.1/stories/self-carousel
-  Future<List<Map<String, dynamic>>> getSelfCarousel() async {
-    try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1.1/stories/self-carousel');
-      appLogger.apiCall('GET', '/api/v1.1/stories/self-carousel');
-      if (resp.statusCode == 200) {
-        final decoded = json.decode(resp.body);
-        if (decoded is List) return decoded.cast<Map<String, dynamic>>();
-      }
-      return [];
-    } catch (e, s) {
-      appLogger.error('Error fetching self carousel', e, s);
-      return [];
-    }
-  }
+  // getSelfCarousel removed — redundant with getStoryCarousel
 
   // ╔══════════════════════════════════════════════════════════════╗
   // ║  BATCH 7 — Collections                                     ║

@@ -35,6 +35,7 @@ class _UserProfilePageState extends State<UserProfilePage>
   bool _isLoading = true;
   bool _isLoadingPosts = false;
   bool _isFollowing = false;
+  bool _isPinned = false;
   
   late TabController _tabController;
   int _currentTab = 0;
@@ -61,6 +62,7 @@ class _UserProfilePageState extends State<UserProfilePage>
         final rels = await widget.apiService.getRelationships([widget.userId]);
         if (rels.isNotEmpty) {
           following = rels[0]['following'] == true;
+          _isPinned = rels[0]['endorsed'] == true;
         }
       } catch (e) {
         appLogger.error('Error loading relationships', e);
@@ -420,18 +422,37 @@ class _UserProfilePageState extends State<UserProfilePage>
               decoration: BoxDecoration(color: CyberpunkTheme.textTertiary, borderRadius: BorderRadius.circular(2)),
             ),
             ListTile(
-              leading: Icon(Icons.push_pin_outlined, color: CyberpunkTheme.textWhite),
-              title: Text(S.of(context).follow, style: TextStyle(color: CyberpunkTheme.textWhite)),
+              leading: Icon(_isPinned ? Icons.push_pin : Icons.push_pin_outlined, color: CyberpunkTheme.textWhite),
+              title: Text(_isPinned ? 'Unpin account' : 'Pin account', style: TextStyle(color: CyberpunkTheme.textWhite)),
               onTap: () async {
                 Navigator.pop(ctx);
-                final ok = await widget.apiService.pinAccount(widget.userId);
+                final ok = _isPinned
+                    ? await widget.apiService.unpinAccount(widget.userId)
+                    : await widget.apiService.pinAccount(widget.userId);
                 if (mounted) {
+                  if (ok) setState(() => _isPinned = !_isPinned);
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text(ok ? S.of(context).success : S.of(context).error, style: const TextStyle(color: Colors.white)),
                     backgroundColor: ok ? CyberpunkTheme.neonCyan.withOpacity(0.8) : Colors.red,
                     behavior: SnackBarBehavior.floating,
                   ));
                 }
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.star_outline, color: CyberpunkTheme.textWhite),
+              title: Text('Endorsements', style: TextStyle(color: CyberpunkTheme.textWhite)),
+              onTap: () async {
+                Navigator.pop(ctx);
+                _showEndorsements();
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.list_outlined, color: CyberpunkTheme.textWhite),
+              title: Text('Lists', style: TextStyle(color: CyberpunkTheme.textWhite)),
+              onTap: () async {
+                Navigator.pop(ctx);
+                _showAccountLists();
               },
             ),
             ListTile(
@@ -490,6 +511,70 @@ class _UserProfilePageState extends State<UserProfilePage>
         ),
       ),
     );
+  }
+
+  void _showEndorsements() async {
+    try {
+      final endorsements = await widget.apiService.getEndorsements(limit: 40);
+      if (!mounted) return;
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: CyberpunkTheme.surfaceDark,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+        builder: (ctx) => SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(width: 40, height: 4, margin: const EdgeInsets.symmetric(vertical: 12), decoration: BoxDecoration(color: CyberpunkTheme.textTertiary, borderRadius: BorderRadius.circular(2))),
+              Padding(padding: const EdgeInsets.all(12), child: Text('Endorsements', style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 16, fontWeight: FontWeight.w700))),
+              if (endorsements.isEmpty)
+                Padding(padding: const EdgeInsets.all(24), child: Text('No endorsements', style: TextStyle(color: CyberpunkTheme.textSecondary)))
+              else
+                ...endorsements.take(20).map((a) => ListTile(
+                  leading: CircleAvatar(backgroundImage: a.avatar != null && a.avatar!.isNotEmpty ? NetworkImage(a.avatar!) : null, child: a.avatar == null || a.avatar!.isEmpty ? const Icon(Icons.person) : null),
+                  title: Text(a.display_name ?? a.username ?? '', style: const TextStyle(color: CyberpunkTheme.textWhite)),
+                  subtitle: Text('@${a.username ?? ''}', style: const TextStyle(color: CyberpunkTheme.textSecondary)),
+                  onTap: () { Navigator.pop(ctx); Navigator.pushNamed(context, '/UserProfile', arguments: {'userId': a.id}); },
+                )),
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
+      );
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).error)));
+    }
+  }
+
+  void _showAccountLists() async {
+    try {
+      final lists = await widget.apiService.getAccountLists(widget.userId);
+      if (!mounted) return;
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: CyberpunkTheme.surfaceDark,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+        builder: (ctx) => SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(width: 40, height: 4, margin: const EdgeInsets.symmetric(vertical: 12), decoration: BoxDecoration(color: CyberpunkTheme.textTertiary, borderRadius: BorderRadius.circular(2))),
+              Padding(padding: const EdgeInsets.all(12), child: Text('Lists', style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 16, fontWeight: FontWeight.w700))),
+              if (lists.isEmpty)
+                Padding(padding: const EdgeInsets.all(24), child: Text('Not in any lists', style: TextStyle(color: CyberpunkTheme.textSecondary)))
+              else
+                ...lists.take(20).map((l) => ListTile(
+                  leading: const Icon(Icons.list, color: CyberpunkTheme.neonCyan),
+                  title: Text(l['title'] ?? 'Untitled', style: const TextStyle(color: CyberpunkTheme.textWhite)),
+                )),
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
+      );
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).error)));
+    }
   }
 
   void _showReportDialog() {

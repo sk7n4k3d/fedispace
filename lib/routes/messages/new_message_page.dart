@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fedispace/core/api.dart';
+import 'package:fedispace/models/account.dart';
 import 'package:fedispace/core/logger.dart';
 import 'package:fedispace/l10n/app_localizations.dart';
 import 'package:fedispace/themes/cyberpunk_theme.dart';
@@ -20,6 +21,33 @@ class _NewMessagePageState extends State<NewMessagePage> {
   final TextEditingController _searchController = TextEditingController();
   final List<_UserSearchResult> _searchResults = [];
   bool _isSearching = false;
+  List<_UserSearchResult> _mutuals = [];
+  bool _isLoadingMutuals = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMutuals();
+  }
+
+  Future<void> _loadMutuals() async {
+    try {
+      final mutuals = await widget.apiService.getDmMutuals();
+      if (mounted) {
+        setState(() {
+          _mutuals = mutuals.map((a) => _UserSearchResult(
+            id: a.id ?? '',
+            username: a.username ?? '',
+            displayName: a.display_name ?? a.username ?? '',
+            avatarUrl: a.avatar,
+          )).toList();
+          _isLoadingMutuals = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() => _isLoadingMutuals = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -40,21 +68,40 @@ class _NewMessagePageState extends State<NewMessagePage> {
     });
 
     try {
-      appLogger.debug('Searching users: $query');
-      final results = await widget.apiService.searchAccounts(query);
-      
-      setState(() {
-        _isSearching = false;
-         _searchResults.clear();
-         for (var account in results) {
-           _searchResults.add(_UserSearchResult(
-             id: account.id,
-             username: account.username,
-             displayName: account.display_name,
-             avatarUrl: account.avatar.isNotEmpty ? account.avatar : null,
-           ));
-         }
-      });
+      appLogger.debug('Searching DM users: $query');
+      // Use lookupDmUser for DM-optimized search, fall back to searchAccounts
+      List<Account> results = [];
+      try {
+        results = await widget.apiService.lookupDmUser(query);
+      } catch (_) {}
+      if (results.isEmpty) {
+        final acctResults = await widget.apiService.searchAccounts(query);
+        setState(() {
+          _isSearching = false;
+          _searchResults.clear();
+          for (var account in acctResults) {
+            _searchResults.add(_UserSearchResult(
+              id: account.id,
+              username: account.username,
+              displayName: account.display_name,
+              avatarUrl: account.avatar.isNotEmpty ? account.avatar : null,
+            ));
+          }
+        });
+      } else {
+        setState(() {
+          _isSearching = false;
+          _searchResults.clear();
+          for (var account in results) {
+            _searchResults.add(_UserSearchResult(
+              id: account.id ?? '',
+              username: account.username ?? '',
+              displayName: account.display_name ?? account.username ?? '',
+              avatarUrl: (account.avatar != null && account.avatar!.isNotEmpty) ? account.avatar : null,
+            ));
+          }
+        });
+      }
     } catch (error, stackTrace) {
       appLogger.error('Error searching users', error, stackTrace);
       setState(() {
@@ -144,6 +191,43 @@ class _NewMessagePageState extends State<NewMessagePage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildMutualsSection(bool isDark) {
+    if (_isLoadingMutuals) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_mutuals.isEmpty) {
+      return Center(
+        child: Text(S.of(context).searchPeople, style: TextStyle(color: isDark ? Colors.white54 : Colors.black54, fontSize: 14)),
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Text('Mutual followers', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontWeight: FontWeight.w600, fontSize: 14)),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: _mutuals.length,
+            itemBuilder: (context, index) {
+              final user = _mutuals[index];
+              return ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: user.avatarUrl != null ? NetworkImage(user.avatarUrl!) : null,
+                  child: user.avatarUrl == null ? const Icon(Icons.person) : null,
+                ),
+                title: Text(user.displayName),
+                subtitle: Text('@${user.username}'),
+                onTap: () => _startConversation(user),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

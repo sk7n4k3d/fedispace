@@ -45,6 +45,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
   int _favoritesCount = 0;
 
   String? _replyToId;
+  bool _isPinned = false;
+  Map<String, dynamic>? _linkCard;
 
   @override
   void initState() {
@@ -54,6 +56,16 @@ class _PostDetailPageState extends State<PostDetailPage> {
     _favoritesCount = widget.post.favourites_count;
 
     _loadComments();
+    _loadLinkCard();
+  }
+
+  Future<void> _loadLinkCard() async {
+    try {
+      final card = await widget.apiService.getStatusCard(widget.post.id);
+      if (card != null && mounted) {
+        setState(() => _linkCard = card);
+      }
+    } catch (_) {}
   }
 
   Future<void> _loadComments() async {
@@ -164,12 +176,15 @@ class _PostDetailPageState extends State<PostDetailPage> {
               decoration: BoxDecoration(color: CyberpunkTheme.textTertiary, borderRadius: BorderRadius.circular(2)),
             ),
             if (isOwnPost) ...[
-              _optionTile(Icons.push_pin_outlined, 'Pin to profile', () async {
+              _optionTile(Icons.push_pin_outlined, _isPinned ? 'Unpin from profile' : 'Pin to profile', () async {
                 Navigator.pop(ctx);
-                final ok = await widget.apiService.pinStatus(widget.post.id);
+                final ok = _isPinned
+                    ? await widget.apiService.unpinStatus(widget.post.id)
+                    : await widget.apiService.pinStatus(widget.post.id);
                 if (mounted) {
+                  if (ok) setState(() => _isPinned = !_isPinned);
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(ok ? 'Pinned!' : 'Failed to pin', style: const TextStyle(color: Colors.white)),
+                    content: Text(ok ? (_isPinned ? 'Pinned!' : 'Unpinned!') : 'Failed', style: const TextStyle(color: Colors.white)),
                     backgroundColor: ok ? CyberpunkTheme.neonCyan.withOpacity(0.8) : Colors.red,
                     behavior: SnackBarBehavior.floating,
                   ));
@@ -247,6 +262,60 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 if (mounted && ok != null) Navigator.pop(context);
               }, color: CyberpunkTheme.neonPink),
             const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLinkCard() {
+    final title = _linkCard!['title'] ?? '';
+    final description = _linkCard!['description'] ?? '';
+    final imageUrl = _linkCard!['image'] ?? '';
+    final url = _linkCard!['url'] ?? '';
+    if (title.isEmpty && description.isEmpty) return const SizedBox.shrink();
+
+    return GestureDetector(
+      onTap: () {
+        if (url.isNotEmpty) launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: CyberpunkTheme.cardDark,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: CyberpunkTheme.borderDark),
+        ),
+        clipBehavior: Clip.hardEdge,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (imageUrl.isNotEmpty)
+              CachedNetworkImage(
+                imageUrl: imageUrl,
+                width: double.infinity,
+                height: 160,
+                fit: BoxFit.cover,
+                errorWidget: (_, __, ___) => const SizedBox.shrink(),
+              ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (title.isNotEmpty)
+                    Text(title, style: const TextStyle(color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w600, fontSize: 14), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  if (description.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(description, style: const TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 12), maxLines: 3, overflow: TextOverflow.ellipsis),
+                  ],
+                  if (url.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(Uri.tryParse(url)?.host ?? url, style: TextStyle(color: CyberpunkTheme.neonCyan.withOpacity(0.7), fontSize: 11)),
+                  ],
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -403,6 +472,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     _buildPostActions(),
                     _buildLikesCount(),
                     _buildPostCaption(),
+                    if (_linkCard != null) _buildLinkCard(),
                     _buildPostTime(),
                     _buildDivider(),
                     _buildCommentsSection(),

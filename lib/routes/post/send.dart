@@ -31,10 +31,12 @@ class _SendPostsState extends State<SendPosts> {
   final FocusNode _captionFocus = FocusNode();
   final List<String> _selectedFiles = [];
   final ImagePicker _imagePicker = ImagePicker();
+  final Map<int, String> _altTexts = {};
   bool _isSensitive = false;
   bool _isUploading = false;
   String _spoilerText = '';
   bool _isCreatingStory = false;
+  Map<String, dynamic>? _selectedLocation;
 
   @override
   void initState() {
@@ -945,6 +947,111 @@ class _SendPostsState extends State<SendPosts> {
     }
   }
 
+  void _showLocationPicker() {
+    final searchCtrl = TextEditingController();
+    List<Map<String, dynamic>> results = [];
+    bool searching = false;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: CyberpunkTheme.surfaceDark,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) => Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          child: SizedBox(
+            height: 400,
+            child: Column(
+              children: [
+                Container(width: 40, height: 4, margin: const EdgeInsets.symmetric(vertical: 12), decoration: BoxDecoration(color: CyberpunkTheme.textTertiary, borderRadius: BorderRadius.circular(2))),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: TextField(
+                    controller: searchCtrl,
+                    style: const TextStyle(color: CyberpunkTheme.textWhite),
+                    decoration: InputDecoration(
+                      hintText: 'Search locations...',
+                      hintStyle: TextStyle(color: CyberpunkTheme.textTertiary),
+                      prefixIcon: const Icon(Icons.search, color: CyberpunkTheme.textTertiary),
+                      filled: true,
+                      fillColor: CyberpunkTheme.cardDark,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    ),
+                    onChanged: (query) async {
+                      if (query.length < 2) return;
+                      setSheetState(() => searching = true);
+                      try {
+                        final locs = await widget.apiService.searchLocation(query);
+                        setSheetState(() { results = locs; searching = false; });
+                      } catch (_) {
+                        setSheetState(() => searching = false);
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (searching)
+                  const Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator(strokeWidth: 2, color: CyberpunkTheme.neonCyan))
+                else
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: results.length,
+                      itemBuilder: (ctx, i) {
+                        final loc = results[i];
+                        return ListTile(
+                          leading: const Icon(Icons.place, color: CyberpunkTheme.neonCyan),
+                          title: Text(loc['name'] ?? loc['slug'] ?? '', style: const TextStyle(color: CyberpunkTheme.textWhite)),
+                          subtitle: loc['country'] != null ? Text(loc['country'], style: const TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 12)) : null,
+                          onTap: () {
+                            Navigator.pop(ctx);
+                            setState(() => _selectedLocation = loc);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showAltTextDialog(int index) {
+    final controller = TextEditingController(text: _altTexts[index] ?? '');
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: CyberpunkTheme.surfaceDark,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Alt text', style: TextStyle(color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w600)),
+        content: TextField(
+          controller: controller,
+          style: const TextStyle(color: CyberpunkTheme.textWhite),
+          maxLines: 3,
+          decoration: InputDecoration(
+            hintText: 'Describe the image for accessibility...',
+            hintStyle: TextStyle(color: CyberpunkTheme.textTertiary),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: CyberpunkTheme.neonCyan)),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel', style: TextStyle(color: CyberpunkTheme.textSecondary))),
+          TextButton(
+            onPressed: () {
+              setState(() => _altTexts[index] = controller.text.trim());
+              Navigator.pop(ctx);
+            },
+            child: const Text('Save', style: TextStyle(color: CyberpunkTheme.neonCyan, fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+  }
+
   // ── Publish ──────────────────────────────────────────────────────
   Future<void> _publish() async {
     if (_selectedFiles.isEmpty) {
@@ -963,6 +1070,7 @@ class _SendPostsState extends State<SendPosts> {
       final result = await widget.apiService.apiPostMedia(
         _captionController.text.trim(),
         _selectedFiles,
+        altTexts: _altTexts.isNotEmpty ? _altTexts : null,
       );
       if (result != null && result > 0) {
         if (mounted) Navigator.of(context).pop(true);
@@ -1257,6 +1365,32 @@ class _SendPostsState extends State<SendPosts> {
                                       ),
                                     ),
                                   ),
+                                  // ALT text button
+                                  Positioned(
+                                    top: 8,
+                                    left: 8,
+                                    child: GestureDetector(
+                                      onTap: () => _showAltTextDialog(index),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: _altTexts[index]?.isNotEmpty == true
+                                              ? CyberpunkTheme.neonCyan.withOpacity(0.8)
+                                              : Colors.black.withOpacity(0.6),
+                                          borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(color: Colors.white.withOpacity(0.2)),
+                                        ),
+                                        child: Text(
+                                          'ALT',
+                                          style: TextStyle(
+                                            color: _altTexts[index]?.isNotEmpty == true ? Colors.black : Colors.white70,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                   // Photo editor button (crop/rotate)
                                   Positioned(
                                     bottom: 8,
@@ -1481,6 +1615,55 @@ class _SendPostsState extends State<SendPosts> {
               ),
               child: Column(
                 children: [
+                  // Location picker
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                    child: GestureDetector(
+                      onTap: _showLocationPicker,
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: (_selectedLocation != null ? CyberpunkTheme.neonCyan : CyberpunkTheme.textTertiary).withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.location_on_outlined,
+                              size: 18,
+                              color: _selectedLocation != null ? CyberpunkTheme.neonCyan : CyberpunkTheme.textTertiary,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              _selectedLocation != null
+                                  ? (_selectedLocation!['name'] ?? _selectedLocation!['slug'] ?? 'Location set')
+                                  : 'Add location',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: _selectedLocation != null ? CyberpunkTheme.neonCyan : CyberpunkTheme.textWhite,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (_selectedLocation != null)
+                            GestureDetector(
+                              onTap: () => setState(() => _selectedLocation = null),
+                              child: const Icon(Icons.close, size: 16, color: CyberpunkTheme.textTertiary),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 0.5,
+                    margin: const EdgeInsets.symmetric(horizontal: 18),
+                    color: CyberpunkTheme.borderDark,
+                  ),
+
                   // NSFW Toggle
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),

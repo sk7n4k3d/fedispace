@@ -29,6 +29,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     _initNotifications();
     _loadProfileImage();
+    // Pre-cache custom emojis for the instance
+    widget.apiService.getCachedCustomEmojis();
   }
 
   @override

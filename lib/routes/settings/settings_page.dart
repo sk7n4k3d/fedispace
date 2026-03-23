@@ -90,10 +90,27 @@ class _SettingsPageState extends State<SettingsPage> {
     'nanobanano': 'https://kie.ai',
   };
 
+  Map<String, dynamic>? _serverPreferences;
+  List<Map<String, dynamic>> _announcements = [];
+
   @override
   void initState() {
     super.initState();
     _loadAiConfig();
+    _loadServerData();
+  }
+
+  Future<void> _loadServerData() async {
+    try {
+      final prefs = await widget.apiService.getPreferences();
+      final announcements = await widget.apiService.getAnnouncements();
+      if (mounted) {
+        setState(() {
+          _serverPreferences = prefs;
+          _announcements = announcements;
+        });
+      }
+    } catch (_) {}
   }
 
   static const _secureStorage = FlutterSecureStorage();
@@ -357,6 +374,33 @@ class _SettingsPageState extends State<SettingsPage> {
             const SizedBox(height: 12),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showAnnouncementDialog(Map<String, dynamic> announcement) {
+    final text = announcement['content']?.toString().replaceAll(RegExp(r'<[^>]*>'), '') ?? '';
+    final publishedAt = announcement['published_at'] ?? '';
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: CyberpunkTheme.cardDark,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Announcement', style: TextStyle(color: CyberpunkTheme.neonCyan, fontWeight: FontWeight.w700)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(text, style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 14)),
+            if (publishedAt.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Text(publishedAt, style: const TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 11)),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(S.of(context).close, style: const TextStyle(color: CyberpunkTheme.neonCyan))),
+        ],
       ),
     );
   }
@@ -1049,6 +1093,39 @@ class _SettingsPageState extends State<SettingsPage> {
             onTap: _showAppLanguagePicker,
           ),
           _divider(),
+
+          // Announcements
+          if (_announcements.isNotEmpty) ...[
+            _sectionHeader('Announcements'),
+            ..._announcements.take(5).map((a) => _settingsItem(
+              icon: Icons.campaign_outlined,
+              title: a['content']?.toString().replaceAll(RegExp(r'<[^>]*>'), '') ?? 'Announcement',
+              subtitle: a['published_at'] ?? '',
+              onTap: () => _showAnnouncementDialog(a),
+            )),
+            _divider(),
+          ],
+
+          // Server preferences
+          if (_serverPreferences != null) ...[
+            _sectionHeader('Server Preferences'),
+            _settingsItem(
+              icon: Icons.language_rounded,
+              title: 'Posting language',
+              subtitle: _serverPreferences!['posting:default:language']?.toString() ?? 'Not set',
+            ),
+            _settingsItem(
+              icon: Icons.visibility_outlined,
+              title: 'Default visibility',
+              subtitle: _serverPreferences!['posting:default:visibility']?.toString() ?? 'public',
+            ),
+            _settingsItem(
+              icon: Icons.warning_outlined,
+              title: 'Default sensitive',
+              subtitle: _serverPreferences!['posting:default:sensitive'] == true ? 'Yes' : 'No',
+            ),
+            _divider(),
+          ],
 
            _sectionHeader(S.of(context).about),
           _settingsItem(
