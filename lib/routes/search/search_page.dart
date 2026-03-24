@@ -7,8 +7,10 @@ import 'package:fedispace/models/account.dart';
 import 'package:fedispace/models/accountUsers.dart';
 import 'package:fedispace/models/status.dart';
 import 'package:fedispace/themes/cyberpunk_theme.dart';
+import 'package:fedispace/widgets/skeleton_loading.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:fedispace/routes/search/explore_grid.dart';
 
 class SearchPage extends StatefulWidget {
   final ApiService apiService;
@@ -40,6 +42,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
   bool _isLoadingDiscover = true;
   List<Map<String, dynamic>> _followedTags = [];
   List<Status> _networkTrending = [];
+  bool _isGridView = false;
 
   late AnimationController _pulseController;
 
@@ -290,6 +293,31 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
                           ],
                         ),
                       ),
+                      const Spacer(),
+                      // Grid/List toggle
+                      GestureDetector(
+                        onTap: () => setState(() => _isGridView = !_isGridView),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: _isGridView
+                                ? CyberpunkTheme.neonCyan.withOpacity(0.12)
+                                : CyberpunkTheme.cardDark,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: _isGridView
+                                  ? CyberpunkTheme.neonCyan.withOpacity(0.3)
+                                  : CyberpunkTheme.borderDark,
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Icon(
+                            _isGridView ? Icons.grid_view_rounded : Icons.view_list_rounded,
+                            color: _isGridView ? CyberpunkTheme.neonCyan : CyberpunkTheme.textSecondary,
+                            size: 20,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -360,7 +388,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
                 const SizedBox(height: 4),
 
                 // Results or Discover
-                Expanded(child: _hasSearched ? _buildSearchResults() : _buildDiscoverContent()),
+                Expanded(child: _hasSearched ? _buildSearchResults() : (_isGridView ? ExploreGrid(apiService: widget.apiService) : _buildDiscoverContent())),
               ],
             ),
           ),

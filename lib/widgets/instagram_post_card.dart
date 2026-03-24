@@ -61,7 +61,7 @@ class _InstagramPostCardState extends State<InstagramPostCard>
     _isBookmarked = widget.status.reblogged;
 
     _likeAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
     _likeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -90,6 +90,7 @@ class _InstagramPostCardState extends State<InstagramPostCard>
   }
 
   void _handleDoubleTap() {
+    HapticFeedback.mediumImpact();
     if (!_isFavorited) {
       _likeAnimationController.forward(from: 0.0);
       widget.onLike?.call();
@@ -97,6 +98,9 @@ class _InstagramPostCardState extends State<InstagramPostCard>
          _isFavorited = true;
          _favouritesCount++;
       });
+    } else {
+      // Still show heart animation even if already liked
+      _likeAnimationController.forward(from: 0.0);
     }
   }
 
@@ -346,15 +350,18 @@ class _InstagramPostCardState extends State<InstagramPostCard>
               ),
               child: Padding(
                 padding: const EdgeInsets.all(2),
-                child: CircleAvatar(
-                  radius: 16,
-                  backgroundColor: CyberpunkTheme.cardDark,
-                  backgroundImage: widget.status.avatar.isNotEmpty
-                      ? CachedNetworkImageProvider(widget.status.avatar)
-                      : null,
-                  child: widget.status.avatar.isEmpty
-                      ? const Icon(Icons.person, size: 16, color: CyberpunkTheme.textTertiary)
-                      : null,
+                child: Hero(
+                  tag: 'avatar_${widget.status.account.id}',
+                  child: CircleAvatar(
+                    radius: 16,
+                    backgroundColor: CyberpunkTheme.cardDark,
+                    backgroundImage: widget.status.avatar.isNotEmpty
+                        ? CachedNetworkImageProvider(widget.status.avatar)
+                        : null,
+                    child: widget.status.avatar.isEmpty
+                        ? const Icon(Icons.person, size: 16, color: CyberpunkTheme.textTertiary)
+                        : null,
+                  ),
                 ),
               ),
             ),
@@ -402,7 +409,9 @@ class _InstagramPostCardState extends State<InstagramPostCard>
       child: Stack(
         alignment: Alignment.center,
         children: [
-          AspectRatio(
+          Hero(
+            tag: 'post_image_${widget.status.id}',
+            child: AspectRatio(
             aspectRatio: 1.0,
             child: CachedNetworkImage(
               imageUrl: widget.status.attach,
@@ -417,22 +426,39 @@ class _InstagramPostCardState extends State<InstagramPostCard>
               ),
             ),
           ),
+          ),
           AnimatedBuilder(
             animation: _likeAnimation,
             builder: (context, child) {
-              return _likeAnimation.value > 0
-                  ? Opacity(
-                      opacity: 1.0 - _likeAnimation.value,
-                      child: Transform.scale(
-                        scale: 0.5 + (_likeAnimation.value * 1.5),
-                        child: Icon(
-                          Icons.favorite,
-                          color: CyberpunkTheme.neonPink.withOpacity(0.9),
-                          size: 100,
-                        ),
-                      ),
-                    )
-                  : const SizedBox.shrink();
+              if (_likeAnimation.value == 0) return const SizedBox.shrink();
+              // Scale: 0 -> 1.2 (at 40%) -> 1.0 (at 60%) -> 1.0 (hold) -> fade out
+              final progress = _likeAnimation.value;
+              double scale;
+              double opacity;
+              if (progress < 0.3) {
+                // Scale up to 1.2
+                scale = (progress / 0.3) * 1.2;
+                opacity = 1.0;
+              } else if (progress < 0.5) {
+                // Settle from 1.2 to 1.0
+                scale = 1.2 - ((progress - 0.3) / 0.2) * 0.2;
+                opacity = 1.0;
+              } else {
+                // Hold at 1.0 and fade out
+                scale = 1.0;
+                opacity = 1.0 - ((progress - 0.5) / 0.5);
+              }
+              return Opacity(
+                opacity: opacity.clamp(0.0, 1.0),
+                child: Transform.scale(
+                  scale: scale.clamp(0.0, 1.5),
+                  child: const Icon(
+                    Icons.favorite,
+                    color: Color(0xFFFF00FF), // cyberpunk neon pink
+                    size: 100,
+                  ),
+                ),
+              );
             },
           ),
         ],

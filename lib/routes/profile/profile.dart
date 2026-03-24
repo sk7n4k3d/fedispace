@@ -7,6 +7,7 @@ import 'package:fedispace/models/account.dart';
 import 'package:fedispace/models/accountUsers.dart';
 import 'package:fedispace/themes/cyberpunk_theme.dart';
 import 'package:fedispace/widgets/instagram_widgets.dart';
+import 'package:fedispace/widgets/skeleton_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart' as html;
 
@@ -136,7 +137,7 @@ class _Profile extends State<Profile> {
     if (!_accountLoaded) {
       return Scaffold(
         backgroundColor: CyberpunkTheme.backgroundBlack,
-        body: const Center(child: InstagramLoadingIndicator(size: 32)),
+        body: const SingleChildScrollView(child: ProfileSkeleton()),
       );
     }
     return FutureBuilder<Object>(
@@ -396,9 +397,20 @@ class _Profile extends State<Profile> {
                           child: Center(child: Text(S.of(context).error, style: const TextStyle(color: CyberpunkTheme.textSecondary))),
                         );
                       }
-                      return const Padding(
-                        padding: EdgeInsets.all(32),
-                        child: Center(child: InstagramLoadingIndicator(size: 24)),
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.only(top: 2),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 1.5,
+                          mainAxisSpacing: 1.5,
+                          childAspectRatio: 1,
+                        ),
+                        itemCount: 9,
+                        itemBuilder: (_, __) => SkeletonLoading(
+                          child: Container(color: CyberpunkTheme.cardDark),
+                        ),
                       );
                     },
                   ),
@@ -417,7 +429,7 @@ class _Profile extends State<Profile> {
         }
         return Scaffold(
           backgroundColor: CyberpunkTheme.backgroundBlack,
-          body: const Center(child: InstagramLoadingIndicator(size: 32)),
+          body: const SingleChildScrollView(child: ProfileSkeleton()),
         );
       },
     );

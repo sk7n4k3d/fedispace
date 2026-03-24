@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:fedispace/routes/auth/register_page.dart';
 import 'package:fedispace/l10n/app_localizations.dart';
 
 /// A premium server picker page that displays Pixelfed instances
@@ -177,11 +178,13 @@ class _ServerPickerPageState extends State<ServerPickerPage>
     return count.toString();
   }
 
-  void _openRegistration(String domain) async {
-    final url = Uri.parse('https://$domain/register');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    }
+  void _openRegistration(String domain) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RegisterPage(instanceUrl: domain),
+      ),
+    );
   }
 
   @override

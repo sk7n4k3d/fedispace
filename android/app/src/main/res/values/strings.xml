@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shortcut_new_post">New Post</string>
+    <string name="shortcut_new_post_long">Create a new post</string>
+    <string name="shortcut_search">Search</string>
+    <string name="shortcut_search_long">Search users and posts</string>
+    <string name="shortcut_messages">Messages</string>
+    <string name="shortcut_messages_long">Direct messages</string>
+</resources>

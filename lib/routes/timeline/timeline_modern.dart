@@ -5,6 +5,8 @@ import 'package:fedispace/core/api.dart';
 import 'package:fedispace/core/logger.dart';
 import 'package:fedispace/models/status.dart' as model;
 import 'package:fedispace/widgets/instagram_post_card.dart';
+import 'package:fedispace/widgets/skeleton_loading.dart';
+import 'package:fedispace/routes/post/swipeable_post_detail.dart';
 import 'package:fedispace/widgets/instagram_widgets.dart';
 import 'package:fedispace/themes/cyberpunk_theme.dart';
 import 'package:flutter/material.dart';
@@ -359,10 +361,25 @@ class _TimelineFeedState extends State<_TimelineFeed> with AutomaticKeepAliveCli
   }
 
   void _handleComment(model.Status status) {
-    Navigator.pushNamed(
+    // Collect all loaded statuses for swipe navigation
+    final allStatuses = <model.Status>[];
+    final pages = _pagingController.value.pages;
+    if (pages != null) {
+      for (final page in pages) {
+        allStatuses.addAll(page);
+      }
+    }
+    final index = allStatuses.indexWhere((s) => s.id == status.id);
+
+    Navigator.push(
       context,
-      '/PostDetail',
-      arguments: {'post': status},
+      MaterialPageRoute(
+        builder: (_) => SwipeablePostDetail(
+          apiService: widget.apiService,
+          statusList: allStatuses.isNotEmpty ? allStatuses : [status],
+          initialIndex: index >= 0 ? index : 0,
+        ),
+      ),
     );
   }
 
@@ -465,8 +482,8 @@ class _TimelineFeedState extends State<_TimelineFeed> with AutomaticKeepAliveCli
                   ],
                 ),
               ),
-              firstPageProgressIndicatorBuilder: (context) => const Center(
-                child: InstagramLoadingIndicator(size: 32),
+              firstPageProgressIndicatorBuilder: (context) => Column(
+                children: List.generate(3, (_) => const TimelineSkeleton()),
               ),
               newPageProgressIndicatorBuilder: (context) => const Padding(
                 padding: EdgeInsets.all(16.0),

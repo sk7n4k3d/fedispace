@@ -51,9 +51,18 @@
                     android:name="io.flutter.embedding.android.SplashScreenDrawable"
                     android:resource="@drawable/launch_background"
             />
+            <meta-data
+                    android:name="android.app.shortcuts"
+                    android:resource="@xml/shortcuts"
+            />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="fedispace" android:host="shortcut"/>
             </intent-filter>
 
             <!-- Receive shared images -->

@@ -90,6 +90,48 @@ class MyAppState extends State<MyApp> {
     _loadLocale();
     _setupNotificationListeners();
     _setupShareIntentListener();
+    _handleShortcutDeepLinks();
+  }
+
+  /// Handle Android app shortcuts deep links (fedispace://shortcut/*)
+  void _handleShortcutDeepLinks() {
+    // Check initial link when app starts from shortcut
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkInitialShortcut();
+    });
+  }
+
+  Future<void> _checkInitialShortcut() async {
+    try {
+      // Use platform channel to get the initial intent data
+      const channel = MethodChannel('space.echelon4.fedispace/shortcuts');
+      final String? shortcutData = await channel.invokeMethod('getInitialShortcut');
+      if (shortcutData != null && shortcutData.isNotEmpty) {
+        _navigateFromShortcut(shortcutData);
+      }
+    } catch (_) {
+      // Platform channel not set up yet or not available, that is fine
+      // Shortcuts will still launch the app, just won't deep-navigate
+    }
+  }
+
+  void _navigateFromShortcut(String path) {
+    final context = navigatorKey.currentContext;
+    if (context == null) return;
+    
+    // Wait a moment for navigation to be ready after login
+    Future.delayed(const Duration(milliseconds: 800), () {
+      final ctx = navigatorKey.currentContext;
+      if (ctx == null) return;
+      
+      if (path.contains('new_post')) {
+        Navigator.of(ctx).pushNamed('/sendPosts');
+      } else if (path.contains('search')) {
+        Navigator.of(ctx).pushNamed('/Search');
+      } else if (path.contains('messages')) {
+        Navigator.of(ctx).pushNamed('/DirectMessages');
+      }
+    });
   }
 
   Future<void> _loadLocale() async {

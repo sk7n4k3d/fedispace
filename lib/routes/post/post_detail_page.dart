@@ -510,15 +510,18 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   BoxShadow(color: CyberpunkTheme.neonCyan.withOpacity(0.15), blurRadius: 8),
                 ],
               ),
-              child: CircleAvatar(
-                radius: 22,
-                backgroundColor: CyberpunkTheme.cardDark,
-                backgroundImage: widget.post.avatar.isNotEmpty
-                    ? CachedNetworkImageProvider(widget.post.avatar)
-                    : null,
-                child: widget.post.avatar.isEmpty
-                    ? const Icon(Icons.person, size: 22, color: CyberpunkTheme.textTertiary)
-                    : null,
+              child: Hero(
+                tag: 'avatar_${widget.post.account.id}',
+                child: CircleAvatar(
+                  radius: 22,
+                  backgroundColor: CyberpunkTheme.cardDark,
+                  backgroundImage: widget.post.avatar.isNotEmpty
+                      ? CachedNetworkImageProvider(widget.post.avatar)
+                      : null,
+                  child: widget.post.avatar.isEmpty
+                      ? const Icon(Icons.person, size: 22, color: CyberpunkTheme.textTertiary)
+                      : null,
+                ),
               ),
             ),
           ),
@@ -590,7 +593,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
           } else {
             return FullScreenWidget(
               child: Hero(
-                tag: "${widget.post.id}_${index}_${Random().nextInt(10000)}",
+                tag: 'post_image_${widget.post.id}_$index',
                 child: CachedNetworkImage(
                   imageUrl: url,
                   fit: BoxFit.cover,
@@ -628,7 +631,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
       aspectRatio: 1.0,
       child: FullScreenWidget(
         child: Hero(
-          tag: "${widget.post.id}_single_${Random().nextInt(10000)}",
+          tag: 'post_image_${widget.post.id}',
           child: CachedNetworkImage(
             imageUrl: widget.post.attach,
             fit: BoxFit.cover,

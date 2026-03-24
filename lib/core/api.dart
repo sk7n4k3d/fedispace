@@ -2879,6 +2879,85 @@ class ApiService {
     }
   }
 
+  // ── Registration API methods ─────────────────────────────────────
+
+  /// Check if a username is available on the given instance.
+  /// Returns true if available, false otherwise.
+  Future<bool> checkUsernameAvailable(String username) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${instanceUrl!}/api/v1.1/auth/invite/admin/uc'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'username': username}),
+      ).timeout(const Duration(seconds: 10));
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Check if an email is available on the given instance.
+  /// Returns true if available, false otherwise.
+  Future<bool> checkEmailAvailable(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${instanceUrl!}/api/v1.1/auth/invite/admin/ec'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      ).timeout(const Duration(seconds: 10));
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Register a new account on the instance.
+  /// Returns the response data on success.
+  Future<Map<String, dynamic>> registerAccount({
+    required String username,
+    required String email,
+    required String password,
+    String? inviteCode,
+  }) async {
+    final body = <String, dynamic>{
+      'username': username,
+      'email': email,
+      'password': password,
+      'password_confirmation': password,
+    };
+    if (inviteCode != null && inviteCode.isNotEmpty) {
+      body['invite_code'] = inviteCode;
+    }
+
+    final response = await http.post(
+      Uri.parse('${instanceUrl!}/api/v1.1/auth/iar'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(body),
+    ).timeout(const Duration(seconds: 15));
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    }
+    throw ApiException(
+      'Registration failed: ${response.body}',
+      statusCode: response.statusCode,
+    );
+  }
+
+  /// Confirm registration with email token.
+  Future<bool> confirmRegistration(String token) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${instanceUrl!}/api/v1.1/auth/confirm'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'token': token}),
+      ).timeout(const Duration(seconds: 10));
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// Revokes all API service credentials & state variables from the
   /// device's secure storage, and sets their values as `null` in the
   /// instance.

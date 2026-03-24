@@ -16,11 +16,16 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fedispace/core/drafts_manager.dart';
+import 'package:fedispace/routes/post/drafts_page.dart';
+import 'package:fedispace/routes/post/photo_filters.dart';
+import 'package:fedispace/core/image_filters.dart';
 
 class SendPosts extends StatefulWidget {
   final ApiService apiService;
+  final PostDraft? draft;
 
-  const SendPosts({Key? key, required this.apiService}) : super(key: key);
+  const SendPosts({Key? key, required this.apiService, this.draft}) : super(key: key);
 
   @override
   State<SendPosts> createState() => _SendPostsState();
@@ -37,10 +42,107 @@ class _SendPostsState extends State<SendPosts> {
   String _spoilerText = '';
   bool _isCreatingStory = false;
   Map<String, dynamic>? _selectedLocation;
+  PhotoFilterResult? _filterResult;
+  int _draftCount = 0;
 
   @override
   void initState() {
     super.initState();
+    _loadDraftCount();
+    _loadDraftData();
+  }
+
+  Future<void> _loadDraftCount() async {
+    final count = await DraftsManager().getDraftCount();
+    if (mounted) setState(() => _draftCount = count);
+  }
+
+  void _loadDraftData() {
+    final draft = widget.draft;
+    if (draft == null) return;
+    _captionController.text = draft.caption;
+    _selectedFiles.addAll(draft.mediaFilePaths);
+    for (final entry in draft.altTexts.entries) {
+      final idx = int.tryParse(entry.key);
+      if (idx != null) _altTexts[idx] = entry.value;
+    }
+    _isSensitive = draft.sensitive;
+    _spoilerText = draft.spoilerText ?? '';
+    if (draft.locationName != null) {
+      _selectedLocation = {'name': draft.locationName};
+    }
+  }
+
+  Future<void> _saveDraft() async {
+    final draft = PostDraft(
+      id: widget.draft?.id ?? PostDraft.generateId(),
+      caption: _captionController.text,
+      mediaFilePaths: List<String>.from(_selectedFiles),
+      altTexts: _altTexts.map((k, v) => MapEntry(k.toString(), v)),
+      visibility: 'public',
+      sensitive: _isSensitive,
+      spoilerText: _spoilerText.isNotEmpty ? _spoilerText : null,
+      locationName: _selectedLocation?['name'] as String?,
+      createdAt: DateTime.now(),
+    );
+    await DraftsManager().saveDraft(draft);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Draft saved'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      Navigator.pop(context);
+    }
+  }
+
+  Future<bool> _onBackPressed() async {
+    if (_selectedFiles.isEmpty && _captionController.text.isEmpty) {
+      return true;
+    }
+    final result = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: CyberpunkTheme.cardDark,
+        title: const Text('Discard post?', style: TextStyle(color: CyberpunkTheme.textWhite)),
+        content: const Text(
+          'You can save this as a draft to continue later.',
+          style: TextStyle(color: CyberpunkTheme.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, 'cancel'),
+            child: const Text('Cancel', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, 'draft'),
+            child: const Text('Save Draft', style: TextStyle(color: CyberpunkTheme.neonCyan)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, 'discard'),
+            child: const Text('Discard', style: TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    );
+    if (result == 'draft') {
+      await _saveDraft();
+      return false; // Already popped in _saveDraft
+    }
+    return result == 'discard';
+  }
+
+  Future<void> _openFilters(int fileIndex) async {
+    final result = await Navigator.push<PhotoFilterResult>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PhotoFiltersPage(imagePath: _selectedFiles[fileIndex]),
+      ),
+    );
+    if (result != null && mounted) {
+      setState(() => _filterResult = result);
+    }
   }
 
   // ── Media source picker bottom sheet ──────────────────────────────
@@ -1109,7 +1211,10 @@ class _SendPostsState extends State<SendPosts> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
+          onTap: () async {
+            final shouldPop = await _onBackPressed();
+            if (shouldPop && context.mounted) Navigator.pop(context);
+          },
           child: Container(
             margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
@@ -1136,6 +1241,79 @@ class _SendPostsState extends State<SendPosts> {
         ),
         centerTitle: true,
         actions: [
+          // Filters button
+          if (_selectedFiles.isNotEmpty)
+            GestureDetector(
+              onTap: () => _openFilters(0),
+              child: Container(
+                margin: const EdgeInsets.only(right: 4),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: (_filterResult?.hasChanges == true)
+                      ? CyberpunkTheme.neonPink.withOpacity(0.15)
+                      : Colors.black.withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: (_filterResult?.hasChanges == true)
+                        ? CyberpunkTheme.neonPink.withOpacity(0.4)
+                        : Colors.white.withOpacity(0.08),
+                  ),
+                ),
+                child: Icon(
+                  Icons.auto_awesome_rounded,
+                  color: (_filterResult?.hasChanges == true)
+                      ? CyberpunkTheme.neonPink
+                      : CyberpunkTheme.textWhite,
+                  size: 18,
+                ),
+              ),
+            ),
+          // Drafts button
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => DraftsPage(apiService: widget.apiService),
+                ),
+              ).then((_) => _loadDraftCount());
+            },
+            child: Container(
+              margin: const EdgeInsets.only(right: 4),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.4),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white.withOpacity(0.08)),
+              ),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  const Icon(Icons.drafts_outlined, color: CyberpunkTheme.textWhite, size: 18),
+                  if (_draftCount > 0)
+                    Positioned(
+                      right: -6,
+                      top: -6,
+                      child: Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: CyberpunkTheme.neonCyan,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          '',
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 8,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: GestureDetector(
