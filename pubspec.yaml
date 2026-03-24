@@ -52,7 +52,7 @@ dependencies:
   permission_handler: ^12.0.1
   like_button: ^2.0.4
   floating_action_bubble: ^1.1.4
-  share_plus: ^10.0.0
+  share_plus: ^12.0.1
   better_video_player:
     path: packages/better_video_player
 
