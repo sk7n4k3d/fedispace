@@ -48,12 +48,7 @@ class _SendPostsState extends State<SendPosts> {
   @override
   void initState() {
     super.initState();
-    // Auto-open gallery picker if no media/draft loaded
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_selectedFiles.isEmpty && widget.draft == null) {
-        _pickFromGallery();
-      }
-    });
+
     _loadDraftCount();
     _loadDraftData();
   }
@@ -1705,27 +1700,41 @@ class _SendPostsState extends State<SendPosts> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 20),
-                              const Text(
-                                'Add your media',
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  color: CyberpunkTheme.textWhite,
-                                  fontWeight: FontWeight.w600,
+                              const SizedBox(height: 16),
+                              // Inline media source options
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 24),
+                                child: Column(
+                                  children: [
+                                    _inlineSourceButton(
+                                      icon: Icons.photo_library_outlined,
+                                      label: 'Choose from Gallery',
+                                      color: CyberpunkTheme.neonCyan,
+                                      onTap: _pickFromGallery,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    _inlineSourceButton(
+                                      icon: Icons.camera_alt_outlined,
+                                      label: 'Take a Photo',
+                                      color: CyberpunkTheme.neonPink,
+                                      onTap: () => _pickFromCamera(ImageSource.camera),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    _inlineSourceButton(
+                                      icon: Icons.videocam_outlined,
+                                      label: 'Record a Video',
+                                      color: const Color(0xFFFF9800),
+                                      onTap: _pickVideoFromCamera,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    _inlineSourceButton(
+                                      icon: Icons.auto_stories_rounded,
+                                      label: 'Create a Story',
+                                      color: const Color(0xFF9C27B0),
+                                      onTap: _createStoryFromGallery,
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              const SizedBox(height: 6),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  _mediaBadge(Icons.photo_library_outlined, 'Gallery'),
-                                  Container(width: 3, height: 3, margin: const EdgeInsets.symmetric(horizontal: 8), decoration: BoxDecoration(color: CyberpunkTheme.textTertiary, shape: BoxShape.circle)),
-                                  _mediaBadge(Icons.camera_alt_outlined, 'Camera'),
-                                  Container(width: 3, height: 3, margin: const EdgeInsets.symmetric(horizontal: 8), decoration: BoxDecoration(color: CyberpunkTheme.textTertiary, shape: BoxShape.circle)),
-                                  _mediaBadge(Icons.videocam_outlined, 'Video'),
-                                  Container(width: 3, height: 3, margin: const EdgeInsets.symmetric(horizontal: 8), decoration: BoxDecoration(color: CyberpunkTheme.textTertiary, shape: BoxShape.circle)),
-                                  _mediaBadge(Icons.auto_stories_rounded, 'Story'),
-                                ],
                               ),
                             ],
                           ),
@@ -1975,6 +1984,48 @@ class _SendPostsState extends State<SendPosts> {
     );
   }
 
+
+  Widget _inlineSourceButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: color.withOpacity(0.2), width: 0.5),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38, height: 38,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(width: 14),
+            Text(
+              label,
+              style: TextStyle(
+                color: CyberpunkTheme.textWhite,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const Spacer(),
+            Icon(Icons.chevron_right_rounded, color: color.withOpacity(0.5), size: 20),
+          ],
+        ),
+      ),
+    );
+  }
   Widget _mediaBadge(IconData icon, String label) {
     return Row(
       mainAxisSize: MainAxisSize.min,
