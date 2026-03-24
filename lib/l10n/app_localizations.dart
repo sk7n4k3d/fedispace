@@ -138,6 +138,8 @@ class AppLocalizations {
 
   // ── Profile ──
   String get editProfile => _t('editProfile');
+  String get changeProfilePhoto => _t('changeProfilePhoto');
+  String get profileUpdated => _t('profileUpdated');
   String get followRequests => _t('followRequests');
   String get follow => _t('follow');
   String get unfollow => _t('unfollow');

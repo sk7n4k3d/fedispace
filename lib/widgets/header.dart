@@ -3,32 +3,20 @@ import 'package:fedispace/core/api.dart';
 import 'package:fedispace/models//account.dart';
 import 'package:flutter/material.dart';
 
-Account? account;
-
 class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
   final ApiService apiService;
 
   const HeaderWidget({required this.apiService, Key? key}) : super(key: key);
 
-  Future<Object> fetchAccount() async {
-    Account currentAccount = await apiService.getCurrentAccount();
-    return account = currentAccount;
-  }
-
-  String avatarurl() {
-    var domain = apiService.domainURL();
-    if (account!.avatarUrl.contains("://")) {
-      return account!.avatarUrl.toString();
-    } else {
-      return domain.toString() + account!.avatarUrl;
-    }
+  Future<Account> _fetchAccount() async {
+    return await apiService.getCurrentAccount();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Object>(
-        future: fetchAccount(),
-        builder: (BuildContext context, AsyncSnapshot<Object> snapshot) {
+    return FutureBuilder<Account>(
+        future: _fetchAccount(),
+        builder: (BuildContext context, AsyncSnapshot<Account> snapshot) {
           if (snapshot.hasData) {
             return AppBar(
                 elevation: 20,

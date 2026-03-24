@@ -258,6 +258,7 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
         _knownMessageIds.add(msg.id);
       }
       
+      if (!mounted) return;
       setState(() {
           _messages.clear();
           _messages.addAll(loadedMessages);
@@ -279,6 +280,7 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
 
     } catch (error, stackTrace) {
       appLogger.error('Error loading messages', error, stackTrace);
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });

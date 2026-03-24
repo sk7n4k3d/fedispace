@@ -2,18 +2,18 @@ import 'package:fedispace/core/api.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class bottomWidget extends StatefulWidget {
+class BottomWidget extends StatefulWidget {
   final ApiService apiService;
-  int page;
+  final int page;
 
-  bottomWidget({Key? key, required this.apiService, required this.page})
+  const BottomWidget({Key? key, required this.apiService, required this.page})
       : super(key: key);
 
   @override
-  State<bottomWidget> createState() => _bottomWidget();
+  State<BottomWidget> createState() => _BottomWidgetState();
 }
 
-class _bottomWidget extends State<bottomWidget> {
+class _BottomWidgetState extends State<BottomWidget> {
   late int _setIndex;
 
   void _getIndex(int pos) {

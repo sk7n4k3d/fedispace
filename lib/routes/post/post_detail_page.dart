@@ -277,7 +277,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
     return GestureDetector(
       onTap: () {
-        if (url.isNotEmpty) launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+        if (url.isNotEmpty) {
+              final uri = Uri.parse(url);
+              if (uri.scheme == 'http' || uri.scheme == 'https') {
+                launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+            }
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

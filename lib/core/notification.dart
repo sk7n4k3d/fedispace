@@ -3,6 +3,7 @@ import 'dart:core';
 
 import 'package:fedispace/core/api.dart';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class Notif extends StatefulWidget implements PreferredSizeWidget {
   final ApiService apiService;
@@ -139,8 +140,8 @@ Widget _body2(domain, data, ApiService apiService) {
                     },
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10.0),
-                      child: Image.network(
-                        data[index]["account"]["avatar_static"]
+                      child: CachedNetworkImage(
+                        imageUrl: data[index]["account"]["avatar_static"]
                                 .toString()
                                 .contains("://")
                             ? data[index]["account"]["avatar_static"]
@@ -148,6 +149,16 @@ Widget _body2(domain, data, ApiService apiService) {
                         height: 95.0,
                         width: 80.0,
                         fit: BoxFit.cover,
+                        placeholder: (context, url) => const SizedBox(
+                          height: 95.0,
+                          width: 80.0,
+                          child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                        ),
+                        errorWidget: (context, url, error) => const SizedBox(
+                          height: 95.0,
+                          width: 80.0,
+                          child: Icon(Icons.person, size: 40, color: Colors.grey),
+                        ),
                       ),
                     ),
                   ),

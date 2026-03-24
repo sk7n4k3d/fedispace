@@ -272,7 +272,12 @@ class _InstagramPostCardState extends State<InstagramPostCard>
             _sheetTile(Icons.open_in_browser_rounded, S.of(context).openInBrowser, () {
               Navigator.pop(ctx);
               final url = widget.status.url;
-              if (url.isNotEmpty) launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+              if (url.isNotEmpty) {
+              final uri = Uri.parse(url);
+              if (uri.scheme == 'http' || uri.scheme == 'https') {
+                launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+            }
             }),
             _sheetTile(Icons.link_rounded, S.of(context).copyLink, () {
               Navigator.pop(ctx);
@@ -508,6 +513,8 @@ class _InstagramPostCardState extends State<InstagramPostCard>
              widget.status.acct,
              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: CyberpunkTheme.textWhite),
            ),
+           // TODO(security): Sanitize HTML content from server before rendering to prevent XSS.
+           // Consider using a sanitizer package like html_sanitize or a whitelist approach.
            Html(
              data: widget.status.content,
              style: {
@@ -544,7 +551,7 @@ class _InstagramPostCardState extends State<InstagramPostCard>
                 
                 try {
                   final uri = Uri.parse(url);
-                  if (await canLaunchUrl(uri)) {
+                  if ((uri.scheme == 'http' || uri.scheme == 'https') && await canLaunchUrl(uri)) {
                     await launchUrl(uri, mode: LaunchMode.externalApplication);
                   }
                 } catch (e) {
