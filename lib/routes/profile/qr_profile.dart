@@ -27,7 +27,7 @@ class QrProfilePage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.share_rounded),
-            onPressed: () => SharePlus.instance.share(ShareParams(text: profileUrl)),
+            onPressed: () => Share.share(profileUrl),
           ),
         ],
       ),

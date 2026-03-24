@@ -105,7 +105,7 @@ class HeaderStatusCard extends StatelessWidget {
                       shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                       onSelected: (int index) {
-                        print('index is $index');
+                        debugPrint('index is $index');
                         if (index == 1) {
                           // Voir la Publication - Navigate to status detail
                           Navigator.pushNamed(

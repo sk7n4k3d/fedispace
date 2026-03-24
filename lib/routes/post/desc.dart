@@ -62,7 +62,7 @@ class _DescState extends State<Desc> {
                                             const AssetPickerConfig());
                                 for (int i = 0; i < result!.length; i++) {
                                   final imageName = await result[i].file;
-                                  print(imageName!.path);
+                                  debugPrint(imageName!.path);
                                   fileNames.add(imageName.path);
                                 }
                               },

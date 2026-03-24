@@ -1,155 +1,157 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/nathan-skynet/fedispace/master/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" width="120" alt="FediSpace Logo"/>
+  <img src="https://raw.githubusercontent.com/sk7n4k3d/fedispace/master/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" width="120" alt="FediSpace Logo"/>
 </p>
 
-<h1 align="center">🚀 FediSpace</h1>
+<h1 align="center">FediSpace</h1>
 
 <p align="center">
-  <strong>An AI-enhanced, modern Pixelfed client built with Flutter</strong>
+  <strong>An AI-enhanced, premium Pixelfed client built with Flutter</strong>
 </p>
 
 <p align="center">
   <a href="https://github.com/sk7n4k3d/fedispace/actions/workflows/ci.yml"><img src="https://github.com/sk7n4k3d/fedispace/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <img src="https://img.shields.io/badge/Flutter-3.41-blue" alt="Flutter">
-  <img src="https://img.shields.io/badge/License-MIT-green" alt="License">
-</p>
-
-<p align="center">
-  <a href="https://github.com/nathan-skynet/fedispace/releases"><img src="https://img.shields.io/github/v/release/nathan-skynet/fedispace?style=for-the-badge&color=00d4ff&labelColor=0a0e1a" alt="Release"></a>
-  <a href="https://github.com/nathan-skynet/fedispace/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge&color=00d4ff&labelColor=0a0e1a" alt="License"></a>
+  <a href="https://github.com/sk7n4k3d/fedispace/releases"><img src="https://img.shields.io/github/v/release/sk7n4k3d/fedispace?style=for-the-badge&color=00d4ff&labelColor=0a0e1a" alt="Release"></a>
+  <a href="https://github.com/sk7n4k3d/fedispace/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge&color=00d4ff&labelColor=0a0e1a" alt="License"></a>
   <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white&labelColor=0a0e1a" alt="Flutter"></a>
   <a href="https://dart.dev"><img src="https://img.shields.io/badge/Dart-3.x-0175C2?style=for-the-badge&logo=dart&logoColor=white&labelColor=0a0e1a" alt="Dart"></a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/🤖_AI_Powered-OpenAI-ff6b6b?style=for-the-badge&labelColor=0a0e1a" alt="AI Powered">
-  <img src="https://img.shields.io/badge/🌍_16_Languages-Supported-success?style=for-the-badge&color=00ff88&labelColor=0a0e1a" alt="16 Languages">
-  <img src="https://img.shields.io/badge/📱_Android-Ready-success?style=for-the-badge&color=3ddc84&labelColor=0a0e1a" alt="Android">
-  <img src="https://img.shields.io/badge/🔔_Push_Notifications-UnifiedPush-blueviolet?style=for-the-badge&labelColor=0a0e1a" alt="Push Notifications">
+  <img src="https://img.shields.io/badge/AI_Powered-OpenAI_Compatible-ff6b6b?style=for-the-badge&labelColor=0a0e1a" alt="AI Powered">
+  <img src="https://img.shields.io/badge/16_Languages-Supported-success?style=for-the-badge&color=00ff88&labelColor=0a0e1a" alt="16 Languages">
+  <img src="https://img.shields.io/badge/Android-Ready-success?style=for-the-badge&color=3ddc84&labelColor=0a0e1a" alt="Android">
+  <img src="https://img.shields.io/badge/Push_Notifications-UnifiedPush-blueviolet?style=for-the-badge&labelColor=0a0e1a" alt="Push Notifications">
 </p>
 
 ---
 
-## ✨ About
+## About
 
-**FediSpace** is an **AI-supercharged**, Instagram-inspired client for [Pixelfed](https://pixelfed.org/) — the federated, privacy-friendly image sharing platform. It takes the original Pixelfed experience and **boosts it with artificial intelligence**: real-time post translation, AI-powered image editing, smart content discovery, and more — all wrapped in a **cyberpunk-inspired dark theme** with smooth animations.
-
-> *The Fediverse has never looked this good — or this smart.*
+**FediSpace** is an AI-supercharged, Instagram-inspired client for [Pixelfed](https://pixelfed.org/) -- the federated, privacy-friendly image sharing platform. It takes the original Pixelfed experience and boosts it with artificial intelligence: real-time post translation, AI-powered image editing, smart content discovery, and more -- all wrapped in a cyberpunk-inspired dark theme with smooth animations.
 
 ---
 
-## 🤖 AI-Powered Features
+## AI-Powered Features
 
-FediSpace goes beyond a standard Pixelfed client by integrating **AI at the core of the experience** — and the best part? **You're not locked into any cloud provider.**
+FediSpace integrates AI at the core of the experience. You are not locked into any cloud provider.
 
-### 🏠 Bring Your Own AI — Local or Cloud
+### Bring Your Own AI -- Local or Cloud
 
-FediSpace works with **any OpenAI-compatible API**, which means you can use:
+FediSpace works with **any OpenAI-compatible API**:
 
 | Provider | Type | Example |
 |---|---|---|
-| 🦙 **[Ollama](https://ollama.ai)** | Local LLM | Run Llama 3, Mistral, Gemma on your own machine |
-| 🖥️ **[LM Studio](https://lmstudio.ai)** | Local LLM | One-click local models with OpenAI-compatible server |
-| 🐳 **[LocalAI](https://localai.io)** | Self-hosted | Docker-based, drop-in OpenAI replacement |
-| ☁️ **[OpenAI](https://openai.com)** | Cloud | GPT-4o, GPT-4 Turbo |
-| 🌐 **Any compatible API** | Custom | Groq, Together AI, Mistral API, vLLM, text-generation-webui... |
+| [Ollama](https://ollama.ai) | Local LLM | Llama 3, Mistral, Gemma on your own machine |
+| [LM Studio](https://lmstudio.ai) | Local LLM | One-click local models with OpenAI-compatible server |
+| [LocalAI](https://localai.io) | Self-hosted | Docker-based, drop-in OpenAI replacement |
+| [OpenAI](https://openai.com) | Cloud | GPT-4o, GPT-4 Turbo |
+| Any compatible API | Custom | Groq, Together AI, Mistral API, vLLM, etc. |
 
-> **100% privacy-friendly:** Point FediSpace to your local Ollama instance and your data never leaves your network. Just enter your custom endpoint URL in Settings — no cloud required.
+> **100% privacy-friendly:** Point FediSpace to your local Ollama instance and your data never leaves your network.
 
-### ✨ What AI Does
+### What AI Does
 
-| Feature | What it does |
+| Feature | Description |
 |---|---|
-| 🌐 **Auto-Translate Posts** | Instantly translate any post into your language — read the global Fediverse without language barriers |
-| 🎨 **AI Image Editing** | Describe what you want changed and AI transforms your photos before posting — creative filters, style transfer, enhancements |
-| 🔄 **Smart Translation Settings** | Configure auto-translate for all posts, choose your target language, or translate on demand |
-| 🌍 **16 Language UI** | The entire app interface adapts to your language — powered by a comprehensive i18n system |
-
-> **How it works:** In Settings → Translation, set your API endpoint (cloud or local) and model. FediSpace speaks the OpenAI API format — if your server is compatible, it just works. Your API key and data stay on **your** device.
+| **Auto-Translate Posts** | Instantly translate any post into your language |
+| **AI Image Editing** | Describe what you want changed and AI transforms your photos |
+| **Smart Translation Settings** | Configure auto-translate, choose target language, or translate on demand |
+| **16 Language UI** | The entire app interface adapts to your language |
 
 ---
 
-## 🎨 Features
+## Features
 
-### 📸 Timeline & Posts
-- **Instagram-style feed** with infinite scroll and blur hash placeholders
-- **Full-screen image viewer** with pinch-to-zoom
-- **Video playback** with custom player controls
-- **Carousel/gallery posts** support
-- **Like, comment, share, bookmark** — full social interactions
-- **Post detail page** with threaded replies
-- **View edit history** of modified posts
+### Timeline and Posts
+- Instagram-style feed with infinite scroll and blur hash placeholders
+- Full-screen image viewer with pinch-to-zoom
+- Video playback with custom player controls
+- Carousel/gallery posts support
+- Like, comment, share, bookmark -- full social interactions
+- Post detail page with threaded replies
+- View edit history of modified posts
 
-### 📖 Stories
-- **Story bar** with avatar bubbles matching Instagram UX
-- **Full-screen story viewer** with progress indicators
-- **Story creation** — capture from camera or pick from gallery
-- **AI-powered image editing** with creative filters
-- **Viewer count and list** for your own stories
-- **Story replies** — interact directly with stories
-- **Auto-advance** and tap-to-skip navigation
+### Reels / Loops (NEW)
+- Dedicated Loops instance integration
+- Separate OAuth login for Loops content
+- Vertical video feed with auto-play
+- Full-screen immersive video experience
 
-### 🔍 Discover & Search
-- **Explore page** with trending content
-- **User search** with real-time results
-- **Hashtag search** and tag-based timelines
-- **Account discovery** across the Fediverse
+### Multi-Account (NEW)
+- Add and switch between multiple Pixelfed accounts
+- Per-account settings and preferences
+- Quick account switcher in navigation
 
-### 💬 Direct Messages
-- **Conversation list** with unread indicators
-- **Real-time messaging** interface
-- **Image sharing** in conversations
-- **New message** with user search and recipient picker
-- **Delete conversations** with confirmation dialogs
+### Post Creation (NEW)
+- Gallery, Camera, and Video capture options
+- Photo filters and AI-powered image editing
+- Post drafts -- save and resume later
+- Story creation from gallery or camera
 
-### 🔔 Notifications
-- **Real-time push notifications** via [UnifiedPush](https://unifiedpush.org/)
-- **Notification types**: follows, likes, boosts, mentions, polls
-- **Clear all** with confirmation
-- **Tap to navigate** directly to relevant content
+### Stories
+- Story bar with avatar bubbles
+- Full-screen story viewer with progress indicators
+- Story creation from camera or gallery
+- AI-powered image editing with creative filters
+- Viewer count and list for your own stories
+- Story replies and auto-advance navigation
 
-### 👤 Profile & Social
-- **Rich user profiles** with stats (posts, followers, following)
-- **Profile editing** capabilities
-- **Follow / Unfollow / Mute / Block** actions
-- **Report users** with reason description
-- **Follow requests** management (accept/reject)
-- **Followers & following lists** with pagination
+### Discover and Search
+- Explore page with trending content
+- User search with real-time results
+- Hashtag search and tag-based timelines
+- Account discovery across the Fediverse
 
-### ⚙️ Settings & Privacy
-- **Content filters** — create and manage keyword filters
-- **Muted & blocked accounts** management
-- **Domain blocks** — block entire instances
-- **Bookmarks** — save posts for later
-- **Liked posts** — view your like history
-- **Archived posts** — archive and restore posts
-- **Collections** — organize posts into collections
+### Direct Messages
+- Conversation list with unread indicators
+- Real-time messaging interface
+- Image/photo sharing in conversations (NEW)
+- New message with user search and recipient picker
+- Delete conversations with confirmation dialogs
 
-### 🌍 Internationalization (i18n)
-Full multi-language support with **16 languages**:
+### Notifications
+- Real-time push notifications via [UnifiedPush](https://unifiedpush.org/)
+- In-app notification polling with badge counts (NEW)
+- Notification types: follows, likes, boosts, mentions, polls
+- Clear all with confirmation
+- Tap to navigate directly to relevant content
 
-| | Language | | Language | | Language | | Language |
-|---|---|---|---|---|---|---|---|
-| 🇬🇧 | English | 🇫🇷 | Français | 🇪🇸 | Español | 🇩🇪 | Deutsch |
-| 🇮🇹 | Italiano | 🇧🇷 | Português | 🇳🇱 | Nederlands | 🇷🇺 | Русский |
-| 🇨🇳 | 中文 | 🇯🇵 | 日本語 | 🇰🇷 | 한국어 | 🇸🇦 | العربية |
-| 🇮🇳 | हिन्दी | 🇹🇷 | Türkçe | 🇵🇱 | Polski | 🇺🇦 | Українська |
+### Profile and Social
+- Rich user profiles with stats
+- Profile editing capabilities
+- QR code profile sharing (NEW)
+- Follow / Unfollow / Mute / Block actions
+- Report users with reason description
+- Follow requests management
+- Followers and following lists with pagination
 
-- **In-app language picker** — switch languages instantly
-- **System locale detection** — auto-detects device language
-- **Persistent preference** — remembers your language choice
+### Settings and Privacy
+- Content filters -- create and manage keyword filters
+- Muted and blocked accounts management
+- Domain blocks -- block entire instances
+- Bookmarks, liked posts, archived posts
+- Collections -- organize posts into collections
 
-### 🎭 UI & Design
-- **Cyberpunk dark theme** — neon accents, glassmorphism, gradients
-- **Instagram-inspired layout** — familiar, intuitive navigation
-- **Custom bottom navigation** with animated transitions
-- **Pull-to-refresh** on all list views
-- **Smooth loading indicators** and skeleton screens
-- **Responsive design** across different screen sizes
+### Internationalization (i18n)
+Full multi-language support with 16 languages:
+
+English, French, Spanish, German, Italian, Portuguese, Dutch, Russian, Chinese, Japanese, Korean, Arabic, Hindi, Turkish, Polish, Ukrainian
+
+- In-app language picker
+- System locale detection
+- Persistent preference
+
+### UI and Design
+- Cyberpunk dark theme with neon accents, glassmorphism, gradients
+- Instagram-inspired layout with familiar navigation
+- Custom bottom navigation with animated transitions
+- Pull-to-refresh on all list views
+- Smooth loading indicators and skeleton screens
+- Responsive design across different screen sizes
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Technology | Purpose |
 |---|---|
@@ -157,129 +159,82 @@ Full multi-language support with **16 languages**:
 | **OAuth2** | Secure authentication |
 | **UnifiedPush** | Decentralized push notifications |
 | **SharedPreferences** | Local settings persistence |
-| **CachedNetworkImage** | Image caching & blur hash |
-| **Camera** | Photo & video capture |
-| **Audioplayers** | Audio playback |
+| **CachedNetworkImage** | Image caching and blur hash |
+| **Camera** | Photo and video capture |
 | **Flutter Secure Storage** | Encrypted credential storage |
 
 ---
 
-## 📦 Installation
+## Installation
 
 ### Prerequisites
-- Flutter SDK `>=3.0.0`
-- Android SDK (API 21+)
+- Flutter SDK >=3.0.0
+- Android SDK (API 24+)
 - A Pixelfed instance account
 
 ### Build from source
 
 ```bash
-# Clone the repository
-git clone https://github.com/nathan-skynet/fedispace.git
+git clone https://github.com/sk7n4k3d/fedispace.git
 cd fedispace
-
-# Install dependencies
 flutter pub get
-
-# Run in debug mode
 flutter run
-
-# Build release APK
 flutter build apk --release
 ```
 
 ### Download
-Check the [Releases](https://github.com/nathan-skynet/fedispace/releases) page for pre-built APKs.
+Check the [Releases](https://github.com/sk7n4k3d/fedispace/releases) page for pre-built APKs.
 
 ---
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 lib/
-├── core/                    # API, auth, notifications, logging
-│   ├── api.dart             # Pixelfed API service
-│   ├── notification.dart    # Push notification handling
-│   └── logger.dart          # App-wide logging
-├── l10n/                    # Internationalization
-│   ├── app_localizations.dart
-│   └── translations.dart    # 16 language maps
-├── models/                  # Data models
-│   ├── account.dart
-│   ├── status.dart
-│   ├── story.dart
-│   └── ...
-├── routes/                  # Pages & screens
-│   ├── bookmarks/
-│   ├── followers/
-│   ├── liked/
-│   ├── messages/            # DMs, conversations
-│   ├── notifications/
-│   ├── post/                # Post detail, creation
-│   ├── profile/             # Profile, collections, archives
-│   ├── search/
-│   ├── settings/            # Settings, filters, blocks
-│   └── timeline/
-├── themes/
-│   └── cyberpunk_theme.dart # Custom dark theme
-├── widgets/                 # Reusable components
-│   ├── instagram_post_card.dart
-│   ├── story_bar.dart
-│   ├── story_viewer.dart
-│   └── ...
-└── main.dart                # App entry point
+  core/           API, auth, notifications, logging, translation
+  l10n/           Internationalization (16 languages)
+  models/         Data models (Account, Status, Story, etc.)
+  routes/         Pages and screens
+    bookmarks/    Saved posts
+    followers/    Follow lists
+    liked/        Liked posts
+    messages/     Direct messages
+    notifications/
+    post/         Post creation and detail
+    profile/      Profile, collections, archives, QR
+    reels/        Loops/Reels video feed
+    search/       Discover and search
+    settings/     Settings, filters, blocks
+    timeline/     Main feed
+  themes/         Cyberpunk theme
+  widgets/        Reusable components
+  main.dart       App entry point
 ```
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
-**Everyone is welcome to contribute!**
-
-| 🎨 **Designers** | 💻 **Developers** | 🌍 **Translators** | 🐛 **Testers** |
-|---|---|---|---|
-| Help improve UI/UX and animations | Pick an issue and submit a PR | Add or improve language translations | Report bugs and verify fixes |
-
-### How to contribute
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feat/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'feat: Add amazing feature'`)
-4. **Push** to the branch (`git push origin feat/amazing-feature`)
-5. **Open** a Pull Request
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feat/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: Add amazing feature'`)
+4. Push to the branch (`git push origin feat/amazing-feature`)
+5. Open a Pull Request
 
 ---
 
-## 📜 Credits
+## Credits
 
 | Resource | Description |
 |---|---|
 | [Pixelfed](https://pixelfed.org/) | The federated image sharing platform |
 | [UnifiedPush](https://unifiedpush.org/) | Decentralized push notification protocol |
 | [Feathr](https://github.com/feathr-space/feathr) | Original project base |
-| [Drissas](https://drissas.com/tuto-flutter-instagram) | Stories & Posts inspiration |
-
-> A huge thank you to **[Dansup](https://pixelfed.social/dansup)** — the creator of Pixelfed — for building an amazing platform for the Fediverse. 💜
 
 ---
 
-## 📄 License
+## License
 
-This project is licensed under the **[MIT License](https://opensource.org/licenses/MIT)** — free and open source.
+MIT License -- Copyright (c) 2024-2026 sk7n4k3d
 
-```
-MIT License — Copyright (c) 2024 nathan-skynet
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software.
-```
-
----
-
-<p align="center">
-  <sub>Built with ❤️ for the Fediverse</sub><br>
-  <sub>⭐ Star this repo if you find it useful!</sub>
-</p>
+See [LICENSE](LICENSE) for full text.

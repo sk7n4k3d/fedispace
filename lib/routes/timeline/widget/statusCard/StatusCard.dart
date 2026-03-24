@@ -357,7 +357,7 @@ class _StatusCardState extends State<StatusCard> {
                                     return;
                                   }
                                 } catch (e) {
-                                  print('Error parsing tag: $e');
+                                  debugPrint('Error parsing tag: $e');
                                 }
                               }
                               
@@ -368,7 +368,7 @@ class _StatusCardState extends State<StatusCard> {
                                   await launchUrl(uri, mode: LaunchMode.inAppWebView);
                                 }
                               } catch (e) {
-                                print('Error launching URL: $e');
+                                debugPrint('Error launching URL: $e');
                               }
                             },
                           ),

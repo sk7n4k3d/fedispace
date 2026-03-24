@@ -1,0 +1,42 @@
+FediSpace v0.2.0 — Major Feature Release
+
+NEW FEATURES:
+- Reels/Loops support with dedicated Loops instance login
+- Multi-account management — switch between Pixelfed accounts
+- Post drafts — save and resume posts later
+- Photo filters and AI-powered image editing
+- QR code profile sharing
+- Notification polling service with badge counts
+- DM image/photo sharing with upload support
+- Conversation detail page with real-time messaging
+- Complete cyberpunk dark theme overhaul with glassmorphism
+- Instagram-style post creation with Gallery/Camera/Video options
+- Story creation and viewing with progress indicators
+- Full 16-language internationalization (i18n)
+- AI translation via any OpenAI-compatible API (local or cloud)
+- Content filters, muted/blocked accounts, domain blocks
+
+IMPROVEMENTS:
+- Complete UI redesign with neon accents and smooth animations
+- Redesigned profile page with collections, archives, liked posts
+- Better video player with custom controls
+- Improved comment system with persistence after posting
+- Enhanced carousel/gallery post support
+- Pull-to-refresh on all views
+- Better error handling with typed exceptions
+
+BUG FIXES:
+- Fixed DM images not displaying (parse media field correctly)
+- Fixed story ring colors and avatar loading
+- Fixed comment disappearing after posting
+- Fixed hashtag navigation to tag timelines
+- Fixed fullscreen image zoom and swipe-to-close
+- Fixed notification parsing crashes
+- Fixed carousel indicator visibility
+- 26+ bug fixes for stability and performance
+
+TECHNICAL:
+- 75+ unit tests covering models, API, translations, push notifications
+- CI/CD with GitHub Actions
+- ProGuard rules for release builds
+- Structured error handling with ApiException hierarchy
