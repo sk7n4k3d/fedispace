@@ -158,17 +158,17 @@ class _NewMessagePageState extends State<NewMessagePage> {
             child: _isSearching
                 ? const Center(child: CircularProgressIndicator())
                 : _searchResults.isEmpty
-                    ? Center(
-                        child: Text(
-                          _searchController.text.isEmpty
-                              ? S.of(context).searchPeople
-                              : S.of(context).noResults,
-                          style: TextStyle(
-                            color: isDark ? Colors.white54 : Colors.black54,
-                            fontSize: 14,
-                          ),
-                        ),
-                      )
+                    ? (_searchController.text.isEmpty
+                        ? _buildMutualsSection(isDark)
+                        : Center(
+                            child: Text(
+                              S.of(context).noResults,
+                              style: TextStyle(
+                                color: isDark ? Colors.white54 : Colors.black54,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ))
                     : ListView.builder(
                         itemCount: _searchResults.length,
                         itemBuilder: (context, index) {

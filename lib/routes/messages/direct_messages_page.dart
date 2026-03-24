@@ -71,7 +71,34 @@ class _DirectMessagesPageState extends State<DirectMessagesPage> {
               String lastMsgContent = '';
               if (lastStatus != null) {
                   lastMsgContent = lastStatus['content_text'] ?? lastStatus['content'] ?? lastStatus['body'] ?? lastStatus['message'] ?? '';
-                  lastMsgContent = lastMsgContent.replaceAll(RegExp(r'<[^>]*>'), '');
+                  lastMsgContent = lastMsgContent.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+
+                  // If text is empty, check for media attachments
+                  if (lastMsgContent.isEmpty) {
+                    final attachments = lastStatus['media_attachments'] as List?;
+                    if (attachments != null && attachments.isNotEmpty) {
+                      final mediaType = attachments[0]['type']?.toString() ?? '';
+                      if (mediaType == 'image') {
+                        lastMsgContent = '\ud83d\udcf7 Photo';
+                      } else if (mediaType == 'video' || mediaType == 'gifv') {
+                        lastMsgContent = '\ud83c\udfa5 Video';
+                      } else if (mediaType == 'audio') {
+                        lastMsgContent = '\ud83c\udfa7 Audio';
+                      } else {
+                        lastMsgContent = '\ud83d\udcce Attachment';
+                      }
+                    } else {
+                      // Check Pixelfed-style type field
+                      final msgType = lastStatus['type']?.toString() ?? '';
+                      if (msgType == 'photo' || msgType == 'photos') {
+                        lastMsgContent = '\ud83d\udcf7 Photo';
+                      } else if (msgType == 'video') {
+                        lastMsgContent = '\ud83c\udfa5 Video';
+                      } else if (msgType == 'emoji') {
+                        lastMsgContent = lastStatus['value']?.toString() ?? '\u2764\ufe0f';
+                      }
+                    }
+                  }
               }
               
               DateTime? lastMsgTime;

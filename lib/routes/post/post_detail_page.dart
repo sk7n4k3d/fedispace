@@ -155,8 +155,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
     try {
       final replyId = optimisticComment.in_reply_to_id;
       await widget.apiService.createPosts(inReplyToId: replyId, content: commentText);
-      // Reload to get the real comment with correct ID
-      _loadComments();
+      // Wait for server to process before reloading
+      await Future.delayed(const Duration(seconds: 2));
+      if (mounted) _loadComments();
     } catch (error, stackTrace) {
       appLogger.error('Error posting comment', error, stackTrace);
       // Remove optimistic comment on failure

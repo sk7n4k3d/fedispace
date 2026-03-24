@@ -15,6 +15,7 @@ import 'package:fedispace/routes/profile/archived_posts_page.dart';
 import 'package:fedispace/routes/profile/collections_page.dart';
 import 'package:fedispace/core/loops_auth.dart';
 import 'package:fedispace/routes/reels/loops_login_page.dart';
+import 'package:fedispace/routes/timeline/tag_timeline.dart';
 
 class SettingsPage extends StatefulWidget {
   final ApiService apiService;
@@ -392,6 +393,65 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _showFollowedTags() async {
+    try {
+      final tags = await widget.apiService.getFollowedTags(limit: 200);
+      if (!mounted) return;
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: CyberpunkTheme.cardDark,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        builder: (ctx) => Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text('Followed Tags', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: CyberpunkTheme.textWhite)),
+              ),
+              const Divider(color: CyberpunkTheme.borderDark),
+              if (tags.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(32),
+                  child: Text('No followed tags', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+                )
+              else
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: tags.length,
+                    itemBuilder: (context, index) {
+                      final tag = tags[index];
+                      final name = tag['name']?.toString() ?? '';
+                      return ListTile(
+                        leading: const Icon(Icons.tag, color: CyberpunkTheme.neonCyan),
+                        title: Text('#$name', style: const TextStyle(color: CyberpunkTheme.textWhite)),
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (_) => TagTimeline(apiService: widget.apiService, tag: name),
+                          ));
+                        },
+                      );
+                    },
+                  ),
+                ),
+            ],
+          ),
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading tags: $e'), backgroundColor: CyberpunkTheme.cardDark),
+        );
+      }
+    }
   }
 
   void _showAnnouncementDialog(Map<String, dynamic> announcement) {
@@ -1107,6 +1167,30 @@ class _SettingsPageState extends State<SettingsPage> {
              title: S.of(context).appLanguage,
              subtitle: _appLocaleCode.isEmpty ? S.of(context).systemDefault : (_appLanguageOptions[_appLocaleCode] ?? _appLocaleCode),
             onTap: _showAppLanguagePicker,
+          ),
+          _divider(),
+
+          // Features
+          _sectionHeader('Features'),
+          _settingsItem(
+            icon: Icons.tag_rounded,
+            title: 'Followed Tags',
+            subtitle: 'Manage tags you follow',
+            onTap: () => _showFollowedTags(),
+          ),
+          _settingsItem(
+            icon: Icons.push_pin_outlined,
+            title: 'Pinned Posts',
+            subtitle: 'View your pinned posts',
+            onTap: () => Navigator.pushNamed(context, '/PinnedPosts'),
+          ),
+          _settingsItem(
+            icon: Icons.campaign_outlined,
+            title: 'Server Announcements',
+            subtitle: '${_announcements.length} announcement${_announcements.length != 1 ? "s" : ""}',
+            onTap: () {
+              if (_announcements.isNotEmpty) _showAnnouncementDialog(_announcements.first);
+            },
           ),
           _divider(),
 

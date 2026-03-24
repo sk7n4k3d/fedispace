@@ -100,9 +100,17 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
     _loadVideos();
   }
 
-  void _onSkipLogin() {
+  void _onSkipLogin() async {
     _showLoginPage = false;
-    _loopsApi = LoopsApi(instanceUrl: 'https://loops.video');
+    // Try to get authenticated client first (user may have logged in before)
+    final authenticated = await LoopsAuth.isAuthenticated();
+    if (authenticated) {
+      _isAuthenticated = true;
+      _loopsApi?.dispose();
+      _loopsApi = await LoopsAuth.getAuthenticatedClient();
+    } else {
+      _loopsApi = LoopsApi(instanceUrl: 'https://loops.video');
+    }
     setState(() => _isLoading = true);
     _loadVideos();
   }
@@ -186,12 +194,40 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
           });
         }
       } else if (_isAuthenticated) {
-        final response = await _loopsApi!.getForYouFeed(limit: 15);
+        try {
+          final response = await _loopsApi!.getForYouFeed(limit: 15);
+          if (mounted) {
+            setState(() {
+              _videos.clear();
+              _videos.addAll(response.data);
+              _nextCursor = response.nextCursor;
+              _isLoading = false;
+            });
+          }
+          return; // Success, stop here
+        } catch (e) {
+          debugPrint('[REELS] Authenticated getForYouFeed failed: $e, trying public feed');
+        }
+        // Fallback to public feed for authenticated users
+        try {
+          final response = await _loopsApi!.getPublicFeed();
+          if (response.isNotEmpty && mounted) {
+            setState(() {
+              _videos.clear();
+              _videos.addAll(response);
+              _isLoading = false;
+            });
+            return;
+          }
+        } catch (e) {
+          debugPrint('[REELS] Authenticated public feed also failed: $e');
+        }
+        // Last resort: direct HTTP
+        final videos = await _fetchPublicFeedDirect();
         if (mounted) {
           setState(() {
             _videos.clear();
-            _videos.addAll(response.data);
-            _nextCursor = response.nextCursor;
+            _videos.addAll(videos);
             _isLoading = false;
           });
         }
