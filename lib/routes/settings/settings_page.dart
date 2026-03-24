@@ -13,6 +13,8 @@ import 'package:fedispace/routes/settings/domain_blocks_page.dart';
 import 'package:fedispace/routes/settings/content_filters_page.dart';
 import 'package:fedispace/routes/profile/archived_posts_page.dart';
 import 'package:fedispace/routes/profile/collections_page.dart';
+import 'package:fedispace/core/loops_auth.dart';
+import 'package:fedispace/routes/reels/loops_login_page.dart';
 
 class SettingsPage extends StatefulWidget {
   final ApiService apiService;
@@ -25,6 +27,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool _notificationsEnabled = true;
+  bool _loopsConnected = false;
   bool _privateAccount = false;
 
   // App language
@@ -97,6 +100,7 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     _loadAiConfig();
+    _checkLoopsAuth();
     _loadServerData();
   }
 
@@ -111,6 +115,13 @@ class _SettingsPageState extends State<SettingsPage> {
         });
       }
     } catch (_) {}
+  }
+
+  Future<void> _checkLoopsAuth() async {
+    final authenticated = await LoopsAuth.isAuthenticated();
+    if (mounted) {
+      setState(() => _loopsConnected = authenticated);
+    }
   }
 
   static const _secureStorage = FlutterSecureStorage();
@@ -1131,6 +1142,77 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             _divider(),
           ],
+
+          _sectionHeader('Loops Account'),
+          FutureBuilder<bool>(
+            future: LoopsAuth.isAuthenticated(),
+            builder: (context, snapshot) {
+              final connected = snapshot.data ?? _loopsConnected;
+              if (connected) {
+                return _settingsItem(
+                  icon: Icons.videocam_rounded,
+                  title: 'Connected to Loops',
+                  subtitle: 'loops.video',
+                  trailing: TextButton(
+                    onPressed: () async {
+                      await LoopsAuth.logout();
+                      setState(() => _loopsConnected = false);
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('Disconnected from Loops'),
+                            backgroundColor: CyberpunkTheme.surfaceDark,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                        );
+                      }
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: CyberpunkTheme.neonPink,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    ),
+                    child: const Text('Disconnect', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                  ),
+                );
+              } else {
+                return _settingsItem(
+                  icon: Icons.videocam_off_outlined,
+                  title: 'Connect to Loops',
+                  subtitle: 'Sign in to access video reels',
+                  onTap: () async {
+                    final result = await Navigator.push<bool>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => LoopsLoginPage(
+                          onAuthenticated: () {
+                            Navigator.pop(context, true);
+                          },
+                          onSkip: () {
+                            Navigator.pop(context, false);
+                          },
+                        ),
+                      ),
+                    );
+                    if (result == true) {
+                      setState(() => _loopsConnected = true);
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('Connected to Loops'),
+                            backgroundColor: CyberpunkTheme.surfaceDark,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                );
+              }
+            },
+          ),
+          _divider(),
 
            _sectionHeader(S.of(context).about),
           _settingsItem(

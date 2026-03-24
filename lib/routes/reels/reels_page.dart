@@ -32,6 +32,7 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
   int _currentIndex = 0;
   String? _nextCursor;
   int _selectedFeedTab = 0; // 0 = For You, 1 = Following
+  late TabController _feedTabController;
 
   // Double-tap heart animation
   bool _showHeart = false;
@@ -54,11 +55,22 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
       TweenSequenceItem(tween: Tween(begin: 1.4, end: 1.0), weight: 30),
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 30),
     ]).animate(CurvedAnimation(parent: _heartController, curve: Curves.easeOut));
+    _feedTabController = TabController(length: 2, vsync: this);
+    _feedTabController.addListener(() {
+      if (!_feedTabController.indexIsChanging && _feedTabController.index != _selectedFeedTab) {
+        setState(() {
+          _selectedFeedTab = _feedTabController.index;
+          _isLoading = true;
+        });
+        _loadVideos();
+      }
+    });
     _checkAuth();
   }
 
   @override
   void dispose() {
+    _feedTabController.dispose();
     _pageController.dispose();
     _heartController.dispose();
     _loopsApi?.dispose();
@@ -447,91 +459,25 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
   }
 
   Widget _buildFeedTabs() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        GestureDetector(
-          onTap: () {
-            if (_selectedFeedTab != 0) {
-              setState(() {
-                _selectedFeedTab = 0;
-                _isLoading = true;
-              });
-              _loadVideos();
-            }
-          },
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'For You',
-                style: TextStyle(
-                  color: _selectedFeedTab == 0 ? Colors.white : Colors.white54,
-                  fontWeight: _selectedFeedTab == 0 ? FontWeight.w700 : FontWeight.w500,
-                  fontSize: 16,
-                  shadows: _selectedFeedTab == 0
-                      ? [Shadow(color: Colors.white.withOpacity(0.5), blurRadius: 8)]
-                      : null,
-                ),
-              ),
-              const SizedBox(height: 4),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: _selectedFeedTab == 0 ? 24 : 0,
-                height: 2,
-                decoration: BoxDecoration(
-                  color: CyberpunkTheme.neonCyan,
-                  borderRadius: BorderRadius.circular(1),
-                  boxShadow: [
-                    BoxShadow(color: CyberpunkTheme.neonCyan.withOpacity(0.6), blurRadius: 6),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 28),
-        GestureDetector(
-          onTap: () {
-            if (_selectedFeedTab != 1) {
-              setState(() {
-                _selectedFeedTab = 1;
-                _isLoading = true;
-              });
-              _loadVideos();
-            }
-          },
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Following',
-                style: TextStyle(
-                  color: _selectedFeedTab == 1 ? Colors.white : Colors.white54,
-                  fontWeight: _selectedFeedTab == 1 ? FontWeight.w700 : FontWeight.w500,
-                  fontSize: 16,
-                  shadows: _selectedFeedTab == 1
-                      ? [Shadow(color: Colors.white.withOpacity(0.5), blurRadius: 8)]
-                      : null,
-                ),
-              ),
-              const SizedBox(height: 4),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: _selectedFeedTab == 1 ? 24 : 0,
-                height: 2,
-                decoration: BoxDecoration(
-                  color: CyberpunkTheme.neonCyan,
-                  borderRadius: BorderRadius.circular(1),
-                  boxShadow: [
-                    BoxShadow(color: CyberpunkTheme.neonCyan.withOpacity(0.6), blurRadius: 6),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return SizedBox(
+      width: 200,
+      child: TabBar(
+        controller: _feedTabController,
+        indicatorColor: CyberpunkTheme.neonCyan,
+        indicatorSize: TabBarIndicatorSize.label,
+        indicatorWeight: 2,
+        labelColor: Colors.white,
+        labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+        unselectedLabelColor: Colors.white54,
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+        dividerColor: Colors.transparent,
+        splashFactory: NoSplash.splashFactory,
+        overlayColor: WidgetStateProperty.all(Colors.transparent),
+        tabs: const [
+          Tab(text: 'For You'),
+          Tab(text: 'Following'),
+        ],
+      ),
     );
   }
 
