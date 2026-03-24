@@ -66,8 +66,8 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
     try {
       // Parallelize independent API calls
       final results = await Future.wait([
-        widget.apiService.getTrendingPosts(limit: 20),
-        widget.apiService.discoverPosts(limit: 30),
+        widget.apiService.getTrendingPosts(limit: 20).catchError((e) { appLogger.error('Error loading trending posts', e); return <Status>[]; }),
+        widget.apiService.discoverPosts(limit: 30).catchError((e) { appLogger.error('Error loading discover posts', e); return <Status>[]; }),
         widget.apiService.discoverPopularAccounts(limit: 10).catchError((e) { appLogger.error('Error loading popular accounts', e); return <Account>[]; }),
         widget.apiService.discoverTrendingHashtags(limit: 10).catchError((e) { appLogger.error('Error loading trending hashtags', e); return <Map<String, dynamic>>[]; }),
         widget.apiService.getSuggestions(limit: 8).catchError((e) { appLogger.error('Error loading suggestions', e); return <Account>[]; }),
@@ -75,13 +75,13 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
         widget.apiService.discoverNetworkTrending(limit: 20).catchError((e) { appLogger.error('Error loading network trending', e); return <Status>[]; }),
       ]);
 
-      final trending = results[0] as List<Status>;
-      final discover = results[1] as List<Status>;
-      final popularAccounts = results[2] as List<Account>;
-      final hashtags = results[3] as List<Map<String, dynamic>>;
-      final suggestionAccounts = results[4] as List<Account>;
-      final followedTags = results[5] as List<Map<String, dynamic>>;
-      final networkTrending = results[6] as List<Status>;
+      final trending = results[0] is List<Status> ? results[0] as List<Status> : <Status>[];
+      final discover = results[1] is List<Status> ? results[1] as List<Status> : <Status>[];
+      final popularAccounts = results[2] is List<Account> ? results[2] as List<Account> : <Account>[];
+      final hashtags = results[3] is List ? List<Map<String, dynamic>>.from(results[3] as List) : <Map<String, dynamic>>[];
+      final suggestionAccounts = results[4] is List<Account> ? results[4] as List<Account> : <Account>[];
+      final followedTags = results[5] is List ? List<Map<String, dynamic>>.from(results[5] as List) : <Map<String, dynamic>>[];
+      final networkTrending = results[6] is List<Status> ? results[6] as List<Status> : <Status>[];
 
       final popular = popularAccounts.map((a) => AccountUsers(
         id: a.id ?? '',

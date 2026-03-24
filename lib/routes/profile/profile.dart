@@ -98,12 +98,17 @@ class _Profile extends State<Profile> {
     super.initState();
     // Defer until after first frame so ModalRoute is available
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final future = fetchAccount().then((result) {
+        _dataFuture = _callAPIToGetListOfData();
+        if (mounted) {
+          setState(() {
+            _accountLoaded = true;
+          });
+        }
+        return result;
+      });
       setState(() {
-        _accountFuture = fetchAccount().then((result) {
-          _accountLoaded = true;
-          _dataFuture = _callAPIToGetListOfData();
-          return result;
-        });
+        _accountFuture = future;
       });
     });
     _scrollController.addListener(() async {
