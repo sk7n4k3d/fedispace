@@ -155,9 +155,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
     try {
       final replyId = optimisticComment.in_reply_to_id;
       await widget.apiService.createPosts(inReplyToId: replyId, content: commentText);
-      // Wait for server to process before reloading
-      await Future.delayed(const Duration(seconds: 2));
-      if (mounted) _loadComments();
+      // Don't auto-reload — optimistic comment stays visible
+      // User can pull-to-refresh to sync with server
     } catch (error, stackTrace) {
       appLogger.error('Error posting comment', error, stackTrace);
       // Remove optimistic comment on failure
@@ -1402,7 +1401,9 @@ class _FullScreenImageViewState extends State<_FullScreenImageView> {
       backgroundColor: Colors.black,
       body: GestureDetector(
         onVerticalDragEnd: (details) {
-          if (details.primaryVelocity != null && details.primaryVelocity!.abs() > 300) {
+          // Only allow swipe-to-close when not zoomed
+          if (_transformController.value == Matrix4.identity() &&
+              details.primaryVelocity != null && details.primaryVelocity! > 300) {
             Navigator.of(context).pop();
           }
         },

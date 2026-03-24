@@ -863,7 +863,9 @@ class _FullScreenImageViewState extends State<_FullScreenImageView> {
       backgroundColor: Colors.black,
       body: GestureDetector(
         onVerticalDragEnd: (details) {
-          if (details.primaryVelocity != null && details.primaryVelocity!.abs() > 300) {
+          // Only allow swipe-to-close when not zoomed
+          if (_transformController.value == Matrix4.identity() &&
+              details.primaryVelocity != null && details.primaryVelocity! > 300) {
             Navigator.of(context).pop();
           }
         },
