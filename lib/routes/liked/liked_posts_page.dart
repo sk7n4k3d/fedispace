@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fedispace/themes/cyberpunk_theme.dart';
 import 'package:fedispace/core/api.dart';
 import 'package:fedispace/core/logger.dart';
 import 'package:fedispace/l10n/app_localizations.dart';
@@ -173,6 +174,8 @@ class _LikedPostsPageState extends State<LikedPostsPage> {
     }
 
     return RefreshIndicator(
+      color: CyberpunkTheme.neonCyan,
+      backgroundColor: CyberpunkTheme.cardDark,
       onRefresh: () => _loadLikedPosts(),
       child: ListView.builder(
         itemCount: _likedPosts.length + (_nextPageId != null ? 1 : 0),

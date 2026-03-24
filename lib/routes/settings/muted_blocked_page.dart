@@ -133,7 +133,7 @@ class _MutedBlockedPageState extends State<MutedBlockedPage> with SingleTickerPr
 
     return RefreshIndicator(
       color: CyberpunkTheme.neonCyan,
-      backgroundColor: CyberpunkTheme.surfaceDark,
+      backgroundColor: CyberpunkTheme.cardDark,
       onRefresh: _loadData,
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -156,7 +156,7 @@ class _MutedBlockedPageState extends State<MutedBlockedPage> with SingleTickerPr
               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               leading: CircleAvatar(
                 radius: 22,
-                backgroundColor: CyberpunkTheme.surfaceDark,
+                backgroundColor: CyberpunkTheme.cardDark,
                 backgroundImage: avatarUrl.isNotEmpty ? CachedNetworkImageProvider(avatarUrl) : null,
                 child: avatarUrl.isEmpty
                     ? const Icon(Icons.person, color: CyberpunkTheme.textTertiary, size: 22)

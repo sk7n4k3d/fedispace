@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fedispace/themes/cyberpunk_theme.dart';
 
@@ -140,7 +141,10 @@ class _NavItemState extends State<_NavItem> with SingleTickerProviderStateMixin 
 
     return Expanded(
       child: InkWell(
-        onTap: widget.onTap,
+        onTap: () {
+          HapticFeedback.selectionClick();
+          widget.onTap();
+        },
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
         child: Column(
@@ -239,7 +243,10 @@ class _ProfileNavItemState extends State<_ProfileNavItem> with SingleTickerProvi
   Widget build(BuildContext context) {
     return Expanded(
       child: InkWell(
-        onTap: widget.onTap,
+        onTap: () {
+          HapticFeedback.selectionClick();
+          widget.onTap();
+        },
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
         child: Column(

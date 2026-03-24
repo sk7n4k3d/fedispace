@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:fedispace/core/api.dart';
 import 'package:fedispace/core/logger.dart';
 import 'package:fedispace/l10n/app_localizations.dart';
@@ -7,12 +8,13 @@ import 'package:fedispace/models/status.dart';
 import 'package:fedispace/themes/cyberpunk_theme.dart';
 import 'package:fedispace/widgets/instagram_widgets.dart';
 import 'package:fedispace/widgets/instagram_post_card.dart';
+import 'package:fedispace/widgets/skeleton_loading.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:fedispace/routes/messages/conversation_detail_page.dart';
 import 'package:fedispace/routes/profile/collections_page.dart';
 
-/// Instagram-style user profile page for viewing other users
+/// Cyberpunk-themed user profile page for viewing other users
 class UserProfilePage extends StatefulWidget {
   final ApiService apiService;
   final String userId;
@@ -55,7 +57,6 @@ class _UserProfilePageState extends State<UserProfilePage>
       appLogger.debug('Loading user profile: ${widget.userId}');
       final account = await widget.apiService.getUserAccount(widget.userId);
       
-      // Use getRelationships for accurate follow/mute/block state
       bool following = account.following ?? false;
       try {
         final rels = await widget.apiService.getRelationships([widget.userId]);
@@ -148,28 +149,37 @@ class _UserProfilePageState extends State<UserProfilePage>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(),
-        body: const Center(child: InstagramLoadingIndicator(size: 32)),
+        backgroundColor: CyberpunkTheme.backgroundBlack,
+        appBar: AppBar(backgroundColor: CyberpunkTheme.backgroundBlack),
+        body: const SingleChildScrollView(child: ProfileSkeleton()),
       );
     }
 
     if (_account == null) {
       return Scaffold(
-        appBar: AppBar(),
-        body: Center(child: Text(S.of(context).error)),
+        backgroundColor: CyberpunkTheme.backgroundBlack,
+        appBar: AppBar(backgroundColor: CyberpunkTheme.backgroundBlack),
+        body: Center(child: Text(S.of(context).error, style: GoogleFonts.inter(color: CyberpunkTheme.textSecondary))),
       );
     }
 
     return Scaffold(
+      backgroundColor: CyberpunkTheme.backgroundBlack,
       appBar: AppBar(
-        title: Text(_account!.username),
+        backgroundColor: CyberpunkTheme.backgroundBlack,
+        title: Text(
+          _account!.username,
+          style: GoogleFonts.inter(
+            color: CyberpunkTheme.textWhite,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         actions: [
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert, color: CyberpunkTheme.textWhite),
             onSelected: (value) async {
               if (value == 'block') {
                  await widget.apiService.blockUser(widget.userId);
@@ -205,12 +215,11 @@ class _UserProfilePageState extends State<UserProfilePage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildProfileHeader(isDark),
-                  _buildStats(),
+                  _buildProfileHeader(),
                   _buildBio(),
                   _buildActionButtons(),
-                  const SizedBox(height: 16),
-                  const InstagramDivider(),
+                  const SizedBox(height: CyberpunkTheme.spacingL),
+                  Container(height: 0.5, color: CyberpunkTheme.borderDark),
                 ],
               ),
             ),
@@ -220,6 +229,9 @@ class _UserProfilePageState extends State<UserProfilePage>
                 TabBar(
                   controller: _tabController,
                   onTap: (index) => setState(() => _currentTab = index),
+                  indicatorColor: CyberpunkTheme.neonCyan,
+                  labelColor: CyberpunkTheme.textWhite,
+                  unselectedLabelColor: CyberpunkTheme.textTertiary,
                   tabs: const [
                     Tab(icon: Icon(Icons.grid_on)),
                     Tab(icon: Icon(Icons.person_pin_outlined)),
@@ -240,19 +252,40 @@ class _UserProfilePageState extends State<UserProfilePage>
     );
   }
 
-  Widget _buildProfileHeader(bool isDark) {
+  Widget _buildProfileHeader() {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(CyberpunkTheme.spacingL),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundImage: _account!.avatar.isNotEmpty
-                ? CachedNetworkImageProvider(_account!.avatar)
-                : null,
-            child: _account!.avatar.isEmpty
-                ? const Icon(Icons.person, size: 40)
-                : null,
+          // Avatar with neon cyan ring + glow (matching profile.dart)
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: CyberpunkTheme.neonCyan.withOpacity(0.5),
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: CyberpunkTheme.neonCyan.withOpacity(0.2),
+                  blurRadius: 12,
+                  spreadRadius: 0,
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(3),
+              child: CircleAvatar(
+                radius: 36,
+                backgroundColor: CyberpunkTheme.cardDark,
+                backgroundImage: _account!.avatar.isNotEmpty
+                    ? CachedNetworkImageProvider(_account!.avatar)
+                    : null,
+                child: _account!.avatar.isEmpty
+                    ? const Icon(Icons.person, size: 36, color: CyberpunkTheme.textTertiary)
+                    : null,
+              ),
+            ),
           ),
           const SizedBox(width: 24),
           Expanded(
@@ -286,26 +319,22 @@ class _UserProfilePageState extends State<UserProfilePage>
       children: [
         Text(
           count,
-          style: const TextStyle(
+          style: GoogleFonts.inter(
             fontSize: 18,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
+            color: CyberpunkTheme.textWhite,
           ),
         ),
+        const SizedBox(height: 2),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 14,
-            color: Theme.of(context).brightness == Brightness.dark
-                ? const Color(0xFFA8A8A8)
-                : const Color(0xFF8E8E8E),
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            color: CyberpunkTheme.textSecondary,
           ),
         ),
       ],
     );
-  }
-
-  Widget _buildStats() {
-    return const SizedBox.shrink();
   }
 
   Widget _buildBio() {
@@ -314,26 +343,30 @@ class _UserProfilePageState extends State<UserProfilePage>
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: CyberpunkTheme.spacingL),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (_account!.display_name.isNotEmpty)
             Text(
               _account!.display_name,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: CyberpunkTheme.textWhite,
               ),
             ),
           if (_account!.note.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
               _account!.note.replaceAll(RegExp(r'<[^>]*>'), ''),
-              style: const TextStyle(fontSize: 14),
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: CyberpunkTheme.textWhite.withOpacity(0.9),
+              ),
             ),
           ],
-          const SizedBox(height: 16),
+          const SizedBox(height: CyberpunkTheme.spacingL),
         ],
       ),
     );
@@ -341,20 +374,20 @@ class _UserProfilePageState extends State<UserProfilePage>
 
   Widget _buildActionButtons() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: CyberpunkTheme.spacingL),
       child: Row(
         children: [
           // Follow Button
           Expanded(
             child: SizedBox(
-               height: 35, // Explicit height
+               height: 35,
                child: InstagramFollowButton(
                 isFollowing: _isFollowing,
                 onPressed: _toggleFollow,
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: CyberpunkTheme.spacingS),
           
           // Message Button
           SizedBox(
@@ -362,12 +395,12 @@ class _UserProfilePageState extends State<UserProfilePage>
             height: 35,
             child: Container(
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.withOpacity(0.5)),
-                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: CyberpunkTheme.borderDark),
+                borderRadius: BorderRadius.circular(CyberpunkTheme.radiusS),
               ),
               child: IconButton(
                 padding: EdgeInsets.zero,
-                icon: const Icon(Icons.mail_outline, size: 20),
+                icon: const Icon(Icons.mail_outline, size: 20, color: CyberpunkTheme.textWhite),
                 onPressed: () {
                    Navigator.push(
                     context,
@@ -386,7 +419,7 @@ class _UserProfilePageState extends State<UserProfilePage>
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: CyberpunkTheme.spacingS),
 
           // More Options Button
           SizedBox(
@@ -394,12 +427,12 @@ class _UserProfilePageState extends State<UserProfilePage>
             height: 35,
              child: Container(
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.withOpacity(0.5)),
-                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: CyberpunkTheme.borderDark),
+                borderRadius: BorderRadius.circular(CyberpunkTheme.radiusS),
               ),
               child: IconButton(
                 padding: EdgeInsets.zero,
-                icon: const Icon(Icons.more_horiz, size: 20),
+                icon: const Icon(Icons.more_horiz, size: 20, color: CyberpunkTheme.textWhite),
                 onPressed: _showMoreOptions,
               ),
             ),
@@ -414,7 +447,7 @@ class _UserProfilePageState extends State<UserProfilePage>
       context: context,
       backgroundColor: CyberpunkTheme.surfaceDark,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(CyberpunkTheme.radiusRound)),
       ),
       builder: (ctx) => SafeArea(
         child: Column(
@@ -427,7 +460,7 @@ class _UserProfilePageState extends State<UserProfilePage>
             ),
             ListTile(
               leading: Icon(_isPinned ? Icons.push_pin : Icons.push_pin_outlined, color: CyberpunkTheme.textWhite),
-              title: Text(_isPinned ? 'Unpin account' : 'Pin account', style: TextStyle(color: CyberpunkTheme.textWhite)),
+              title: Text(_isPinned ? 'Unpin account' : 'Pin account', style: GoogleFonts.inter(color: CyberpunkTheme.textWhite)),
               onTap: () async {
                 Navigator.pop(ctx);
                 final ok = _isPinned
@@ -436,32 +469,32 @@ class _UserProfilePageState extends State<UserProfilePage>
                 if (mounted) {
                   if (ok) setState(() => _isPinned = !_isPinned);
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(ok ? S.of(context).success : S.of(context).error, style: const TextStyle(color: Colors.white)),
-                    backgroundColor: ok ? CyberpunkTheme.neonCyan.withOpacity(0.8) : Colors.red,
+                    content: Text(ok ? S.of(context).success : S.of(context).error, style: GoogleFonts.inter(color: CyberpunkTheme.textWhite)),
+                    backgroundColor: ok ? CyberpunkTheme.neonCyan.withOpacity(0.8) : CyberpunkTheme.errorRed,
                     behavior: SnackBarBehavior.floating,
                   ));
                 }
               },
             ),
             ListTile(
-              leading: Icon(Icons.star_outline, color: CyberpunkTheme.textWhite),
-              title: Text('Endorsements', style: TextStyle(color: CyberpunkTheme.textWhite)),
+              leading: const Icon(Icons.star_outline, color: CyberpunkTheme.textWhite),
+              title: Text('Endorsements', style: GoogleFonts.inter(color: CyberpunkTheme.textWhite)),
               onTap: () async {
                 Navigator.pop(ctx);
                 _showEndorsements();
               },
             ),
             ListTile(
-              leading: Icon(Icons.list_outlined, color: CyberpunkTheme.textWhite),
-              title: Text('Lists', style: TextStyle(color: CyberpunkTheme.textWhite)),
+              leading: const Icon(Icons.list_outlined, color: CyberpunkTheme.textWhite),
+              title: Text('Lists', style: GoogleFonts.inter(color: CyberpunkTheme.textWhite)),
               onTap: () async {
                 Navigator.pop(ctx);
                 _showAccountLists();
               },
             ),
             ListTile(
-              leading: Icon(Icons.collections_outlined, color: CyberpunkTheme.textWhite),
-              title: Text(S.of(context).collections, style: TextStyle(color: CyberpunkTheme.textWhite)),
+              leading: const Icon(Icons.collections_outlined, color: CyberpunkTheme.textWhite),
+              title: Text(S.of(context).collections, style: GoogleFonts.inter(color: CyberpunkTheme.textWhite)),
               onTap: () {
                 Navigator.pop(ctx);
                 Navigator.push(context, MaterialPageRoute(
@@ -469,18 +502,18 @@ class _UserProfilePageState extends State<UserProfilePage>
                 ));
               },
             ),
-            Divider(color: CyberpunkTheme.borderDark),
+            const Divider(color: CyberpunkTheme.borderDark),
             ListTile(
-              leading: const Icon(Icons.report_gmailerrorred, color: Colors.red),
-              title: Text(S.of(context).report, style: const TextStyle(color: Colors.red)),
+              leading: const Icon(Icons.report_gmailerrorred, color: CyberpunkTheme.errorRed),
+              title: Text(S.of(context).report, style: GoogleFonts.inter(color: CyberpunkTheme.errorRed)),
               onTap: () {
                 Navigator.pop(ctx);
                 _showReportDialog();
               },
             ),
             ListTile(
-              leading: const Icon(Icons.block, color: Colors.red),
-              title: Text(S.of(context).block, style: const TextStyle(color: Colors.red)),
+              leading: const Icon(Icons.block, color: CyberpunkTheme.errorRed),
+              title: Text(S.of(context).block, style: GoogleFonts.inter(color: CyberpunkTheme.errorRed)),
               onTap: () async {
                 Navigator.pop(ctx);
                 await widget.apiService.blockUser(widget.userId);
@@ -488,8 +521,8 @@ class _UserProfilePageState extends State<UserProfilePage>
               },
             ),
             ListTile(
-              leading: Icon(Icons.volume_off, color: CyberpunkTheme.textWhite),
-              title: Text(S.of(context).mute, style: TextStyle(color: CyberpunkTheme.textWhite)),
+              leading: const Icon(Icons.volume_off, color: CyberpunkTheme.textWhite),
+              title: Text(S.of(context).mute, style: GoogleFonts.inter(color: CyberpunkTheme.textWhite)),
               onTap: () async {
                 Navigator.pop(ctx);
                 await widget.apiService.muteUser(widget.userId);
@@ -497,14 +530,14 @@ class _UserProfilePageState extends State<UserProfilePage>
               },
             ),
             ListTile(
-              leading: Icon(Icons.person_remove_outlined, color: CyberpunkTheme.textWhite),
-              title: Text(S.of(context).unfollow, style: TextStyle(color: CyberpunkTheme.textWhite)),
+              leading: const Icon(Icons.person_remove_outlined, color: CyberpunkTheme.textWhite),
+              title: Text(S.of(context).unfollow, style: GoogleFonts.inter(color: CyberpunkTheme.textWhite)),
               onTap: () async {
                 Navigator.pop(ctx);
                 final ok = await widget.apiService.removeFromFollowers(widget.userId);
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(ok ? S.of(context).success : S.of(context).error, style: const TextStyle(color: Colors.white)),
+                    content: Text(ok ? S.of(context).success : S.of(context).error, style: GoogleFonts.inter(color: CyberpunkTheme.textWhite)),
                     behavior: SnackBarBehavior.floating,
                   ));
                 }
@@ -524,20 +557,20 @@ class _UserProfilePageState extends State<UserProfilePage>
       showModalBottomSheet(
         context: context,
         backgroundColor: CyberpunkTheme.surfaceDark,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(CyberpunkTheme.radiusRound))),
         builder: (ctx) => SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(width: 40, height: 4, margin: const EdgeInsets.symmetric(vertical: 12), decoration: BoxDecoration(color: CyberpunkTheme.textTertiary, borderRadius: BorderRadius.circular(2))),
-              Padding(padding: const EdgeInsets.all(12), child: Text('Endorsements', style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 16, fontWeight: FontWeight.w700))),
+              Padding(padding: const EdgeInsets.all(12), child: Text('Endorsements', style: GoogleFonts.inter(color: CyberpunkTheme.textWhite, fontSize: 16, fontWeight: FontWeight.w700))),
               if (endorsements.isEmpty)
-                Padding(padding: const EdgeInsets.all(24), child: Text('No endorsements', style: TextStyle(color: CyberpunkTheme.textSecondary)))
+                Padding(padding: const EdgeInsets.all(24), child: Text('No endorsements', style: GoogleFonts.inter(color: CyberpunkTheme.textSecondary)))
               else
                 ...endorsements.take(20).map((a) => ListTile(
                   leading: CircleAvatar(backgroundImage: a.avatar != null && a.avatar!.isNotEmpty ? NetworkImage(a.avatar!) : null, child: a.avatar == null || a.avatar!.isEmpty ? const Icon(Icons.person) : null),
-                  title: Text(a.display_name ?? a.username ?? '', style: const TextStyle(color: CyberpunkTheme.textWhite)),
-                  subtitle: Text('@${a.username ?? ''}', style: const TextStyle(color: CyberpunkTheme.textSecondary)),
+                  title: Text(a.display_name ?? a.username ?? '', style: GoogleFonts.inter(color: CyberpunkTheme.textWhite)),
+                  subtitle: Text('@${a.username ?? ''}', style: GoogleFonts.inter(color: CyberpunkTheme.textSecondary)),
                   onTap: () { Navigator.pop(ctx); Navigator.pushNamed(context, '/UserProfile', arguments: {'userId': a.id}); },
                 )),
               const SizedBox(height: 8),
@@ -557,19 +590,19 @@ class _UserProfilePageState extends State<UserProfilePage>
       showModalBottomSheet(
         context: context,
         backgroundColor: CyberpunkTheme.surfaceDark,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(CyberpunkTheme.radiusRound))),
         builder: (ctx) => SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(width: 40, height: 4, margin: const EdgeInsets.symmetric(vertical: 12), decoration: BoxDecoration(color: CyberpunkTheme.textTertiary, borderRadius: BorderRadius.circular(2))),
-              Padding(padding: const EdgeInsets.all(12), child: Text('Lists', style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 16, fontWeight: FontWeight.w700))),
+              Padding(padding: const EdgeInsets.all(12), child: Text('Lists', style: GoogleFonts.inter(color: CyberpunkTheme.textWhite, fontSize: 16, fontWeight: FontWeight.w700))),
               if (lists.isEmpty)
-                Padding(padding: const EdgeInsets.all(24), child: Text('Not in any lists', style: TextStyle(color: CyberpunkTheme.textSecondary)))
+                Padding(padding: const EdgeInsets.all(24), child: Text('Not in any lists', style: GoogleFonts.inter(color: CyberpunkTheme.textSecondary)))
               else
                 ...lists.take(20).map((l) => ListTile(
                   leading: const Icon(Icons.list, color: CyberpunkTheme.neonCyan),
-                  title: Text(l['title'] ?? 'Untitled', style: const TextStyle(color: CyberpunkTheme.textWhite)),
+                  title: Text(l['title'] ?? 'Untitled', style: GoogleFonts.inter(color: CyberpunkTheme.textWhite)),
                 )),
               const SizedBox(height: 8),
             ],
@@ -586,19 +619,21 @@ class _UserProfilePageState extends State<UserProfilePage>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(S.of(context).report),
+        backgroundColor: CyberpunkTheme.cardDark,
+        title: Text(S.of(context).report, style: GoogleFonts.inter(color: CyberpunkTheme.textWhite)),
         content: TextField(
           controller: reasonController,
+          style: GoogleFonts.inter(color: CyberpunkTheme.textWhite),
           decoration: InputDecoration(
             hintText: S.of(context).report,
-            border: const OutlineInputBorder(),
+            hintStyle: GoogleFonts.inter(color: CyberpunkTheme.textTertiary),
           ),
           maxLines: 3,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(S.of(context).cancel),
+            child: Text(S.of(context).cancel, style: GoogleFonts.inter(color: CyberpunkTheme.textSecondary)),
           ),
           TextButton(
             onPressed: () async {
@@ -606,7 +641,7 @@ class _UserProfilePageState extends State<UserProfilePage>
               await widget.apiService.reportUser(widget.userId, comment: reasonController.text);
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).success)));
             },
-            child: Text(S.of(context).report, style: const TextStyle(color: Colors.red)),
+            child: Text(S.of(context).report, style: GoogleFonts.inter(color: CyberpunkTheme.errorRed)),
           ),
         ],
       ),
@@ -615,7 +650,18 @@ class _UserProfilePageState extends State<UserProfilePage>
 
   Widget _buildPostsGrid() {
     if (_isLoadingPosts) {
-      return const Center(child: InstagramLoadingIndicator(size: 32));
+      return GridView.builder(
+        padding: EdgeInsets.zero,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 1.5,
+          mainAxisSpacing: 1.5,
+        ),
+        itemCount: 9,
+        itemBuilder: (_, __) => SkeletonLoading(
+          child: Container(color: CyberpunkTheme.cardDark),
+        ),
+      );
     }
 
     if (_posts.isEmpty) {
@@ -623,11 +669,11 @@ class _UserProfilePageState extends State<UserProfilePage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.photo_camera_outlined, size: 64, color: Colors.grey),
-            const SizedBox(height: 16),
+            Icon(Icons.photo_camera_outlined, size: 64, color: CyberpunkTheme.textTertiary),
+            const SizedBox(height: CyberpunkTheme.spacingL),
             Text(
               S.of(context).noPosts,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w600, color: CyberpunkTheme.textWhite),
             ),
           ],
         ),
@@ -645,16 +691,11 @@ class _UserProfilePageState extends State<UserProfilePage>
       itemBuilder: (context, index) {
         final post = _posts[index];
         
-        // Robust video detection: check media type first, then extension
         final firstMedia = post.getFirstMedia();
         final isVideoType = firstMedia != null && (firstMedia['type'] == 'video' || firstMedia['type'] == 'gifv');
         final isVideoExtension = post.attach.toLowerCase().contains('.mp4') || post.attach.toLowerCase().contains('.mov');
         final isVideo = isVideoType || isVideoExtension;
 
-        // Determine image URL to display
-        // 1. Prefer preview_url (thumbnail)
-        // 2. If no preview, and NOT video, use main attach URL
-        // 3. If video and no preview, use empty string (don't load MP4 as image)
         String imageUrl = post.preview_url;
         if (imageUrl.isEmpty && !isVideo) {
           imageUrl = post.attach;
@@ -683,11 +724,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                     children: [
                       _ProfileVideoItem(url: post.attach, previewUrl: post.preview_url),
                       const Center(
-                        child: Icon(
-                          Icons.play_circle_outline,
-                          color: Colors.white,
-                          size: 48,
-                        ),
+                        child: Icon(Icons.play_circle_outline, color: Colors.white, size: 48),
                       ),
                     ],
                   ),
@@ -696,10 +733,10 @@ class _UserProfilePageState extends State<UserProfilePage>
                 CachedNetworkImage(
                   imageUrl: imageUrl,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(color: Colors.grey[300]),
+                  placeholder: (context, url) => Container(color: CyberpunkTheme.cardDark),
                   errorWidget: (context, url, error) => Container(
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.error),
+                    color: CyberpunkTheme.cardDark,
+                    child: const Icon(Icons.error, color: CyberpunkTheme.textTertiary),
                   ),
                 )
               else if (post.blurhash.isNotEmpty)
@@ -712,22 +749,14 @@ class _UserProfilePageState extends State<UserProfilePage>
                 )
               else
                 Container(
-                  color: Colors.black87,
+                  color: CyberpunkTheme.cardDark,
                   child: const Center(
-                    child: Icon(
-                      Icons.broken_image,
-                      color: Colors.white54,
-                      size: 32,
-                    ),
+                    child: Icon(Icons.broken_image, color: CyberpunkTheme.textTertiary, size: 32),
                   ),
                 ),
               if (isVideo)
                 const Center(
-                  child: Icon(
-                    Icons.play_circle_outline,
-                    color: Colors.white,
-                    size: 48,
-                  ),
+                  child: Icon(Icons.play_circle_outline, color: Colors.white, size: 48),
                 ),
               if (post.attachement.length > 1)
                 Positioned(
@@ -736,14 +765,10 @@ class _UserProfilePageState extends State<UserProfilePage>
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
+                      color: CyberpunkTheme.backgroundBlack.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: const Icon(
-                      Icons.collections_rounded,
-                      color: Colors.white,
-                      size: 16,
-                    ),
+                    child: const Icon(Icons.collections_rounded, color: Colors.white, size: 16),
                   ),
                 ),
             ],
@@ -758,11 +783,11 @@ class _UserProfilePageState extends State<UserProfilePage>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.person_pin_outlined, size: 64, color: Colors.grey),
-          const SizedBox(height: 16),
+          const Icon(Icons.person_pin_outlined, size: 64, color: CyberpunkTheme.textTertiary),
+          const SizedBox(height: CyberpunkTheme.spacingL),
           Text(
             S.of(context).noPosts,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w600, color: CyberpunkTheme.textWhite),
           ),
         ],
       ),
@@ -784,7 +809,7 @@ class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
+      color: CyberpunkTheme.backgroundBlack,
       child: tabBar,
     );
   }
@@ -795,7 +820,7 @@ class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 
-/// Lightweight video thumbnail - no VideoPlayerController until user taps play.
+/// Lightweight video thumbnail
 class _ProfileVideoItem extends StatelessWidget {
   final String url;
   final String? previewUrl;

@@ -6,6 +6,7 @@ import 'package:fedispace/models/status.dart';
 import 'package:fedispace/routes/timeline/widget/navbar.dart';
 import 'package:fedispace/routes/timeline/widget/statusCard/StatusCard.dart';
 import 'package:flutter/material.dart';
+import 'package:fedispace/themes/cyberpunk_theme.dart';
 import 'package:flutter/services.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
@@ -131,7 +132,7 @@ class _TimelineTabsState extends State<TimelineLegacy> with TickerProviderStateM
                         children: [
                           // Main Content
                           RefreshIndicator(
-                            backgroundColor: Colors.yellowAccent,
+                            color: CyberpunkTheme.neonCyan, backgroundColor: CyberpunkTheme.cardDark,
                             onRefresh: () => Future.sync(_pagingController.refresh),
                             child: ValueListenableBuilder<PagingState<String?, Status>>(
                               valueListenable: _pagingController,

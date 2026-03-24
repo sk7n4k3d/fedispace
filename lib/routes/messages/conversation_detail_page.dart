@@ -646,7 +646,7 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
       builder: (ctx) => AlertDialog(
         backgroundColor: CyberpunkTheme.surfaceDark,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(CyberpunkTheme.radiusRound),
           side: BorderSide(color: CyberpunkTheme.borderDark),
         ),
         title: Text(S.of(context).deleteMessage, style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 16, fontWeight: FontWeight.w700)),

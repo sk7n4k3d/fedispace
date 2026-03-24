@@ -187,7 +187,7 @@ class _TagTimelineState extends State<TagTimeline> {
                 // Post list
                 Expanded(
                   child: RefreshIndicator(
-                    backgroundColor: Colors.yellowAccent,
+                    color: CyberpunkTheme.neonCyan, backgroundColor: CyberpunkTheme.cardDark,
                     onRefresh: () => Future.sync(_pagingController.refresh),
                     child: ValueListenableBuilder<PagingState<String?, Status>>(
                       valueListenable: _pagingController,

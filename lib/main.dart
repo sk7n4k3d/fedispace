@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:camera/camera.dart';
 import 'package:fedispace/core/api.dart';
-import 'package:fedispace/core/notification.dart';
 import 'package:fedispace/core/unifiedpush.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -35,6 +34,15 @@ import 'package:fedispace/themes/cyberpunk_theme.dart';
 import 'package:fedispace/routes/messages/conversation_detail_page.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:flutter/material.dart';
+
+
+/// Global bouncing scroll physics for premium feel
+class BouncingScrollBehavior extends ScrollBehavior {
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return const BouncingScrollPhysics();
+  }
+}
 
 /// Global navigator key for notification-based navigation
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -199,6 +207,7 @@ class MyAppState extends State<MyApp> {
       navigatorKey: navigatorKey,
       title: title,
       theme: CyberpunkTheme.theme,
+      scrollBehavior: BouncingScrollBehavior(),
       debugShowCheckedModeBanner: false,
       locale: _locale,
       supportedLocales: AppLocalizations.supportedLocales,
@@ -278,7 +287,7 @@ class MyAppState extends State<MyApp> {
             story: (ModalRoute.of(context)!.settings.arguments as Map)['story'],
             apiService: widget.apiService,
           ),
-        '/Notification': (context) => Notif(apiService: widget.apiService),
+        '/Notification': (context) => NotificationsPage(apiService: widget.apiService),
         '/View': (context) => const post_view.View(),
         '/Search': (context) =>
             SearchPage(apiService: widget.apiService),

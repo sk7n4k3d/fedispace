@@ -1,14 +1,17 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:fedispace/core/api.dart';
 import 'package:fedispace/l10n/app_localizations.dart';
 import 'package:fedispace/core/logger.dart';
 import 'package:fedispace/models/account.dart';
+import 'package:fedispace/themes/cyberpunk_theme.dart';
 import 'package:fedispace/widgets/instagram_widgets.dart';
+import 'package:fedispace/widgets/skeleton_loading.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
 
-/// Instagram-style profile editing page
+/// Cyberpunk-themed profile editing page
 class EditProfilePage extends StatefulWidget {
   final ApiService apiService;
 
@@ -120,18 +123,29 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: Text(S.of(context).editProfile)),
-        body: const Center(child: InstagramLoadingIndicator(size: 32)),
+        backgroundColor: CyberpunkTheme.backgroundBlack,
+        appBar: AppBar(
+          backgroundColor: CyberpunkTheme.backgroundBlack,
+          title: Text(S.of(context).editProfile, style: GoogleFonts.inter(color: CyberpunkTheme.textWhite, fontSize: 20, fontWeight: FontWeight.w700)),
+        ),
+        body: const SingleChildScrollView(child: ProfileSkeleton()),
       );
     }
 
     return Scaffold(
+      backgroundColor: CyberpunkTheme.backgroundBlack,
       appBar: AppBar(
-        title: Text(S.of(context).editProfile),
+        backgroundColor: CyberpunkTheme.backgroundBlack,
+        title: Text(
+          S.of(context).editProfile,
+          style: GoogleFonts.inter(
+            color: CyberpunkTheme.textWhite,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: _isSaving ? null : _saveProfile,
@@ -143,9 +157,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   )
                 : Text(
                     S.of(context).done,
-                    style: TextStyle(
+                    style: GoogleFonts.inter(
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
+                      color: CyberpunkTheme.neonCyan,
                     ),
                   ),
           ),
@@ -156,23 +171,43 @@ class _EditProfilePageState extends State<EditProfilePage> {
           key: _formKey,
           child: Column(
             children: [
-              const SizedBox(height: 16),
+              const SizedBox(height: CyberpunkTheme.spacingL),
               // Avatar
               GestureDetector(
                 onTap: () => _pickImage(true),
                 child: Stack(
                   children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundImage: _newAvatarFile != null
-                          ? FileImage(_newAvatarFile!) as ImageProvider
-                          : (_account?.avatar.isNotEmpty ?? false)
-                              ? CachedNetworkImageProvider(_account!.avatar)
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: CyberpunkTheme.neonCyan.withOpacity(0.5),
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: CyberpunkTheme.neonCyan.withOpacity(0.2),
+                            blurRadius: 12,
+                            spreadRadius: 0,
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(3),
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundColor: CyberpunkTheme.cardDark,
+                          backgroundImage: _newAvatarFile != null
+                              ? FileImage(_newAvatarFile!) as ImageProvider
+                              : (_account?.avatar.isNotEmpty ?? false)
+                                  ? CachedNetworkImageProvider(_account!.avatar)
+                                  : null,
+                          child: (_newAvatarFile == null && 
+                                  (_account?.avatar.isEmpty ?? true))
+                              ? const Icon(Icons.person, size: 50, color: CyberpunkTheme.textTertiary)
                               : null,
-                      child: (_newAvatarFile == null && 
-                              (_account?.avatar.isEmpty ?? true))
-                          ? const Icon(Icons.person, size: 50)
-                          : null,
+                        ),
+                      ),
                     ),
                     Positioned(
                       bottom: 0,
@@ -180,33 +215,33 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF0095F6),
+                          color: CyberpunkTheme.neonCyan,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: isDark ? Colors.black : Colors.white,
+                            color: CyberpunkTheme.backgroundBlack,
                             width: 2,
                           ),
                         ),
                         child: const Icon(
                           Icons.camera_alt,
                           size: 16,
-                          color: Colors.white,
+                          color: Colors.black,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: CyberpunkTheme.spacingS),
               Text(
                 S.of(context).changeProfilePhoto,
-                style: const TextStyle(
-                  color: const Color(0xFF0095F6),
+                style: GoogleFonts.inter(
+                  color: CyberpunkTheme.neonCyan,
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: CyberpunkTheme.spacingXXL),
               const InstagramDivider(),
               _buildTextField(
                 label: 'Name',
@@ -227,36 +262,32 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 maxLines: 3,
               ),
               const InstagramDivider(),
-              const SizedBox(height: 16),
+              const SizedBox(height: CyberpunkTheme.spacingL),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: CyberpunkTheme.spacingL),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Header Image',
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : Colors.black,
+                        color: CyberpunkTheme.textWhite,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: CyberpunkTheme.spacingM),
                     GestureDetector(
                       onTap: () => _pickImage(false),
                       child: Container(
                         height: 120,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: isDark
-                                ? const Color(0xFF262626)
-                                : const Color(0xFFDBDBDB),
-                          ),
+                          borderRadius: BorderRadius.circular(CyberpunkTheme.radiusS),
+                          border: Border.all(color: CyberpunkTheme.borderDark),
                         ),
                         child: _newHeaderFile != null
                             ? ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(CyberpunkTheme.radiusS),
                                 child: Image.file(
                                   _newHeaderFile!,
                                   fit: BoxFit.cover,
@@ -265,7 +296,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               )
                             : (_account?.header.isNotEmpty ?? false)
                                 ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius: BorderRadius.circular(CyberpunkTheme.radiusS),
                                     child: CachedNetworkImage(
                                       imageUrl: _account!.header,
                                       fit: BoxFit.cover,
@@ -276,20 +307,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Icon(
+                                        const Icon(
                                           Icons.add_photo_alternate_outlined,
                                           size: 40,
-                                          color: isDark
-                                              ? Colors.white54
-                                              : Colors.black54,
+                                          color: CyberpunkTheme.textTertiary,
                                         ),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: CyberpunkTheme.spacingS),
                                         Text(
                                           'Add Header Image',
-                                          style: TextStyle(
-                                            color: isDark
-                                                ? Colors.white54
-                                                : Colors.black54,
+                                          style: GoogleFonts.inter(
+                                            color: CyberpunkTheme.textTertiary,
                                           ),
                                         ),
                                       ],
@@ -316,7 +343,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     bool enabled = true,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: CyberpunkTheme.spacingL, vertical: CyberpunkTheme.spacingM),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -324,12 +351,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
             width: 100,
             child: Text(
               label,
-              style: const TextStyle(
+              style: GoogleFonts.inter(
                 fontSize: 16,
+                color: CyberpunkTheme.textSecondary,
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: CyberpunkTheme.spacingL),
           Expanded(
             child: TextFormField(
               controller: controller,
@@ -337,16 +365,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
               enabled: enabled,
               maxLength: maxLength,
               maxLines: maxLines,
-              style: const TextStyle(fontSize: 16),
+              style: GoogleFonts.inter(fontSize: 16, color: CyberpunkTheme.textWhite),
               decoration: InputDecoration(
                 border: InputBorder.none,
                 counterText: '',
                 hintText: label,
-                hintStyle: TextStyle(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? const Color(0xFFA8A8A8)
-                      : const Color(0xFF8E8E8E),
+                hintStyle: GoogleFonts.inter(
+                  color: CyberpunkTheme.textTertiary,
                 ),
+                filled: false,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
               ),
             ),
           ),

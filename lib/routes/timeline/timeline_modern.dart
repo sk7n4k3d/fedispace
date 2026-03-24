@@ -10,6 +10,7 @@ import 'package:fedispace/routes/post/swipeable_post_detail.dart';
 import 'package:fedispace/widgets/instagram_widgets.dart';
 import 'package:fedispace/themes/cyberpunk_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:fedispace/l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -59,9 +60,9 @@ class _TimelineState extends State<Timeline> with TickerProviderStateMixin {
     // Only show tabs when on the main home screen
     if (widget.typeTimeLine == 'home') {
       _tabs = [
-        _TimelineTab(label: 'Accueil', type: 'home', icon: Icons.home_rounded),
+        _TimelineTab(label: 'Home', type: 'home', icon: Icons.home_rounded),
         _TimelineTab(label: 'Local', type: 'local', icon: Icons.people_rounded),
-        _TimelineTab(label: 'Fédéré', type: 'federated', icon: Icons.public_rounded),
+        _TimelineTab(label: 'Federated', type: 'federated', icon: Icons.public_rounded),
       ];
       _tabController = TabController(length: _tabs.length, vsync: this);
     } else {
@@ -69,6 +70,16 @@ class _TimelineState extends State<Timeline> with TickerProviderStateMixin {
         _TimelineTab(label: widget.typeTimeLine, type: widget.typeTimeLine, icon: Icons.list),
       ];
       _tabController = TabController(length: 1, vsync: this);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.typeTimeLine == 'home' && _tabs.length == 3) {
+      _tabs[0] = _TimelineTab(label: S.of(context).home, type: 'home', icon: Icons.home_rounded);
+      _tabs[1] = _TimelineTab(label: S.of(context).localTimeline, type: 'local', icon: Icons.people_rounded);
+      _tabs[2] = _TimelineTab(label: S.of(context).federatedTimeline, type: 'federated', icon: Icons.public_rounded);
     }
   }
 

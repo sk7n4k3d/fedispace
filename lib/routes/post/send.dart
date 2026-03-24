@@ -121,7 +121,7 @@ class _SendPostsState extends State<SendPosts> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, 'discard'),
-            child: const Text('Discard', style: TextStyle(color: Colors.redAccent)),
+            child: const Text('Discard', style: TextStyle(color: CyberpunkTheme.errorRed)),
           ),
         ],
       ),
@@ -460,7 +460,7 @@ class _SendPostsState extends State<SendPosts> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircularProgressIndicator(color: Colors.cyanAccent),
+                    CircularProgressIndicator(color: CyberpunkTheme.neonCyan),
                     SizedBox(height: 16),
                     Text('Publishing story...', style: TextStyle(color: Colors.white)),
                   ],
@@ -484,7 +484,7 @@ class _SendPostsState extends State<SendPosts> {
         if (mounted) {
           Fluttertoast.showToast(
             msg: 'Story published! 🎉',
-            backgroundColor: Colors.green,
+            backgroundColor: CyberpunkTheme.neonGreen,
             textColor: Colors.white,
           );
         }
@@ -1159,7 +1159,7 @@ class _SendPostsState extends State<SendPosts> {
     if (_selectedFiles.isEmpty) {
       Fluttertoast.showToast(
         msg: "Please select at least one photo or video",
-        backgroundColor: Colors.orange,
+        backgroundColor: CyberpunkTheme.neonAmber,
         textColor: Colors.white,
       );
       return;
@@ -1853,13 +1853,13 @@ class _SendPostsState extends State<SendPosts> {
                             Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                color: (_isSensitive ? Colors.orange : CyberpunkTheme.textTertiary).withOpacity(0.12),
+                                color: (_isSensitive ? CyberpunkTheme.neonAmber : CyberpunkTheme.textTertiary).withOpacity(0.12),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
                                 Icons.warning_amber_rounded,
                                 size: 18,
-                                color: _isSensitive ? Colors.orange : CyberpunkTheme.textTertiary,
+                                color: _isSensitive ? CyberpunkTheme.neonAmber : CyberpunkTheme.textTertiary,
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -1878,7 +1878,7 @@ class _SendPostsState extends State<SendPosts> {
                           onChanged: (value) {
                             setState(() => _isSensitive = value);
                           },
-                          activeColor: Colors.orange,
+                          activeColor: CyberpunkTheme.neonAmber,
                         ),
                       ],
                     ),
@@ -1887,7 +1887,7 @@ class _SendPostsState extends State<SendPosts> {
                     Container(
                       height: 0.5,
                       margin: const EdgeInsets.symmetric(horizontal: 18),
-                      color: Colors.orange.withOpacity(0.15),
+                      color: CyberpunkTheme.neonAmber.withOpacity(0.15),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(16),
@@ -1904,18 +1904,18 @@ class _SendPostsState extends State<SendPosts> {
                             fontSize: 14,
                           ),
                           filled: true,
-                          fillColor: Colors.orange.withOpacity(0.05),
+                          fillColor: CyberpunkTheme.neonAmber.withOpacity(0.05),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.orange.withOpacity(0.2)),
+                            borderSide: BorderSide(color: CyberpunkTheme.neonAmber.withOpacity(0.2)),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.orange.withOpacity(0.2)),
+                            borderSide: BorderSide(color: CyberpunkTheme.neonAmber.withOpacity(0.2)),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.orange),
+                            borderSide: const BorderSide(color: CyberpunkTheme.neonAmber),
                           ),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         ),

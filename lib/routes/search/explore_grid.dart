@@ -115,7 +115,7 @@ class _ExploreGridState extends State<ExploreGrid>
 
     return RefreshIndicator(
       color: CyberpunkTheme.neonCyan,
-      backgroundColor: CyberpunkTheme.surfaceDark,
+      backgroundColor: CyberpunkTheme.cardDark,
       onRefresh: _loadPosts,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),

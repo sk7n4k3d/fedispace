@@ -1,3 +1,4 @@
+import 'package:fedispace/themes/cyberpunk_theme.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
 
@@ -160,7 +161,7 @@ class _BackgroundPainter extends CustomPainter {
     // ── 1. Deep dark base ──
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = const Color(0xFF0A0A0F),
+      Paint()..color = CyberpunkTheme.backgroundBlack,
     );
 
     // ── 2. Subtle animated gradient overlay ──
@@ -177,9 +178,9 @@ class _BackgroundPainter extends CustomPainter {
         ),
         radius: 1.0,
         colors: [
-          const Color(0xFF0A0A0F).withValues(alpha: 0.0),
+          CyberpunkTheme.backgroundBlack.withValues(alpha: 0.0),
           const Color(0xFF1A1A2E).withValues(alpha: 0.4),
-          const Color(0xFF0A0A0F).withValues(alpha: 0.0),
+          CyberpunkTheme.backgroundBlack.withValues(alpha: 0.0),
         ],
         stops: const [0.0, 0.5, 1.0],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));

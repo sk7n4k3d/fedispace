@@ -81,7 +81,7 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                content: Text(S.of(context).notificationsCleared, style: GoogleFonts.inter(color: Colors.white)),
-              backgroundColor: CyberpunkTheme.surfaceDark,
+              backgroundColor: CyberpunkTheme.cardDark,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
@@ -97,7 +97,7 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: CyberpunkTheme.surfaceDark,
+        backgroundColor: CyberpunkTheme.cardDark,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(color: CyberpunkTheme.borderDark),
@@ -301,7 +301,7 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
 
     return RefreshIndicator(
       color: CyberpunkTheme.neonCyan,
-      backgroundColor: CyberpunkTheme.surfaceDark,
+      backgroundColor: CyberpunkTheme.cardDark,
       onRefresh: _loadNotifications,
       child: ListView.builder(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),

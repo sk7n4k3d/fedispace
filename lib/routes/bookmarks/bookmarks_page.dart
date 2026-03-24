@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:fedispace/core/api.dart';
 import 'package:fedispace/core/logger.dart';
 import 'package:fedispace/l10n/app_localizations.dart';
 import 'package:fedispace/models/status.dart';
+import 'package:fedispace/themes/cyberpunk_theme.dart';
 import 'package:fedispace/widgets/instagram_post_card.dart';
-import 'package:fedispace/widgets/instagram_widgets.dart';
+import 'package:fedispace/widgets/skeleton_loading.dart';
+import 'package:fedispace/widgets/cyberpunk_empty_state.dart';
 import 'package:fedispace/utils/social_actions.dart';
 
-/// Instagram-style bookmarks page
+/// Cyberpunk-themed bookmarks page
 class BookmarksPage extends StatefulWidget {
   final ApiService apiService;
 
@@ -79,7 +82,6 @@ class _BookmarksPageState extends State<BookmarksPage> {
   }
 
   void _handleBookmark(Status status) async {
-    // Remove from bookmarks (optimistic update)
     setState(() {
       _bookmarks.removeWhere((b) => b.id == status.id);
     });
@@ -87,7 +89,6 @@ class _BookmarksPageState extends State<BookmarksPage> {
       await widget.apiService.undoBookmarkStatus(status.id);
     } catch (e) {
       appLogger.error('Failed to remove bookmark', e);
-      // Revert on error
       setState(() {
         _bookmarks.add(status);
       });
@@ -104,70 +105,61 @@ class _BookmarksPageState extends State<BookmarksPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
+      backgroundColor: CyberpunkTheme.backgroundBlack,
       appBar: AppBar(
-        title: Text(S.of(context).bookmarks),
+        backgroundColor: CyberpunkTheme.backgroundBlack,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        title: Text(
+          S.of(context).bookmarks,
+          style: GoogleFonts.inter(
+            color: CyberpunkTheme.textWhite,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
-      body: _buildBody(isDark),
+      body: _buildBody(),
     );
   }
 
-  Widget _buildBody(bool isDark) {
+  Widget _buildBody() {
     if (_isLoading) {
-      return const Center(child: InstagramLoadingIndicator(size: 32));
+      return ListView(
+        children: List.generate(
+          3,
+          (_) => const TimelineSkeleton(),
+        ),
+      );
     }
 
     if (_bookmarks.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.bookmark_border,
-              size: 64,
-              color: isDark ? Colors.white54 : Colors.black54,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              S.of(context).bookmarks,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-                color: isDark ? Colors.white : Colors.black,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: Text(
-                'Save photos and videos that you want to see again. No one is notified, and only you can see what you\'ve saved.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark ? Colors.white54 : Colors.black54,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
-        ),
+      return CyberpunkEmptyState(
+        icon: Icons.bookmark_border_rounded,
+        title: S.of(context).bookmarks,
+        subtitle: 'Save photos and videos that you want to see again. No one is notified, and only you can see what you\'ve saved.',
+        accentColor: CyberpunkTheme.neonCyan,
       );
     }
 
     return RefreshIndicator(
       onRefresh: () => _loadBookmarks(),
+      color: CyberpunkTheme.neonCyan,
+      backgroundColor: CyberpunkTheme.cardDark,
       child: ListView.builder(
         itemCount: _bookmarks.length + (_nextPageId != null ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == _bookmarks.length) {
-            // Load more
             return Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(CyberpunkTheme.spacingL),
               child: Center(
                 child: TextButton(
                   onPressed: () => _loadBookmarks(maxId: _nextPageId),
-                  child: Text(S.of(context).loading),
+                  child: Text(
+                    S.of(context).loading,
+                    style: GoogleFonts.inter(color: CyberpunkTheme.neonCyan),
+                  ),
                 ),
               ),
             );

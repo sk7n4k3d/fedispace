@@ -164,7 +164,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
       context: context,
       backgroundColor: CyberpunkTheme.surfaceDark,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(CyberpunkTheme.radiusRound)),
       ),
       builder: (ctx) => SafeArea(
         child: Column(
@@ -226,7 +226,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
               showModalBottomSheet(
                 context: context,
                 backgroundColor: CyberpunkTheme.surfaceDark,
-                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(CyberpunkTheme.radiusRound))),
                 builder: (c2) => SafeArea(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -342,7 +342,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: CyberpunkTheme.surfaceDark,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: const BorderSide(color: CyberpunkTheme.borderDark)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CyberpunkTheme.radiusRound), side: const BorderSide(color: CyberpunkTheme.borderDark)),
         title: Text(S.of(context).editPost, style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 16, fontWeight: FontWeight.w700)),
         content: TextField(
           controller: controller,
@@ -393,7 +393,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
       context: context,
       backgroundColor: CyberpunkTheme.surfaceDark,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(CyberpunkTheme.radiusRound))),
       builder: (ctx) => DraggableScrollableSheet(
         initialChildSize: 0.5,
         expand: false,
@@ -659,8 +659,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
           _actionIcon(
             _isFavorited ? Icons.favorite_rounded : Icons.favorite_border_rounded,
             onTap: _toggleLike,
-            color: _isFavorited ? const Color(0xFFFF2D55) : CyberpunkTheme.textWhite,
-            glowColor: _isFavorited ? const Color(0xFFFF2D55) : null,
+            color: _isFavorited ? CyberpunkTheme.neonPink : CyberpunkTheme.textWhite,
+            glowColor: _isFavorited ? CyberpunkTheme.neonPink : null,
           ),
           const SizedBox(width: 20),
           _actionIcon(
@@ -726,7 +726,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     _showAccountListSheet(
       title: 'Liked by',
       icon: Icons.favorite_rounded,
-      iconColor: const Color(0xFFFF2D55),
+      iconColor: CyberpunkTheme.neonPink,
       fetcher: () => widget.apiService.getFavouritedBy(widget.post.id),
     );
   }
@@ -1134,7 +1134,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
               child: Icon(
                 comment.favorited ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                 size: 18,
-                color: comment.favorited ? const Color(0xFFFF2D55) : CyberpunkTheme.textTertiary,
+                color: comment.favorited ? CyberpunkTheme.neonPink : CyberpunkTheme.textTertiary,
               ),
             ),
           ),

@@ -45,6 +45,8 @@ class AppLocalizations {
 
   // ── Navigation ──
   String get home => _t('home');
+  String get localTimeline => _t('localTimeline');
+  String get federatedTimeline => _t('federatedTimeline');
   String get explore => _t('explore');
   String get create => _t('create');
   String get messages => _t('messages');
