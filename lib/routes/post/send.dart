@@ -48,6 +48,12 @@ class _SendPostsState extends State<SendPosts> {
   @override
   void initState() {
     super.initState();
+    // Auto-open gallery picker if no media/draft loaded
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_selectedFiles.isEmpty && widget.draft == null) {
+        _pickFromGallery();
+      }
+    });
     _loadDraftCount();
     _loadDraftData();
   }

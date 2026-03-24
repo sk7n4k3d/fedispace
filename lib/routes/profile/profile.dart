@@ -163,11 +163,11 @@ class _Profile extends State<Profile> {
                       : null,
                   actions: [
                     IconButton(
-                      icon: const Icon(Icons.notifications_none_rounded, size: 22, color: CyberpunkTheme.textWhite),
+                      icon: const Icon(Icons.notifications_none_rounded, size: 28, color: CyberpunkTheme.textWhite),
                       onPressed: () => Navigator.pushNamed(context, '/Notification'),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.settings_outlined, size: 22, color: CyberpunkTheme.textWhite),
+                      icon: const Icon(Icons.settings_outlined, size: 28, color: CyberpunkTheme.textWhite),
                       onPressed: () => Navigator.pushNamed(context, '/Settings'),
                     ),
                   ],
