@@ -85,21 +85,25 @@ class GroupsApi {
   }
 
   /// Get group feed (timeline of posts in the group).
-  Future<List<Status>> getGroupFeed(String groupId, {int limit = 20, String? maxId}) async {
+  Future<List<Status>> getGroupFeed(String groupId,
+      {int limit = 20, String? maxId}) async {
     try {
       var url = '$_baseUrl/api/v1/groups/$groupId/statuses?limit=$limit';
       if (maxId != null) url += '&max_id=$maxId';
       final response = await apiService.helper!.get(url);
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        return data.map((e) => Status.fromJson(e as Map<String, dynamic>)).toList();
+        return data
+            .map((e) => Status.fromJson(e as Map<String, dynamic>))
+            .toList();
       }
     } catch (_) {}
     return [];
   }
 
   /// Post to a group.
-  Future<bool> postToGroup(String groupId, String content, {String visibility = 'public'}) async {
+  Future<bool> postToGroup(String groupId, String content,
+      {String visibility = 'public'}) async {
     try {
       final response = await apiService.helper!.post(
         '$_baseUrl/api/v1/groups/$groupId/statuses',
@@ -115,7 +119,8 @@ class GroupsApi {
   }
 
   /// Get group members.
-  Future<List<Map<String, dynamic>>> getGroupMembers(String groupId, {int limit = 40}) async {
+  Future<List<Map<String, dynamic>>> getGroupMembers(String groupId,
+      {int limit = 40}) async {
     try {
       final response = await apiService.helper!.get(
         '$_baseUrl/api/v1/groups/$groupId/members?limit=$limit',

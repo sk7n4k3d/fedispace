@@ -10,20 +10,26 @@ class BetterVideoPlayerWithControls extends StatefulWidget {
   final bool isFullScreen;
   final BetterVideoPlayerConfiguration configuration;
 
-  const BetterVideoPlayerWithControls({Key? key, required this.isFullScreen, required this.configuration})
+  const BetterVideoPlayerWithControls(
+      {Key? key, required this.isFullScreen, required this.configuration})
       : super(key: key);
 
   @override
-  _BetterVideoPlayerWithControlsState createState() => _BetterVideoPlayerWithControlsState();
+  _BetterVideoPlayerWithControlsState createState() =>
+      _BetterVideoPlayerWithControlsState();
 }
 
-class _BetterVideoPlayerWithControlsState extends State<BetterVideoPlayerWithControls> {
+class _BetterVideoPlayerWithControlsState
+    extends State<BetterVideoPlayerWithControls> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<BetterVideoPlayerController>();
 
-    final videoInitialized = controller.videoPlayerValue?.isInitialized ?? false;
-    final videoAspectRatio = BetterVideoPlayerUtils.aspectRatio(controller.videoPlayerValue) ?? (16.0 / 9.0);
+    final videoInitialized =
+        controller.videoPlayerValue?.isInitialized ?? false;
+    final videoAspectRatio =
+        BetterVideoPlayerUtils.aspectRatio(controller.videoPlayerValue) ??
+            (16.0 / 9.0);
 
     return Container(
       color: Colors.black,
@@ -47,7 +53,10 @@ class _BetterVideoPlayerWithControlsState extends State<BetterVideoPlayerWithCon
             )
           else
             widget.configuration.placeholder,
-          if (widget.isFullScreen) widget.configuration.fullScreenControls else widget.configuration.controls,
+          if (widget.isFullScreen)
+            widget.configuration.fullScreenControls
+          else
+            widget.configuration.controls,
         ],
       ),
     );

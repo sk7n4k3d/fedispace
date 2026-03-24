@@ -18,14 +18,14 @@ class UnifiedPushService {
   Future<bool> initUnifiedPush() async {
     try {
       appLogger.info('Initializing UnifiedPush');
-      
+
       await UnifiedPush.initialize(
         onNewEndpoint: _onNewEndpoint,
         onRegistrationFailed: _onRegistrationFailed,
         onUnregistered: _onUnregistered,
         onMessage: _onMessage,
       );
-      
+
       appLogger.info('UnifiedPush initialized successfully');
       return true;
     } catch (e, stackTrace) {
@@ -35,26 +35,27 @@ class UnifiedPushService {
   }
 
   /// Start UnifiedPush registration with distributor check
-  Future<void> startUnifiedPush(BuildContext context, ApiService apiService) async {
+  Future<void> startUnifiedPush(
+      BuildContext context, ApiService apiService) async {
     _apiService = apiService;
     _initNotifications();
-    
+
     appLogger.info('Starting UnifiedPush registration');
-    
+
     // Check available distributors first
     final distributors = await UnifiedPush.getDistributors();
-    
+
     if (distributors.isEmpty) {
       appLogger.error('No UnifiedPush distributors found');
       _showNoDistributorWarning(context);
       return;
     }
-    
+
     appLogger.info('Found distributors: $distributors');
-    
+
     // Save and use first available distributor
     await UnifiedPush.saveDistributor(distributors.first);
-    
+
     // Register with UnifiedPush
     await UnifiedPush.registerApp(instance);
   }
@@ -65,12 +66,12 @@ class UnifiedPushService {
       appLogger.error('Received endpoint for different instance: $inst');
       return;
     }
-    
+
     registered = true;
     endpoint = endpointUrl;
-    
+
     appLogger.info('New UnifiedPush endpoint received: $endpointUrl');
-    
+
     // Send endpoint to server
     if (_apiService != null) {
       _registerEndpointWithServer(endpointUrl);
@@ -84,23 +85,24 @@ class UnifiedPushService {
   Future<void> _registerEndpointWithServer(String endpointUrl) async {
     try {
       appLogger.info('Registering push endpoint with server');
-      
+
       // Generate VAPID keys for the push subscription
       // These are placeholder keys - the server needs them for Web Push protocol
       // Send empty keys - Pixelfed doesn't encrypt push payloads
       final p256dhKey = '';
       final authKey = '';
-      
+
       final result = await _apiService!.subscribePushNotifications(
         endpoint: endpointUrl,
         p256dhKey: p256dhKey,
         authKey: authKey,
       );
-      
+
       if (result != null) {
         appLogger.info('Push endpoint registered successfully with server');
       } else {
-        appLogger.error('Push endpoint registration returned null - server may not support Web Push');
+        appLogger.error(
+            'Push endpoint registration returned null - server may not support Web Push');
       }
     } catch (e, stackTrace) {
       appLogger.error('Failed to register endpoint with server', e, stackTrace);
@@ -110,10 +112,10 @@ class UnifiedPushService {
   /// Callback when registration fails (v5 API uses String)
   void _onRegistrationFailed(String inst) {
     if (inst != instance) return;
-    
+
     registered = false;
     appLogger.error('UnifiedPush registration failed for instance: $inst');
-    
+
     AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: 101,
@@ -127,7 +129,7 @@ class UnifiedPushService {
   /// Callback when unregistered
   void _onUnregistered(String inst) {
     if (inst != instance) return;
-    
+
     registered = false;
     endpoint = null;
     appLogger.info('UnifiedPush unregistered');
@@ -136,10 +138,11 @@ class UnifiedPushService {
   /// Callback when message is received (v5 API uses Uint8List)
   void _onMessage(Uint8List message, String inst) {
     if (inst != instance) return;
-    
+
     final decoded = String.fromCharCodes(message);
-    appLogger.info('UnifiedPush message received (length: ${message.length} bytes)');
-    
+    appLogger
+        .info('UnifiedPush message received (length: ${message.length} bytes)');
+
     // Try to parse as JSON (Mastodon/Pixelfed notification format)
     try {
       final data = json.decode(decoded);
@@ -178,7 +181,8 @@ class UnifiedPushService {
     // { "notification_id": "...", "notification_type": "follow|favourite|reblog|mention|poll|follow_request",
     //   "title": "...", "body": "...", "icon": "...",
     //   "preferred_locale": "...", "access_token": "..." }
-    final String notificationType = data['notification_type'] ?? data['type'] ?? 'status';
+    final String notificationType =
+        data['notification_type'] ?? data['type'] ?? 'status';
     final String title = data['title'] ?? _getTitleForType(notificationType);
     final String body = data['body'] ?? data['message'] ?? '';
     final String? icon = data['icon'];
@@ -212,7 +216,9 @@ class UnifiedPushService {
         title: title,
         body: body,
         bigPicture: icon,
-        notificationLayout: icon != null ? NotificationLayout.BigPicture : NotificationLayout.Default,
+        notificationLayout: icon != null
+            ? NotificationLayout.BigPicture
+            : NotificationLayout.Default,
       ),
     );
   }

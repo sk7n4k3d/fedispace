@@ -18,7 +18,8 @@ class TimelineLegacy extends StatefulWidget implements PreferredSizeWidget {
   final String typeTimeLine;
 
   /// Main instance of the API service to use in the widget.
-  TimelineLegacy({Key? key, required this.apiService, required this.typeTimeLine})
+  TimelineLegacy(
+      {Key? key, required this.apiService, required this.typeTimeLine})
       : super(key: key);
 
   @override
@@ -28,7 +29,8 @@ class TimelineLegacy extends StatefulWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-class _TimelineTabsState extends State<TimelineLegacy> with TickerProviderStateMixin {
+class _TimelineTabsState extends State<TimelineLegacy>
+    with TickerProviderStateMixin {
   Account? account;
   static const _pageSize = 20;
   late Animation<double> _animation;
@@ -39,7 +41,8 @@ class _TimelineTabsState extends State<TimelineLegacy> with TickerProviderStateM
     return account = currentAccount;
   }
 
-  late final PagingController<String?, Status> _pagingController = PagingController(
+  late final PagingController<String?, Status> _pagingController =
+      PagingController(
     getNextPageKey: (state) {
       if ((state.pages ?? []).isEmpty) return "";
       final lastPage = state.pages!.last;
@@ -47,12 +50,13 @@ class _TimelineTabsState extends State<TimelineLegacy> with TickerProviderStateM
       return lastPage.last.id;
     },
     fetchPage: (pageKey) async {
-       try {
-         final key = (pageKey == "" || pageKey == null) ? null : pageKey;
-         return await widget.apiService.getStatusList(key, _pageSize, widget.typeTimeLine);
-       } catch (error) {
-          rethrow;
-       }
+      try {
+        final key = (pageKey == "" || pageKey == null) ? null : pageKey;
+        return await widget.apiService
+            .getStatusList(key, _pageSize, widget.typeTimeLine);
+      } catch (error) {
+        rethrow;
+      }
     },
   );
 
@@ -101,83 +105,94 @@ class _TimelineTabsState extends State<TimelineLegacy> with TickerProviderStateM
   Widget build(BuildContext context) {
     return PopScope(
         canPop: false,
-        onPopInvokedWithResult: (didPop, _) { if (!didPop) _onWillPop(); },
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) _onWillPop();
+        },
         child: Container(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                image: const DecorationImage(
-                  image: NetworkImage("https://img.freepik.com/free-vector/dark-hexagonal-background-with-gradient-color_79603-1409.jpg"), // Hex grid pattern
-                  fit: BoxFit.cover,
-                  opacity: 0.2, // Subtle background texture
-                ),
+              color: Theme.of(context).scaffoldBackgroundColor,
+              image: const DecorationImage(
+                image: NetworkImage(
+                    "https://img.freepik.com/free-vector/dark-hexagonal-background-with-gradient-color_79603-1409.jpg"), // Hex grid pattern
+                fit: BoxFit.cover,
+                opacity: 0.2, // Subtle background texture
+              ),
             ),
             child: Scaffold(
                 backgroundColor: Colors.transparent,
                 drawer: NavBar(apiService: widget.apiService),
                 // AppBar removed for full-screen immersive experience
                 extendBody: true,
-                body: Builder(
-                  builder: (BuildContext scaffoldContext) {
-                    return GestureDetector(
-                      onHorizontalDragStart: (details) {
-                        // Only open drawer if swipe starts from left edge (first 50px)
-                        if (details.globalPosition.dx < 50) {
-                          Scaffold.of(scaffoldContext).openDrawer();
-                        }
-                      },
-                      behavior: HitTestBehavior.translucent,
-                      child: Stack(
-                        children: [
-                          // Main Content
-                          RefreshIndicator(
-                            color: CyberpunkTheme.neonCyan, backgroundColor: CyberpunkTheme.cardDark,
-                            onRefresh: () => Future.sync(_pagingController.refresh),
-                            child: ValueListenableBuilder<PagingState<String?, Status>>(
-                              valueListenable: _pagingController,
-                              builder: (context, state, child) => PagedListView<String?, Status>(
-                                state: state,
-                                fetchNextPage: _pagingController.fetchNextPage,
-                                physics: const ClampingScrollPhysics(),
-                                builderDelegate: PagedChildBuilderDelegate<Status>(
-                                  itemBuilder: (context, item, index) => StatusCard(
-                                    item,
-                                    apiService: widget.apiService,
-                                  ),
+                body: Builder(builder: (BuildContext scaffoldContext) {
+                  return GestureDetector(
+                    onHorizontalDragStart: (details) {
+                      // Only open drawer if swipe starts from left edge (first 50px)
+                      if (details.globalPosition.dx < 50) {
+                        Scaffold.of(scaffoldContext).openDrawer();
+                      }
+                    },
+                    behavior: HitTestBehavior.translucent,
+                    child: Stack(
+                      children: [
+                        // Main Content
+                        RefreshIndicator(
+                          color: CyberpunkTheme.neonCyan,
+                          backgroundColor: CyberpunkTheme.cardDark,
+                          onRefresh: () =>
+                              Future.sync(_pagingController.refresh),
+                          child: ValueListenableBuilder<
+                              PagingState<String?, Status>>(
+                            valueListenable: _pagingController,
+                            builder: (context, state, child) =>
+                                PagedListView<String?, Status>(
+                              state: state,
+                              fetchNextPage: _pagingController.fetchNextPage,
+                              physics: const ClampingScrollPhysics(),
+                              builderDelegate:
+                                  PagedChildBuilderDelegate<Status>(
+                                itemBuilder: (context, item, index) =>
+                                    StatusCard(
+                                  item,
+                                  apiService: widget.apiService,
                                 ),
                               ),
                             ),
                           ),
-                          
-                          // Floating Menu Button (Top-Left)
-                          Positioned(
-                            top: 40,
-                            left: 16,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF101010).withOpacity(0.8),
-                                border: Border.all(color: const Color(0xFF00F3FF), width: 1.5),
-                                borderRadius: BorderRadius.circular(8),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF00F3FF).withOpacity(0.5),
-                                    blurRadius: 10,
-                                    spreadRadius: 0,
-                                  )
-                                ],
-                              ),
-                              child: IconButton(
-                                icon: const Icon(Icons.menu, color: Color(0xFF00F3FF), size: 28),
-                                onPressed: () => Scaffold.of(scaffoldContext).openDrawer(),
-                              ),
+                        ),
+
+                        // Floating Menu Button (Top-Left)
+                        Positioned(
+                          top: 40,
+                          left: 16,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF101010).withOpacity(0.8),
+                              border: Border.all(
+                                  color: const Color(0xFF00F3FF), width: 1.5),
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color:
+                                      const Color(0xFF00F3FF).withOpacity(0.5),
+                                  blurRadius: 10,
+                                  spreadRadius: 0,
+                                )
+                              ],
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.menu,
+                                  color: Color(0xFF00F3FF), size: 28),
+                              onPressed: () =>
+                                  Scaffold.of(scaffoldContext).openDrawer(),
                             ),
                           ),
-                        ],
-                      ),
-                    );
-                  }
-                ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
                 floatingActionButtonLocation:
                     FloatingActionButtonLocation.endFloat,
 

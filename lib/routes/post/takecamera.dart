@@ -13,6 +13,7 @@ import 'package:permission_handler/permission_handler.dart';
 class CameraScreen extends StatefulWidget {
   final ApiService apiService;
   final bool isStoryMode;
+
   /// If true, returns file path via Navigator.pop instead of uploading directly
   final bool returnFile;
 
@@ -109,7 +110,8 @@ class _CameraScreenState extends State<CameraScreen>
 
   Future<void> _selectCamera(CameraDescription desc) async {
     final prev = controller;
-    final cam = CameraController(desc, currentResolutionPreset, imageFormatGroup: ImageFormatGroup.jpeg);
+    final cam = CameraController(desc, currentResolutionPreset,
+        imageFormatGroup: ImageFormatGroup.jpeg);
     await prev?.dispose();
 
     try {
@@ -218,7 +220,9 @@ class _CameraScreenState extends State<CameraScreen>
       builder: (ctx) => AlertDialog(
         backgroundColor: CyberpunkTheme.surfaceDark,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Add to Story?', style: GoogleFonts.inter(color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700)),
+        title: Text('Add to Story?',
+            style: GoogleFonts.inter(
+                color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700)),
         content: ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: Image.file(File(path), height: 280, fit: BoxFit.cover),
@@ -226,18 +230,22 @@ class _CameraScreenState extends State<CameraScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel', style: GoogleFonts.inter(color: CyberpunkTheme.textSecondary)),
+            child: Text('Cancel',
+                style: GoogleFonts.inter(color: CyberpunkTheme.textSecondary)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: CyberpunkTheme.neonPink,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
             onPressed: () async {
               Navigator.pop(ctx);
               final error = await widget.apiService.createStory(filePath: path);
-              if (mounted) showSnackBar(context, error == null ? 'Added to Story ✓' : 'Story error: $error');
+              if (mounted)
+                showSnackBar(context,
+                    error == null ? 'Added to Story ✓' : 'Story error: $error');
             },
             child: const Text('Add'),
           ),
@@ -252,7 +260,9 @@ class _CameraScreenState extends State<CameraScreen>
       builder: (ctx) => AlertDialog(
         backgroundColor: CyberpunkTheme.surfaceDark,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Upload?', style: GoogleFonts.inter(color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700)),
+        title: Text('Upload?',
+            style: GoogleFonts.inter(
+                color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700)),
         content: ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: Image.file(File(path), height: 280, fit: BoxFit.cover),
@@ -260,18 +270,23 @@ class _CameraScreenState extends State<CameraScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel', style: GoogleFonts.inter(color: CyberpunkTheme.textSecondary)),
+            child: Text('Cancel',
+                style: GoogleFonts.inter(color: CyberpunkTheme.textSecondary)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: CyberpunkTheme.neonCyan,
               foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
             onPressed: () async {
               Navigator.pop(ctx);
-              final result = await widget.apiService.apiPostMedia('Description', [path]);
-              if (mounted) showSnackBar(context, result == 200 ? 'Media uploaded' : 'Upload error');
+              final result =
+                  await widget.apiService.apiPostMedia('Description', [path]);
+              if (mounted)
+                showSnackBar(
+                    context, result == 200 ? 'Media uploaded' : 'Upload error');
             },
             child: const Text('Upload'),
           ),
@@ -307,7 +322,9 @@ class _CameraScreenState extends State<CameraScreen>
                 ? _buildNoCameras()
                 : _isCameraInitialized
                     ? _buildCameraUI()
-                    : const Center(child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan))
+                    : const Center(
+                        child: CircularProgressIndicator(
+                            color: CyberpunkTheme.neonCyan))
             : _buildPermissionDenied(),
       ),
     );
@@ -323,20 +340,29 @@ class _CameraScreenState extends State<CameraScreen>
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: CyberpunkTheme.neonPink.withOpacity(0.1),
-              border: Border.all(color: CyberpunkTheme.neonPink.withOpacity(0.2)),
+              border:
+                  Border.all(color: CyberpunkTheme.neonPink.withOpacity(0.2)),
             ),
-            child: const Icon(Icons.no_photography_rounded, size: 48, color: CyberpunkTheme.neonPink),
+            child: const Icon(Icons.no_photography_rounded,
+                size: 48, color: CyberpunkTheme.neonPink),
           ),
           const SizedBox(height: 24),
-          Text('No Camera Found', style: GoogleFonts.inter(color: CyberpunkTheme.textWhite, fontSize: 18, fontWeight: FontWeight.w700)),
+          Text('No Camera Found',
+              style: GoogleFonts.inter(
+                  color: CyberpunkTheme.textWhite,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
-          Text('This device has no available cameras', style: GoogleFonts.inter(color: CyberpunkTheme.textSecondary, fontSize: 14)),
+          Text('This device has no available cameras',
+              style: GoogleFonts.inter(
+                  color: CyberpunkTheme.textSecondary, fontSize: 14)),
           const SizedBox(height: 24),
           OutlinedButton(
             style: OutlinedButton.styleFrom(
               foregroundColor: CyberpunkTheme.textWhite,
               side: BorderSide(color: CyberpunkTheme.borderDark),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: () => Navigator.pop(context),
             child: const Text('Go Back'),
@@ -356,24 +382,34 @@ class _CameraScreenState extends State<CameraScreen>
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: CyberpunkTheme.neonPink.withOpacity(0.1),
-              border: Border.all(color: CyberpunkTheme.neonPink.withOpacity(0.2)),
+              border:
+                  Border.all(color: CyberpunkTheme.neonPink.withOpacity(0.2)),
             ),
-            child: const Icon(Icons.camera_alt_outlined, size: 48, color: CyberpunkTheme.neonPink),
+            child: const Icon(Icons.camera_alt_outlined,
+                size: 48, color: CyberpunkTheme.neonPink),
           ),
           const SizedBox(height: 24),
-          Text('Camera Permission Required', style: GoogleFonts.inter(color: CyberpunkTheme.textWhite, fontSize: 18, fontWeight: FontWeight.w700)),
+          Text('Camera Permission Required',
+              style: GoogleFonts.inter(
+                  color: CyberpunkTheme.textWhite,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
-          Text('Allow camera access to take photos', style: GoogleFonts.inter(color: CyberpunkTheme.textSecondary, fontSize: 14)),
+          Text('Allow camera access to take photos',
+              style: GoogleFonts.inter(
+                  color: CyberpunkTheme.textSecondary, fontSize: 14)),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               backgroundColor: CyberpunkTheme.neonCyan,
               foregroundColor: Colors.black,
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
             icon: const Icon(Icons.lock_open_rounded, size: 18),
-            label: Text('Grant Permission', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+            label: Text('Grant Permission',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
             onPressed: _requestPermission,
           ),
         ],
@@ -398,11 +434,14 @@ class _CameraScreenState extends State<CameraScreen>
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
         children: [
-          _circleButton(icon: Icons.close_rounded, onTap: () => Navigator.pop(context)),
+          _circleButton(
+              icon: Icons.close_rounded, onTap: () => Navigator.pop(context)),
           const Spacer(),
           _circleButton(
             icon: _flashIcon(),
-            color: _currentFlashMode == FlashMode.off ? CyberpunkTheme.textSecondary : CyberpunkTheme.neonCyan,
+            color: _currentFlashMode == FlashMode.off
+                ? CyberpunkTheme.textSecondary
+                : CyberpunkTheme.neonCyan,
             onTap: _cycleFlash,
           ),
           if (!_isRecordingInProgress && _cameras.length > 1) ...[
@@ -414,11 +453,15 @@ class _CameraScreenState extends State<CameraScreen>
     );
   }
 
-  Widget _circleButton({required IconData icon, VoidCallback? onTap, Color color = CyberpunkTheme.textWhite}) {
+  Widget _circleButton(
+      {required IconData icon,
+      VoidCallback? onTap,
+      Color color = CyberpunkTheme.textWhite}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 44, height: 44,
+        width: 44,
+        height: 44,
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.08),
           shape: BoxShape.circle,
@@ -431,15 +474,24 @@ class _CameraScreenState extends State<CameraScreen>
 
   IconData _flashIcon() {
     switch (_currentFlashMode) {
-      case FlashMode.auto: return Icons.flash_auto_rounded;
-      case FlashMode.always: return Icons.flash_on_rounded;
-      case FlashMode.torch: return Icons.flashlight_on_rounded;
-      default: return Icons.flash_off_rounded;
+      case FlashMode.auto:
+        return Icons.flash_auto_rounded;
+      case FlashMode.always:
+        return Icons.flash_on_rounded;
+      case FlashMode.torch:
+        return Icons.flashlight_on_rounded;
+      default:
+        return Icons.flash_off_rounded;
     }
   }
 
   void _cycleFlash() async {
-    final modes = [FlashMode.off, FlashMode.auto, FlashMode.always, FlashMode.torch];
+    final modes = [
+      FlashMode.off,
+      FlashMode.auto,
+      FlashMode.always,
+      FlashMode.torch
+    ];
     final idx = modes.indexOf(_currentFlashMode ?? FlashMode.off);
     final next = modes[(idx + 1) % modes.length];
     setState(() => _currentFlashMode = next);
@@ -460,7 +512,8 @@ class _CameraScreenState extends State<CameraScreen>
                 behavior: HitTestBehavior.opaque,
                 onTapDown: (d) => _onViewFinderTap(d, constraints),
                 onScaleUpdate: (details) async {
-                  final newZoom = (_currentZoomLevel * details.scale).clamp(_minAvailableZoom, _maxAvailableZoom);
+                  final newZoom = (_currentZoomLevel * details.scale)
+                      .clamp(_minAvailableZoom, _maxAvailableZoom);
                   setState(() => _currentZoomLevel = newZoom);
                   await controller?.setZoomLevel(newZoom);
                 },
@@ -481,17 +534,23 @@ class _CameraScreenState extends State<CameraScreen>
               ),
               child: Text(
                 '${_currentZoomLevel.toStringAsFixed(1)}x',
-                style: GoogleFonts.inter(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600),
               ),
             ),
           ),
           // REC indicator
           if (_isRecordingInProgress)
             Positioned(
-              top: 16, left: 0, right: 0,
+              top: 16,
+              left: 0,
+              right: 0,
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.red.withOpacity(0.8),
                     borderRadius: BorderRadius.circular(20),
@@ -499,9 +558,17 @@ class _CameraScreenState extends State<CameraScreen>
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle)),
+                      Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                              color: Colors.white, shape: BoxShape.circle)),
                       const SizedBox(width: 8),
-                      Text('REC', style: GoogleFonts.inter(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+                      Text('REC',
+                          style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700)),
                     ],
                   ),
                 ),
@@ -523,9 +590,11 @@ class _CameraScreenState extends State<CameraScreen>
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _modeToggle('PHOTO', !_isVideoCameraSelected, () => setState(() => _isVideoCameraSelected = false)),
+                _modeToggle('PHOTO', !_isVideoCameraSelected,
+                    () => setState(() => _isVideoCameraSelected = false)),
                 const SizedBox(width: 4),
-                _modeToggle('VIDEO', _isVideoCameraSelected, () => setState(() => _isVideoCameraSelected = true)),
+                _modeToggle('VIDEO', _isVideoCameraSelected,
+                    () => setState(() => _isVideoCameraSelected = true)),
               ],
             ),
           const SizedBox(height: 20),
@@ -536,15 +605,19 @@ class _CameraScreenState extends State<CameraScreen>
                 GestureDetector(
                   onTap: _pauseResumeRecording,
                   child: Container(
-                    width: 50, height: 50,
+                    width: 50,
+                    height: 50,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.white.withOpacity(0.08),
                       border: Border.all(color: Colors.white.withOpacity(0.15)),
                     ),
                     child: Icon(
-                      controller?.value.isRecordingPaused == true ? Icons.play_arrow_rounded : Icons.pause_rounded,
-                      color: Colors.white, size: 28,
+                      controller?.value.isRecordingPaused == true
+                          ? Icons.play_arrow_rounded
+                          : Icons.pause_rounded,
+                      color: Colors.white,
+                      size: 28,
                     ),
                   ),
                 ),
@@ -553,21 +626,31 @@ class _CameraScreenState extends State<CameraScreen>
               // Main capture button
               GestureDetector(
                 onTap: _isVideoCameraSelected
-                    ? (_isRecordingInProgress ? _stopVideoRecording : _startVideoRecording)
+                    ? (_isRecordingInProgress
+                        ? _stopVideoRecording
+                        : _startVideoRecording)
                     : _takePicture,
                 child: Container(
-                  width: 76, height: 76,
+                  width: 76,
+                  height: 76,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: _isRecordingInProgress ? Colors.red
-                          : _isVideoCameraSelected ? Colors.red.withOpacity(0.7) : CyberpunkTheme.neonCyan,
+                      color: _isRecordingInProgress
+                          ? Colors.red
+                          : _isVideoCameraSelected
+                              ? Colors.red.withOpacity(0.7)
+                              : CyberpunkTheme.neonCyan,
                       width: 4,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: (_isRecordingInProgress ? Colors.red
-                            : _isVideoCameraSelected ? Colors.red : CyberpunkTheme.neonCyan).withOpacity(0.25),
+                        color: (_isRecordingInProgress
+                                ? Colors.red
+                                : _isVideoCameraSelected
+                                    ? Colors.red
+                                    : CyberpunkTheme.neonCyan)
+                            .withOpacity(0.25),
                         blurRadius: 16,
                       ),
                     ],
@@ -575,10 +658,17 @@ class _CameraScreenState extends State<CameraScreen>
                   child: Container(
                     margin: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      shape: _isRecordingInProgress ? BoxShape.rectangle : BoxShape.circle,
-                      borderRadius: _isRecordingInProgress ? BorderRadius.circular(8) : null,
-                      color: _isRecordingInProgress ? Colors.red
-                          : _isVideoCameraSelected ? Colors.red.withOpacity(0.9) : Colors.white.withOpacity(0.9),
+                      shape: _isRecordingInProgress
+                          ? BoxShape.rectangle
+                          : BoxShape.circle,
+                      borderRadius: _isRecordingInProgress
+                          ? BorderRadius.circular(8)
+                          : null,
+                      color: _isRecordingInProgress
+                          ? Colors.red
+                          : _isVideoCameraSelected
+                              ? Colors.red.withOpacity(0.9)
+                              : Colors.white.withOpacity(0.9),
                     ),
                   ),
                 ),
@@ -599,11 +689,15 @@ class _CameraScreenState extends State<CameraScreen>
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: active
-              ? (label == 'VIDEO' ? Colors.red.withOpacity(0.15) : CyberpunkTheme.neonCyan.withOpacity(0.12))
+              ? (label == 'VIDEO'
+                  ? Colors.red.withOpacity(0.15)
+                  : CyberpunkTheme.neonCyan.withOpacity(0.12))
               : Colors.transparent,
           border: Border.all(
             color: active
-                ? (label == 'VIDEO' ? Colors.red.withOpacity(0.3) : CyberpunkTheme.neonCyan.withOpacity(0.25))
+                ? (label == 'VIDEO'
+                    ? Colors.red.withOpacity(0.3)
+                    : CyberpunkTheme.neonCyan.withOpacity(0.25))
                 : Colors.white.withOpacity(0.08),
           ),
         ),
@@ -612,7 +706,9 @@ class _CameraScreenState extends State<CameraScreen>
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-            color: active ? (label == 'VIDEO' ? Colors.red : CyberpunkTheme.neonCyan) : CyberpunkTheme.textTertiary,
+            color: active
+                ? (label == 'VIDEO' ? Colors.red : CyberpunkTheme.neonCyan)
+                : CyberpunkTheme.textTertiary,
             letterSpacing: 1.2,
           ),
         ),

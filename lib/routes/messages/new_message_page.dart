@@ -35,12 +35,14 @@ class _NewMessagePageState extends State<NewMessagePage> {
       final mutuals = await widget.apiService.getDmMutuals();
       if (mounted) {
         setState(() {
-          _mutuals = mutuals.map((a) => _UserSearchResult(
-            id: a.id ?? '',
-            username: a.username ?? '',
-            displayName: a.display_name ?? a.username ?? '',
-            avatarUrl: a.avatar,
-          )).toList();
+          _mutuals = mutuals
+              .map((a) => _UserSearchResult(
+                    id: a.id ?? '',
+                    username: a.username ?? '',
+                    displayName: a.display_name ?? a.username ?? '',
+                    avatarUrl: a.avatar,
+                  ))
+              .toList();
           _isLoadingMutuals = false;
         });
       }
@@ -97,7 +99,9 @@ class _NewMessagePageState extends State<NewMessagePage> {
               id: account.id ?? '',
               username: account.username ?? '',
               displayName: account.display_name ?? account.username ?? '',
-              avatarUrl: (account.avatar != null && account.avatar!.isNotEmpty) ? account.avatar : null,
+              avatarUrl: (account.avatar != null && account.avatar!.isNotEmpty)
+                  ? account.avatar
+                  : null,
             ));
           }
         });
@@ -145,7 +149,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
                 hintText: 'Search...',
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
-                fillColor: isDark ? const Color(0xFF262626) : const Color(0xFFEFEFEF),
+                fillColor:
+                    isDark ? const Color(0xFF262626) : const Color(0xFFEFEFEF),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -200,7 +205,9 @@ class _NewMessagePageState extends State<NewMessagePage> {
     }
     if (_mutuals.isEmpty) {
       return Center(
-        child: Text(S.of(context).searchPeople, style: TextStyle(color: isDark ? Colors.white54 : Colors.black54, fontSize: 14)),
+        child: Text(S.of(context).searchPeople,
+            style: TextStyle(
+                color: isDark ? Colors.white54 : Colors.black54, fontSize: 14)),
       );
     }
     return Column(
@@ -208,7 +215,11 @@ class _NewMessagePageState extends State<NewMessagePage> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Text('Mutual followers', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontWeight: FontWeight.w600, fontSize: 14)),
+          child: Text('Mutual followers',
+              style: TextStyle(
+                  color: isDark ? Colors.white70 : Colors.black87,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14)),
         ),
         Expanded(
           child: ListView.builder(
@@ -217,8 +228,11 @@ class _NewMessagePageState extends State<NewMessagePage> {
               final user = _mutuals[index];
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundImage: user.avatarUrl != null ? NetworkImage(user.avatarUrl!) : null,
-                  child: user.avatarUrl == null ? const Icon(Icons.person) : null,
+                  backgroundImage: user.avatarUrl != null
+                      ? NetworkImage(user.avatarUrl!)
+                      : null,
+                  child:
+                      user.avatarUrl == null ? const Icon(Icons.person) : null,
                 ),
                 title: Text(user.displayName),
                 subtitle: Text('@${user.username}'),

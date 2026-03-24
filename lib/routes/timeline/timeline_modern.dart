@@ -62,12 +62,16 @@ class _TimelineState extends State<Timeline> with TickerProviderStateMixin {
       _tabs = [
         _TimelineTab(label: 'Home', type: 'home', icon: Icons.home_rounded),
         _TimelineTab(label: 'Local', type: 'local', icon: Icons.people_rounded),
-        _TimelineTab(label: 'Federated', type: 'federated', icon: Icons.public_rounded),
+        _TimelineTab(
+            label: 'Federated', type: 'federated', icon: Icons.public_rounded),
       ];
       _tabController = TabController(length: _tabs.length, vsync: this);
     } else {
       _tabs = [
-        _TimelineTab(label: widget.typeTimeLine, type: widget.typeTimeLine, icon: Icons.list),
+        _TimelineTab(
+            label: widget.typeTimeLine,
+            type: widget.typeTimeLine,
+            icon: Icons.list),
       ];
       _tabController = TabController(length: 1, vsync: this);
     }
@@ -77,9 +81,16 @@ class _TimelineState extends State<Timeline> with TickerProviderStateMixin {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (widget.typeTimeLine == 'home' && _tabs.length == 3) {
-      _tabs[0] = _TimelineTab(label: S.of(context).home, type: 'home', icon: Icons.home_rounded);
-      _tabs[1] = _TimelineTab(label: S.of(context).localTimeline, type: 'local', icon: Icons.people_rounded);
-      _tabs[2] = _TimelineTab(label: S.of(context).federatedTimeline, type: 'federated', icon: Icons.public_rounded);
+      _tabs[0] = _TimelineTab(
+          label: S.of(context).home, type: 'home', icon: Icons.home_rounded);
+      _tabs[1] = _TimelineTab(
+          label: S.of(context).localTimeline,
+          type: 'local',
+          icon: Icons.people_rounded);
+      _tabs[2] = _TimelineTab(
+          label: S.of(context).federatedTimeline,
+          type: 'federated',
+          icon: Icons.public_rounded);
     }
   }
 
@@ -97,17 +108,22 @@ class _TimelineState extends State<Timeline> with TickerProviderStateMixin {
             context: context,
             builder: (context) => AlertDialog(
               backgroundColor: CyberpunkTheme.cardDark,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Text('Exit App?', style: TextStyle(color: CyberpunkTheme.textWhite)),
-              content: const Text('Do you want to exit the app?', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              title: const Text('Exit App?',
+                  style: TextStyle(color: CyberpunkTheme.textWhite)),
+              content: const Text('Do you want to exit the app?',
+                  style: TextStyle(color: CyberpunkTheme.textSecondary)),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('Cancel', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+                  child: const Text('Cancel',
+                      style: TextStyle(color: CyberpunkTheme.textSecondary)),
                 ),
                 TextButton(
                   onPressed: () => SystemNavigator.pop(),
-                  child: const Text('Exit', style: TextStyle(color: CyberpunkTheme.neonPink)),
+                  child: const Text('Exit',
+                      style: TextStyle(color: CyberpunkTheme.neonPink)),
                 ),
               ],
             ),
@@ -194,7 +210,9 @@ class _TimelineState extends State<Timeline> with TickerProviderStateMixin {
     if (widget.typeTimeLine != 'home') {
       return PopScope(
         canPop: false,
-        onPopInvokedWithResult: (didPop, _) { if (!didPop) _onWillPop(); },
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) _onWillPop();
+        },
         child: Scaffold(
           backgroundColor: CyberpunkTheme.backgroundBlack,
           body: _TimelineFeed(
@@ -248,16 +266,18 @@ class _TimelineState extends State<Timeline> with TickerProviderStateMixin {
                     indicatorWeight: 2.5,
                     indicatorSize: TabBarIndicatorSize.label,
                     dividerHeight: 0,
-                    tabs: _tabs.map((tab) => Tab(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(tab.icon, size: 16),
-                          const SizedBox(width: 6),
-                          Text(tab.label),
-                        ],
-                      ),
-                    )).toList(),
+                    tabs: _tabs
+                        .map((tab) => Tab(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(tab.icon, size: 16),
+                                  const SizedBox(width: 6),
+                                  Text(tab.label),
+                                ],
+                              ),
+                            ))
+                        .toList(),
                   ),
                 ),
               ),
@@ -265,11 +285,13 @@ class _TimelineState extends State<Timeline> with TickerProviderStateMixin {
           ],
           body: TabBarView(
             controller: _tabController,
-            children: _tabs.map((tab) => _TimelineFeed(
-              apiService: widget.apiService,
-              typeTimeLine: tab.type,
-              showStoryBar: tab.type == 'home',
-            )).toList(),
+            children: _tabs
+                .map((tab) => _TimelineFeed(
+                      apiService: widget.apiService,
+                      typeTimeLine: tab.type,
+                      showStoryBar: tab.type == 'home',
+                    ))
+                .toList(),
           ),
         ),
       ),
@@ -306,10 +328,12 @@ class _TimelineFeed extends StatefulWidget {
   State<_TimelineFeed> createState() => _TimelineFeedState();
 }
 
-class _TimelineFeedState extends State<_TimelineFeed> with AutomaticKeepAliveClientMixin {
+class _TimelineFeedState extends State<_TimelineFeed>
+    with AutomaticKeepAliveClientMixin {
   static const _pageSize = 20;
 
-  late final PagingController<String?, model.Status> _pagingController = PagingController(
+  late final PagingController<String?, model.Status> _pagingController =
+      PagingController(
     getNextPageKey: (state) {
       if ((state.pages ?? []).isEmpty) return "";
       final lastPage = state.pages!.last;
@@ -317,15 +341,17 @@ class _TimelineFeedState extends State<_TimelineFeed> with AutomaticKeepAliveCli
       return lastPage.last.id;
     },
     fetchPage: (pageKey) async {
-       try {
-         final key = (pageKey == "" || pageKey == null) ? null : pageKey;
-         appLogger.debug('Fetching ${widget.typeTimeLine} timeline page: $key');
-         final List<model.Status> newItems = await widget.apiService.getStatusList(key, _pageSize, widget.typeTimeLine);
-         return newItems;
-       } catch (error, stackTrace) {
-          appLogger.error('Error fetching ${widget.typeTimeLine} timeline', error, stackTrace);
-          rethrow;
-       }
+      try {
+        final key = (pageKey == "" || pageKey == null) ? null : pageKey;
+        appLogger.debug('Fetching ${widget.typeTimeLine} timeline page: $key');
+        final List<model.Status> newItems = await widget.apiService
+            .getStatusList(key, _pageSize, widget.typeTimeLine);
+        return newItems;
+      } catch (error, stackTrace) {
+        appLogger.error('Error fetching ${widget.typeTimeLine} timeline', error,
+            stackTrace);
+        rethrow;
+      }
     },
   );
 
@@ -421,7 +447,8 @@ class _TimelineFeedState extends State<_TimelineFeed> with AutomaticKeepAliveCli
 
   void _handleProfileTap(dynamic post) {
     if (post.account != null) {
-      Navigator.pushNamed(context, '/UserProfile', arguments: {'userId': post.account.id});
+      Navigator.pushNamed(context, '/UserProfile',
+          arguments: {'userId': post.account.id});
     }
   }
 
@@ -460,16 +487,21 @@ class _TimelineFeedState extends State<_TimelineFeed> with AutomaticKeepAliveCli
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.wifi_off_rounded, size: 48, color: CyberpunkTheme.textTertiary),
+                    const Icon(Icons.wifi_off_rounded,
+                        size: 48, color: CyberpunkTheme.textTertiary),
                     const SizedBox(height: 16),
                     const Text(
                       'Failed to load posts',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: CyberpunkTheme.textWhite),
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: CyberpunkTheme.textWhite),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       '${state.error}',
-                      style: const TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 13),
+                      style: const TextStyle(
+                          color: CyberpunkTheme.textTertiary, fontSize: 13),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
@@ -477,13 +509,16 @@ class _TimelineFeedState extends State<_TimelineFeed> with AutomaticKeepAliveCli
                       onPressed: _pagingController.refresh,
                       style: TextButton.styleFrom(
                         foregroundColor: CyberpunkTheme.neonCyan,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 10),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
-                          side: BorderSide(color: CyberpunkTheme.neonCyan.withOpacity(0.3)),
+                          side: BorderSide(
+                              color: CyberpunkTheme.neonCyan.withOpacity(0.3)),
                         ),
                       ),
-                      child: const Text('Retry', style: TextStyle(fontWeight: FontWeight.w600)),
+                      child: const Text('Retry',
+                          style: TextStyle(fontWeight: FontWeight.w600)),
                     ),
                   ],
                 ),
@@ -499,16 +534,22 @@ class _TimelineFeedState extends State<_TimelineFeed> with AutomaticKeepAliveCli
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.explore_outlined, size: 64, color: CyberpunkTheme.neonCyan.withOpacity(0.4)),
+                    Icon(Icons.explore_outlined,
+                        size: 64,
+                        color: CyberpunkTheme.neonCyan.withOpacity(0.4)),
                     const SizedBox(height: 16),
                     Text(
                       _getEmptyMessage(),
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: CyberpunkTheme.textWhite),
+                      style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: CyberpunkTheme.textWhite),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       _getEmptySubMessage(),
-                      style: const TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 14),
+                      style: const TextStyle(
+                          color: CyberpunkTheme.textSecondary, fontSize: 14),
                     ),
                   ],
                 ),

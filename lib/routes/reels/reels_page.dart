@@ -56,10 +56,12 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
       TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.4), weight: 40),
       TweenSequenceItem(tween: Tween(begin: 1.4, end: 1.0), weight: 30),
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 30),
-    ]).animate(CurvedAnimation(parent: _heartController, curve: Curves.easeOut));
+    ]).animate(
+        CurvedAnimation(parent: _heartController, curve: Curves.easeOut));
     _feedTabController = TabController(length: 2, vsync: this);
     _feedTabController.addListener(() {
-      if (!_feedTabController.indexIsChanging && _feedTabController.index != _selectedFeedTab) {
+      if (!_feedTabController.indexIsChanging &&
+          _feedTabController.index != _selectedFeedTab) {
         setState(() {
           _selectedFeedTab = _feedTabController.index;
           _isLoading = true;
@@ -122,16 +124,22 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
     client.connectionTimeout = const Duration(seconds: 15);
     client.userAgent = 'Mozilla/5.0 (Linux; Android 14) FediSpace/0.1.5';
     try {
-      final request = await client.getUrl(Uri.parse('https://loops.video/api/v1/timeline/public'));
+      final request = await client
+          .getUrl(Uri.parse('https://loops.video/api/v1/timeline/public'));
       request.headers.set('Accept', 'application/json');
       if (_loopsApi?.accessToken != null) {
-        request.headers.set('Authorization', 'Bearer ${_loopsApi!.accessToken}');
+        request.headers
+            .set('Authorization', 'Bearer ${_loopsApi!.accessToken}');
       }
-      final response = await request.close().timeout(const Duration(seconds: 20));
+      final response =
+          await request.close().timeout(const Duration(seconds: 20));
       final body = await response.transform(utf8.decoder).join();
-      debugPrint('[REELS] Direct fetch status: ${response.statusCode}, body length: ${body.length}');
+      debugPrint(
+          '[REELS] Direct fetch status: ${response.statusCode}, body length: ${body.length}');
 
-      if (response.statusCode >= 200 && response.statusCode < 300 && body.isNotEmpty) {
+      if (response.statusCode >= 200 &&
+          response.statusCode < 300 &&
+          body.isNotEmpty) {
         final decoded = jsonDecode(body);
         List<dynamic> data;
         if (decoded is List) {
@@ -141,7 +149,9 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
         } else {
           data = [];
         }
-        return data.map((e) => LoopsVideo.fromJson(e as Map<String, dynamic>)).toList();
+        return data
+            .map((e) => LoopsVideo.fromJson(e as Map<String, dynamic>))
+            .toList();
       }
     } catch (e) {
       debugPrint('[REELS] Direct fetch error: $e');
@@ -154,13 +164,18 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
     client2.connectionTimeout = const Duration(seconds: 15);
     client2.userAgent = 'Mozilla/5.0 (Linux; Android 14) FediSpace/0.1.5';
     try {
-      final request = await client2.getUrl(Uri.parse('https://loops.video/api/web/feed'));
+      final request =
+          await client2.getUrl(Uri.parse('https://loops.video/api/web/feed'));
       request.headers.set('Accept', 'application/json');
-      final response = await request.close().timeout(const Duration(seconds: 20));
+      final response =
+          await request.close().timeout(const Duration(seconds: 20));
       final body = await response.transform(utf8.decoder).join();
-      debugPrint('[REELS] Direct fetch /api/web/feed status: ${response.statusCode}, body length: ${body.length}');
+      debugPrint(
+          '[REELS] Direct fetch /api/web/feed status: ${response.statusCode}, body length: ${body.length}');
 
-      if (response.statusCode >= 200 && response.statusCode < 300 && body.isNotEmpty) {
+      if (response.statusCode >= 200 &&
+          response.statusCode < 300 &&
+          body.isNotEmpty) {
         final decoded = jsonDecode(body);
         List<dynamic> data;
         if (decoded is List) {
@@ -170,7 +185,9 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
         } else {
           data = [];
         }
-        return data.map((e) => LoopsVideo.fromJson(e as Map<String, dynamic>)).toList();
+        return data
+            .map((e) => LoopsVideo.fromJson(e as Map<String, dynamic>))
+            .toList();
       }
     } catch (e) {
       debugPrint('[REELS] Direct fetch /api/web/feed error: $e');
@@ -206,7 +223,8 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
           }
           return; // Success, stop here
         } catch (e) {
-          debugPrint('[REELS] Authenticated getForYouFeed failed: $e, trying public feed');
+          debugPrint(
+              '[REELS] Authenticated getForYouFeed failed: $e, trying public feed');
         }
         // Fallback to public feed for authenticated users
         try {
@@ -511,8 +529,10 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
               setState(() => _isLoading = true);
               _loadVideos();
             },
-            icon: const Icon(Icons.refresh_rounded, color: CyberpunkTheme.neonCyan),
-            label: const Text('Try again', style: TextStyle(color: CyberpunkTheme.neonCyan)),
+            icon: const Icon(Icons.refresh_rounded,
+                color: CyberpunkTheme.neonCyan),
+            label: const Text('Try again',
+                style: TextStyle(color: CyberpunkTheme.neonCyan)),
           ),
         ],
       ),
@@ -548,9 +568,11 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
               child: GestureDetector(
                 onHorizontalDragEnd: (details) {
                   if (details.primaryVelocity != null) {
-                    if (details.primaryVelocity! < -100 && _selectedFeedTab == 0) {
+                    if (details.primaryVelocity! < -100 &&
+                        _selectedFeedTab == 0) {
                       _feedTabController.animateTo(1);
-                    } else if (details.primaryVelocity! > 100 && _selectedFeedTab == 1) {
+                    } else if (details.primaryVelocity! > 100 &&
+                        _selectedFeedTab == 1) {
                       _feedTabController.animateTo(0);
                     }
                   }
@@ -576,8 +598,12 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
                       color: CyberpunkTheme.neonPink,
                       size: 120,
                       shadows: [
-                        Shadow(color: CyberpunkTheme.neonPink.withOpacity(0.8), blurRadius: 40),
-                        Shadow(color: CyberpunkTheme.neonPink.withOpacity(0.4), blurRadius: 80),
+                        Shadow(
+                            color: CyberpunkTheme.neonPink.withOpacity(0.8),
+                            blurRadius: 40),
+                        Shadow(
+                            color: CyberpunkTheme.neonPink.withOpacity(0.4),
+                            blurRadius: 80),
                       ],
                     ),
                   );
@@ -600,7 +626,8 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
         labelColor: Colors.white,
         labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
         unselectedLabelColor: Colors.white54,
-        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+        unselectedLabelStyle:
+            const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
         dividerColor: Colors.transparent,
         splashFactory: NoSplash.splashFactory,
         overlayColor: WidgetStateProperty.all(Colors.transparent),
@@ -675,7 +702,8 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
       children: [
         // Like
         _ActionButton(
-          icon: isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+          icon:
+              isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
           label: _formatCount(likeCount),
           color: isLiked ? CyberpunkTheme.neonPink : Colors.white,
           glowColor: isLiked ? CyberpunkTheme.neonPink : null,
@@ -751,7 +779,8 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
               : null,
         ),
         child: avatar.isEmpty
-            ? const Icon(Icons.music_note_rounded, color: Colors.white54, size: 16)
+            ? const Icon(Icons.music_note_rounded,
+                color: Colors.white54, size: 16)
             : null,
       ),
     );
@@ -824,7 +853,8 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
                   }
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.white70, width: 1),
@@ -875,7 +905,8 @@ class _ExpandableCaptionState extends State<_ExpandableCaption> {
         maxLines: _expanded ? 20 : 2,
         overflow: TextOverflow.ellipsis,
         text: TextSpan(
-          style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+          style:
+              const TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
           children: [
             TextSpan(text: widget.text),
             if (!_expanded && widget.text.length > 80)
@@ -987,10 +1018,11 @@ class _CommentsSheetState extends State<_CommentsSheet> {
   Future<void> _loadComments() async {
     try {
       final comments = await widget.api.getVideoComments(widget.video.id);
-      if (mounted) setState(() {
-        _comments = comments;
-        _loading = false;
-      });
+      if (mounted)
+        setState(() {
+          _comments = comments;
+          _loading = false;
+        });
     } catch (e) {
       if (mounted) setState(() => _loading = false);
     }
@@ -1037,7 +1069,8 @@ class _CommentsSheetState extends State<_CommentsSheet> {
               ),
               // Title
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
                     Text(
@@ -1073,12 +1106,14 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                         ? Center(
                             child: Text(
                               'No comments yet',
-                              style: TextStyle(color: CyberpunkTheme.textTertiary),
+                              style:
+                                  TextStyle(color: CyberpunkTheme.textTertiary),
                             ),
                           )
                         : ListView.builder(
                             controller: scrollController,
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
                             itemCount: _comments.length,
                             itemBuilder: (context, index) {
                               final comment = _comments[index];
@@ -1089,13 +1124,16 @@ class _CommentsSheetState extends State<_CommentsSheet> {
               // Input area
               Container(
                 padding: EdgeInsets.fromLTRB(
-                  16, 8, 16,
+                  16,
+                  8,
+                  16,
                   MediaQuery.of(context).viewInsets.bottom + 8,
                 ),
                 decoration: BoxDecoration(
                   color: CyberpunkTheme.cardDark,
                   border: Border(
-                    top: BorderSide(color: CyberpunkTheme.borderDark, width: 0.5),
+                    top: BorderSide(
+                        color: CyberpunkTheme.borderDark, width: 0.5),
                   ),
                 ),
                 child: Row(
@@ -1103,23 +1141,29 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                     Expanded(
                       child: TextField(
                         controller: _textController,
-                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 14),
                         decoration: InputDecoration(
                           hintText: 'Add a comment...',
-                          hintStyle: TextStyle(color: CyberpunkTheme.textTertiary),
+                          hintStyle:
+                              TextStyle(color: CyberpunkTheme.textTertiary),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(24),
-                            borderSide: BorderSide(color: CyberpunkTheme.borderDark),
+                            borderSide:
+                                BorderSide(color: CyberpunkTheme.borderDark),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(24),
-                            borderSide: BorderSide(color: CyberpunkTheme.borderDark),
+                            borderSide:
+                                BorderSide(color: CyberpunkTheme.borderDark),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(24),
-                            borderSide: BorderSide(color: CyberpunkTheme.neonCyan, width: 1),
+                            borderSide: BorderSide(
+                                color: CyberpunkTheme.neonCyan, width: 1),
                           ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 10),
                           filled: true,
                           fillColor: CyberpunkTheme.surfaceDark,
                         ),
@@ -1150,7 +1194,8 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Icon(Icons.send_rounded, color: Colors.white, size: 18),
+                            : const Icon(Icons.send_rounded,
+                                color: Colors.white, size: 18),
                       ),
                     ),
                   ],
@@ -1167,7 +1212,8 @@ class _CommentsSheetState extends State<_CommentsSheet> {
     final username = comment.account?['username'] as String? ?? 'user';
     final avatar = comment.account?['avatar'] as String? ?? '';
     final timeStr = comment.createdAt != null
-        ? timeago.format(DateTime.tryParse(comment.createdAt!) ?? DateTime.now())
+        ? timeago
+            .format(DateTime.tryParse(comment.createdAt!) ?? DateTime.now())
         : '';
 
     return Padding(
@@ -1177,7 +1223,8 @@ class _CommentsSheetState extends State<_CommentsSheet> {
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundImage: avatar.isNotEmpty ? CachedNetworkImageProvider(avatar) : null,
+            backgroundImage:
+                avatar.isNotEmpty ? CachedNetworkImageProvider(avatar) : null,
             backgroundColor: CyberpunkTheme.cardDark,
             child: avatar.isEmpty
                 ? const Icon(Icons.person, size: 14, color: Colors.white54)
@@ -1211,7 +1258,8 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                 const SizedBox(height: 4),
                 Text(
                   comment.content,
-                  style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.3),
+                  style: const TextStyle(
+                      color: Colors.white, fontSize: 14, height: 1.3),
                 ),
               ],
             ),

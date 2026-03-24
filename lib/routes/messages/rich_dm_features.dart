@@ -7,7 +7,8 @@ import 'package:fedispace/themes/cyberpunk_theme.dart';
 class VoiceMessageRecorder extends StatefulWidget {
   final void Function(String path, Duration duration)? onRecordComplete;
 
-  const VoiceMessageRecorder({Key? key, this.onRecordComplete}) : super(key: key);
+  const VoiceMessageRecorder({Key? key, this.onRecordComplete})
+      : super(key: key);
 
   @override
   State<VoiceMessageRecorder> createState() => _VoiceMessageRecorderState();
@@ -77,7 +78,8 @@ class _VoiceMessageRecorderState extends State<VoiceMessageRecorder>
             child: AnimatedBuilder(
               animation: _pulseController,
               builder: (context, child) {
-                final scale = _isRecording ? 1.0 + (_pulseController.value * 0.2) : 1.0;
+                final scale =
+                    _isRecording ? 1.0 + (_pulseController.value * 0.2) : 1.0;
                 return Transform.scale(
                   scale: scale,
                   child: Container(
@@ -89,12 +91,17 @@ class _VoiceMessageRecorderState extends State<VoiceMessageRecorder>
                           ? Colors.red.withOpacity(0.8)
                           : CyberpunkTheme.neonCyan.withOpacity(0.2),
                       boxShadow: _isRecording
-                          ? [BoxShadow(color: Colors.red.withOpacity(0.4), blurRadius: 16)]
+                          ? [
+                              BoxShadow(
+                                  color: Colors.red.withOpacity(0.4),
+                                  blurRadius: 16)
+                            ]
                           : [],
                     ),
                     child: Icon(
                       _isRecording ? Icons.stop_rounded : Icons.mic_rounded,
-                      color: _isRecording ? Colors.white : CyberpunkTheme.neonCyan,
+                      color:
+                          _isRecording ? Colors.white : CyberpunkTheme.neonCyan,
                       size: 24,
                     ),
                   ),
@@ -122,7 +129,8 @@ class _VoiceMessageRecorderState extends State<VoiceMessageRecorder>
             const Expanded(
               child: Text(
                 'Hold to record voice message',
-                style: TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 13),
+                style: TextStyle(
+                    color: CyberpunkTheme.textSecondary, fontSize: 13),
               ),
             ),
         ],
@@ -170,7 +178,8 @@ class _WaveformVisualizerState extends State<_WaveformVisualizer>
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: List.generate(20, (i) {
               final height = widget.isActive
-                  ? 8.0 + (16.0 * ((i + _controller.value * 10).remainder(5) / 5))
+                  ? 8.0 +
+                      (16.0 * ((i + _controller.value * 10).remainder(5) / 5))
                   : 4.0;
               return Container(
                 width: 3,
@@ -250,13 +259,15 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
                 LinearProgressIndicator(
                   value: _progress,
                   backgroundColor: CyberpunkTheme.borderDark,
-                  valueColor: const AlwaysStoppedAnimation(CyberpunkTheme.neonCyan),
+                  valueColor:
+                      const AlwaysStoppedAnimation(CyberpunkTheme.neonCyan),
                   minHeight: 3,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   _formatDuration(widget.duration),
-                  style: const TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 11),
+                  style: const TextStyle(
+                      color: CyberpunkTheme.textTertiary, fontSize: 11),
                 ),
               ],
             ),

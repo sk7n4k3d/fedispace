@@ -35,7 +35,7 @@ class _DirectMessagesPageState extends State<DirectMessagesPage> {
 
     try {
       appLogger.debug('Loading direct messages');
-      
+
       // H3: Parallel fetch instead of sequential
       final results = await Future.wait([
         widget.apiService.getConversationsByScope(scope: 'inbox', limit: 40),
@@ -43,95 +43,107 @@ class _DirectMessagesPageState extends State<DirectMessagesPage> {
       ]);
       final inboxConversations = results[0];
       final sentConversations = results[1];
-      
-      final List<dynamic> allConversations = [...inboxConversations, ...sentConversations];
-      
+
+      final List<dynamic> allConversations = [
+        ...inboxConversations,
+        ...sentConversations
+      ];
+
       final Map<String, _Conversation> convByPartner = {};
-      
+
       for (var conv in allConversations) {
         try {
-           if (conv == null) continue;
-           
-           final Map<String, dynamic> convMap = conv is Map ? Map<String, dynamic>.from(conv) : {};
-           
-           List<dynamic>? accounts;
-           if (convMap.containsKey('accounts') && convMap['accounts'] is List) {
-               accounts = convMap['accounts'];
-           } else if (convMap.containsKey('participants') && convMap['participants'] is List) {
-               accounts = convMap['participants'];
-           }
-           
-           if (accounts != null && accounts.isNotEmpty) {
-              final account = accounts[0];
-              final String partnerId = account['id']?.toString() ?? '';
-              
-              final lastStatus = convMap['last_status'] ?? convMap['latest_message'];
-              final String threadId = convMap['id']?.toString() ?? '';
-              
-              String lastMsgContent = '';
-              if (lastStatus != null) {
-                  lastMsgContent = lastStatus['content_text'] ?? lastStatus['content'] ?? lastStatus['body'] ?? lastStatus['message'] ?? '';
-                  lastMsgContent = lastMsgContent.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+          if (conv == null) continue;
 
-                  // If text is empty, check for media attachments
-                  if (lastMsgContent.isEmpty) {
-                    final attachments = lastStatus['media_attachments'] as List?;
-                    if (attachments != null && attachments.isNotEmpty) {
-                      final mediaType = attachments[0]['type']?.toString() ?? '';
-                      if (mediaType == 'image') {
-                        lastMsgContent = '\ud83d\udcf7 Photo';
-                      } else if (mediaType == 'video' || mediaType == 'gifv') {
-                        lastMsgContent = '\ud83c\udfa5 Video';
-                      } else if (mediaType == 'audio') {
-                        lastMsgContent = '\ud83c\udfa7 Audio';
-                      } else {
-                        lastMsgContent = '\ud83d\udcce Attachment';
-                      }
-                    } else {
-                      // Check Pixelfed-style type field
-                      final msgType = lastStatus['type']?.toString() ?? '';
-                      if (msgType == 'photo' || msgType == 'photos') {
-                        lastMsgContent = '\ud83d\udcf7 Photo';
-                      } else if (msgType == 'video') {
-                        lastMsgContent = '\ud83c\udfa5 Video';
-                      } else if (msgType == 'emoji') {
-                        lastMsgContent = lastStatus['value']?.toString() ?? '\u2764\ufe0f';
-                      }
-                    }
+          final Map<String, dynamic> convMap =
+              conv is Map ? Map<String, dynamic>.from(conv) : {};
+
+          List<dynamic>? accounts;
+          if (convMap.containsKey('accounts') && convMap['accounts'] is List) {
+            accounts = convMap['accounts'];
+          } else if (convMap.containsKey('participants') &&
+              convMap['participants'] is List) {
+            accounts = convMap['participants'];
+          }
+
+          if (accounts != null && accounts.isNotEmpty) {
+            final account = accounts[0];
+            final String partnerId = account['id']?.toString() ?? '';
+
+            final lastStatus =
+                convMap['last_status'] ?? convMap['latest_message'];
+            final String threadId = convMap['id']?.toString() ?? '';
+
+            String lastMsgContent = '';
+            if (lastStatus != null) {
+              lastMsgContent = lastStatus['content_text'] ??
+                  lastStatus['content'] ??
+                  lastStatus['body'] ??
+                  lastStatus['message'] ??
+                  '';
+              lastMsgContent =
+                  lastMsgContent.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+
+              // If text is empty, check for media attachments
+              if (lastMsgContent.isEmpty) {
+                final attachments = lastStatus['media_attachments'] as List?;
+                if (attachments != null && attachments.isNotEmpty) {
+                  final mediaType = attachments[0]['type']?.toString() ?? '';
+                  if (mediaType == 'image') {
+                    lastMsgContent = '\ud83d\udcf7 Photo';
+                  } else if (mediaType == 'video' || mediaType == 'gifv') {
+                    lastMsgContent = '\ud83c\udfa5 Video';
+                  } else if (mediaType == 'audio') {
+                    lastMsgContent = '\ud83c\udfa7 Audio';
+                  } else {
+                    lastMsgContent = '\ud83d\udcce Attachment';
                   }
-              }
-              
-              DateTime? lastMsgTime;
-              if (lastStatus != null) {
-                  final created = lastStatus['created_at'];
-                  if (created != null) {
-                      lastMsgTime = DateTime.tryParse(created);
+                } else {
+                  // Check Pixelfed-style type field
+                  final msgType = lastStatus['type']?.toString() ?? '';
+                  if (msgType == 'photo' || msgType == 'photos') {
+                    lastMsgContent = '\ud83d\udcf7 Photo';
+                  } else if (msgType == 'video') {
+                    lastMsgContent = '\ud83c\udfa5 Video';
+                  } else if (msgType == 'emoji') {
+                    lastMsgContent =
+                        lastStatus['value']?.toString() ?? '\u2764\ufe0f';
                   }
+                }
               }
-              
-              final newConv = _Conversation(
-                id: threadId,
-                username: account['username'] ?? '',
-                displayName: account['display_name'] ?? account['username'] ?? '',
-                avatarUrl: account['avatar'] ?? '',
-                lastMessage: lastMsgContent,
-                lastMessageTime: lastMsgTime ?? DateTime(2000),
-                unread: convMap['unread'] ?? false,
-                lastStatusId: lastStatus?['id']?.toString(),
-                userId: partnerId,
-              );
-              
-              if (!convByPartner.containsKey(partnerId) || 
-                  newConv.lastMessageTime.isAfter(convByPartner[partnerId]!.lastMessageTime)) {
-                convByPartner[partnerId] = newConv;
+            }
+
+            DateTime? lastMsgTime;
+            if (lastStatus != null) {
+              final created = lastStatus['created_at'];
+              if (created != null) {
+                lastMsgTime = DateTime.tryParse(created);
               }
-           }
+            }
+
+            final newConv = _Conversation(
+              id: threadId,
+              username: account['username'] ?? '',
+              displayName: account['display_name'] ?? account['username'] ?? '',
+              avatarUrl: account['avatar'] ?? '',
+              lastMessage: lastMsgContent,
+              lastMessageTime: lastMsgTime ?? DateTime(2000),
+              unread: convMap['unread'] ?? false,
+              lastStatusId: lastStatus?['id']?.toString(),
+              userId: partnerId,
+            );
+
+            if (!convByPartner.containsKey(partnerId) ||
+                newConv.lastMessageTime
+                    .isAfter(convByPartner[partnerId]!.lastMessageTime)) {
+              convByPartner[partnerId] = newConv;
+            }
+          }
         } catch (e, stack) {
-           appLogger.error('Error parsing conversation item', e);
-
+          appLogger.error('Error parsing conversation item', e);
         }
       }
-      
+
       final sortedConversations = convByPartner.values.toList()
         ..sort((a, b) => b.lastMessageTime.compareTo(a.lastMessageTime));
 
@@ -146,13 +158,12 @@ class _DirectMessagesPageState extends State<DirectMessagesPage> {
       if (!mounted) return;
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading DMs: $error'), backgroundColor: CyberpunkTheme.cardDark),
+        SnackBar(
+            content: Text('Error loading DMs: $error'),
+            backgroundColor: CyberpunkTheme.cardDark),
       );
     }
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -162,16 +173,23 @@ class _DirectMessagesPageState extends State<DirectMessagesPage> {
         backgroundColor: CyberpunkTheme.backgroundBlack,
         elevation: 0,
         title: Text(
-           S.of(context).messages,
-           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: CyberpunkTheme.textWhite),
-         ),
+          S.of(context).messages,
+          style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: CyberpunkTheme.textWhite),
+        ),
         actions: [
-IconButton(
-            icon: const Icon(Icons.edit_note_rounded, color: CyberpunkTheme.textWhite, size: 24),
+          IconButton(
+            icon: const Icon(Icons.edit_note_rounded,
+                color: CyberpunkTheme.textWhite, size: 24),
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(
-                builder: (context) => NewMessagePage(apiService: widget.apiService),
-              ));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        NewMessagePage(apiService: widget.apiService),
+                  ));
             },
           ),
         ],
@@ -199,31 +217,43 @@ IconButton(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.forum_outlined, size: 64, color: CyberpunkTheme.neonCyan.withOpacity(0.3)),
+            Icon(Icons.forum_outlined,
+                size: 64, color: CyberpunkTheme.neonCyan.withOpacity(0.3)),
             const SizedBox(height: 16),
-             Text(
-               S.of(context).noConversations,
-               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: CyberpunkTheme.textWhite),
-             ),
-             const SizedBox(height: 8),
-             Text(
-               S.of(context).sendMessage,
-               style: const TextStyle(fontSize: 14, color: CyberpunkTheme.textSecondary),
-             ),
+            Text(
+              S.of(context).noConversations,
+              style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: CyberpunkTheme.textWhite),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              S.of(context).sendMessage,
+              style: const TextStyle(
+                  fontSize: 14, color: CyberpunkTheme.textSecondary),
+            ),
             const SizedBox(height: 24),
             OutlinedButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) => NewMessagePage(apiService: widget.apiService),
-                ));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          NewMessagePage(apiService: widget.apiService),
+                    ));
               },
               style: OutlinedButton.styleFrom(
                 foregroundColor: CyberpunkTheme.neonCyan,
-                side: BorderSide(color: CyberpunkTheme.neonCyan.withOpacity(0.4)),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                side:
+                    BorderSide(color: CyberpunkTheme.neonCyan.withOpacity(0.4)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
               ),
-               child: Text(S.of(context).sendMessage, style: const TextStyle(fontWeight: FontWeight.w600)),
+              child: Text(S.of(context).sendMessage,
+                  style: const TextStyle(fontWeight: FontWeight.w600)),
             ),
           ],
         ),
@@ -242,18 +272,22 @@ IconButton(
         return _ConversationItem(
           conversation: conversation,
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(
-              builder: (context) => ConversationDetailPage(
-                apiService: widget.apiService,
-                threadId: conversation.id,
-                conversationId: conversation.username,
-                recipientName: conversation.displayName,
-                recipientUsername: conversation.username,
-                recipientAvatar: conversation.avatarUrl.isNotEmpty ? conversation.avatarUrl : null,
-                lastStatusId: conversation.lastStatusId,
-                recipientId: conversation.userId,
-              ),
-            ));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ConversationDetailPage(
+                    apiService: widget.apiService,
+                    threadId: conversation.id,
+                    conversationId: conversation.username,
+                    recipientName: conversation.displayName,
+                    recipientUsername: conversation.username,
+                    recipientAvatar: conversation.avatarUrl.isNotEmpty
+                        ? conversation.avatarUrl
+                        : null,
+                    lastStatusId: conversation.lastStatusId,
+                    recipientId: conversation.userId,
+                  ),
+                ));
           },
         );
       },
@@ -311,8 +345,8 @@ class _ConversationItem extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: conversation.unread 
-                          ? CyberpunkTheme.neonCyan.withOpacity(0.5) 
+                      color: conversation.unread
+                          ? CyberpunkTheme.neonCyan.withOpacity(0.5)
                           : Colors.transparent,
                       width: 1.5,
                     ),
@@ -326,7 +360,8 @@ class _ConversationItem extends StatelessWidget {
                           ? CachedNetworkImageProvider(conversation.avatarUrl)
                           : null,
                       child: conversation.avatarUrl.isEmpty
-                          ? const Icon(Icons.person, size: 24, color: CyberpunkTheme.textTertiary)
+                          ? const Icon(Icons.person,
+                              size: 24, color: CyberpunkTheme.textTertiary)
                           : null,
                     ),
                   ),
@@ -341,7 +376,8 @@ class _ConversationItem extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: CyberpunkTheme.neonCyan,
                         shape: BoxShape.circle,
-                        border: Border.all(color: CyberpunkTheme.backgroundBlack, width: 2),
+                        border: Border.all(
+                            color: CyberpunkTheme.backgroundBlack, width: 2),
                       ),
                     ),
                   ),
@@ -354,20 +390,30 @@ class _ConversationItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    conversation.displayName.isNotEmpty ? conversation.displayName : conversation.username,
+                    conversation.displayName.isNotEmpty
+                        ? conversation.displayName
+                        : conversation.username,
                     style: TextStyle(
                       fontSize: 15,
-                      fontWeight: conversation.unread ? FontWeight.w600 : FontWeight.w500,
+                      fontWeight: conversation.unread
+                          ? FontWeight.w600
+                          : FontWeight.w500,
                       color: CyberpunkTheme.textWhite,
                     ),
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    conversation.lastMessage.isNotEmpty ? conversation.lastMessage : 'No messages',
+                    conversation.lastMessage.isNotEmpty
+                        ? conversation.lastMessage
+                        : 'No messages',
                     style: TextStyle(
                       fontSize: 13,
-                      color: conversation.unread ? CyberpunkTheme.textWhite : CyberpunkTheme.textSecondary,
-                      fontWeight: conversation.unread ? FontWeight.w500 : FontWeight.normal,
+                      color: conversation.unread
+                          ? CyberpunkTheme.textWhite
+                          : CyberpunkTheme.textSecondary,
+                      fontWeight: conversation.unread
+                          ? FontWeight.w500
+                          : FontWeight.normal,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -379,7 +425,8 @@ class _ConversationItem extends StatelessWidget {
             // Time
             Text(
               timeago.format(conversation.lastMessageTime, locale: 'en_short'),
-              style: const TextStyle(fontSize: 12, color: CyberpunkTheme.textTertiary),
+              style: const TextStyle(
+                  fontSize: 12, color: CyberpunkTheme.textTertiary),
             ),
           ],
         ),

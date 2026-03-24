@@ -9,7 +9,7 @@ const String featherRedirectUri = 'space.echelon4.fedispace://oauth-callback';
 
 /// List of oauth scopes to be requested to Mastodon on authentication
 ///
-const List<String> oauthScopes = ['read', 'write', 'follow','push'];
+const List<String> oauthScopes = ['read', 'write', 'follow', 'push'];
 
 /// a Pixelfed instance's OAuth2 endpoints.
 class PixelfedOAuth2Client extends OAuth2Client {
@@ -18,20 +18,20 @@ class PixelfedOAuth2Client extends OAuth2Client {
 
   PixelfedOAuth2Client({required this.instanceUrl})
       : super(
-    authorizeUrl: '$instanceUrl/oauth/authorize',
-    tokenUrl: '$instanceUrl/oauth/token',
-    redirectUri: featherRedirectUri,
-    customUriScheme: featherUriScheme,
-  );
+          authorizeUrl: '$instanceUrl/oauth/authorize',
+          tokenUrl: '$instanceUrl/oauth/token',
+          redirectUri: featherRedirectUri,
+          customUriScheme: featherUriScheme,
+        );
 }
 
 /// Returns an instance of the [OAuth2Helper] helper class that serves as a
 /// bridge between the OAuth2 auth flow and requests to Mastodon's endpoint.
 OAuth2Helper getOauthHelper(
-    String instanceUrl,
-    String oauthClientId,
-    String oauthClientSecret,
-    ) {
+  String instanceUrl,
+  String oauthClientId,
+  String oauthClientSecret,
+) {
   final PixelfedOAuth2Client oauthClient = PixelfedOAuth2Client(
     instanceUrl: instanceUrl,
   );

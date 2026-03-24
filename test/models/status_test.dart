@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fedispace/models/status.dart';
 
-
 void main() {
   final baseAccount = {
     'id': '1',
@@ -316,7 +315,8 @@ void main() {
 
   group('userFromJson', () {
     test('parses list of statuses from JSON string', () {
-      const jsonString = '[{"id":"1","content":"Post 1","account":{"id":"1","username":"u1","display_name":"U1","acct":"u1","locked":false,"bot":false,"avatar":"","header":"","followers_count":0,"following_count":0,"statuses_count":0,"note":""},"favourited":false,"reblogged":false,"visibility":"public","uri":"","url":"","created_at":"","favourites_count":0,"replies_count":0,"reblogs_count":0,"media_attachments":[]},{"id":"2","content":"Post 2","account":{"id":"2","username":"u2","display_name":"U2","acct":"u2","locked":false,"bot":false,"avatar":"","header":"","followers_count":0,"following_count":0,"statuses_count":0,"note":""},"favourited":true,"reblogged":false,"visibility":"unlisted","uri":"","url":"","created_at":"","favourites_count":3,"replies_count":1,"reblogs_count":0,"media_attachments":[]}]';
+      const jsonString =
+          '[{"id":"1","content":"Post 1","account":{"id":"1","username":"u1","display_name":"U1","acct":"u1","locked":false,"bot":false,"avatar":"","header":"","followers_count":0,"following_count":0,"statuses_count":0,"note":""},"favourited":false,"reblogged":false,"visibility":"public","uri":"","url":"","created_at":"","favourites_count":0,"replies_count":0,"reblogs_count":0,"media_attachments":[]},{"id":"2","content":"Post 2","account":{"id":"2","username":"u2","display_name":"U2","acct":"u2","locked":false,"bot":false,"avatar":"","header":"","followers_count":0,"following_count":0,"statuses_count":0,"note":""},"favourited":true,"reblogged":false,"visibility":"unlisted","uri":"","url":"","created_at":"","favourites_count":3,"replies_count":1,"reblogs_count":0,"media_attachments":[]}]';
 
       final statuses = userFromJson(jsonString);
       expect(statuses.length, 2);

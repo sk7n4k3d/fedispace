@@ -87,7 +87,7 @@ class ErrorHandler {
     // Try to parse error message from response
     String errorMessage = 'An error occurred';
     try {
-      final Map<String, dynamic> json = 
+      final Map<String, dynamic> json =
           (response.isNotEmpty) ? parseJson(response) : {};
       errorMessage = json['error'] ?? json['message'] ?? errorMessage;
     } catch (_) {

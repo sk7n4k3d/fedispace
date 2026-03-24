@@ -6,15 +6,16 @@ import 'package:fedispace/themes/cyberpunk_theme.dart';
 class EmojiReactionPicker extends StatelessWidget {
   final void Function(String emoji)? onReactionSelected;
 
-  const EmojiReactionPicker({Key? key, this.onReactionSelected}) : super(key: key);
+  const EmojiReactionPicker({Key? key, this.onReactionSelected})
+      : super(key: key);
 
   static const List<String> defaultReactions = [
-    '\u2764\uFE0F',  // red heart
-    '\uD83D\uDE02',  // face with tears of joy
-    '\uD83D\uDE2E',  // face with open mouth
-    '\uD83D\uDE22',  // crying face
-    '\uD83D\uDD25',  // fire
-    '\uD83D\uDC4D',  // thumbs up
+    '\u2764\uFE0F', // red heart
+    '\uD83D\uDE02', // face with tears of joy
+    '\uD83D\uDE2E', // face with open mouth
+    '\uD83D\uDE22', // crying face
+    '\uD83D\uDD25', // fire
+    '\uD83D\uDC4D', // thumbs up
   ];
 
   /// Show the reaction picker as an overlay near the given position.
@@ -40,7 +41,8 @@ class EmojiReactionPicker extends StatelessWidget {
                 onTap: () => Navigator.pop(context, emoji),
                 borderRadius: BorderRadius.circular(20),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   child: Text(emoji, style: const TextStyle(fontSize: 24)),
                 ),
               );
@@ -111,7 +113,9 @@ class ReactionBadge extends StatelessWidget {
               : CyberpunkTheme.glassWhite,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? CyberpunkTheme.neonCyan : CyberpunkTheme.glassBorder,
+            color: isSelected
+                ? CyberpunkTheme.neonCyan
+                : CyberpunkTheme.glassBorder,
             width: 0.5,
           ),
         ),
@@ -124,7 +128,9 @@ class ReactionBadge extends StatelessWidget {
               Text(
                 count.toString(),
                 style: TextStyle(
-                  color: isSelected ? CyberpunkTheme.neonCyan : CyberpunkTheme.textSecondary,
+                  color: isSelected
+                      ? CyberpunkTheme.neonCyan
+                      : CyberpunkTheme.textSecondary,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),

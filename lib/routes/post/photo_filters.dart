@@ -36,7 +36,8 @@ class _PhotoFiltersPageState extends State<PhotoFiltersPage>
   }
 
   ColorFilter? get _combinedFilter {
-    final filterCf = photoFilters[_selectedFilterIndex].getColorFilter(_filterIntensity);
+    final filterCf =
+        photoFilters[_selectedFilterIndex].getColorFilter(_filterIntensity);
     final adjustCf = _adjustments.toColorFilter();
 
     // If only one is active, return it
@@ -50,11 +51,13 @@ class _PhotoFiltersPageState extends State<PhotoFiltersPage>
   }
 
   void _applyAndReturn() {
-    Navigator.pop(context, PhotoFilterResult(
-      filterIndex: _selectedFilterIndex,
-      filterIntensity: _filterIntensity,
-      adjustments: _adjustments,
-    ));
+    Navigator.pop(
+        context,
+        PhotoFilterResult(
+          filterIndex: _selectedFilterIndex,
+          filterIntensity: _filterIntensity,
+          adjustments: _adjustments,
+        ));
   }
 
   @override
@@ -137,7 +140,8 @@ class _PhotoFiltersPageState extends State<PhotoFiltersPage>
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
                 children: [
-                  const Icon(Icons.tune_rounded, color: CyberpunkTheme.textTertiary, size: 16),
+                  const Icon(Icons.tune_rounded,
+                      color: CyberpunkTheme.textTertiary, size: 16),
                   Expanded(
                     child: SliderTheme(
                       data: SliderThemeData(
@@ -146,7 +150,8 @@ class _PhotoFiltersPageState extends State<PhotoFiltersPage>
                         thumbColor: CyberpunkTheme.neonCyan,
                         overlayColor: CyberpunkTheme.neonCyan.withOpacity(0.15),
                         trackHeight: 2,
-                        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+                        thumbShape:
+                            const RoundSliderThumbShape(enabledThumbRadius: 6),
                       ),
                       child: Slider(
                         value: _filterIntensity,
@@ -182,7 +187,8 @@ class _PhotoFiltersPageState extends State<PhotoFiltersPage>
               indicatorWeight: 2,
               labelColor: CyberpunkTheme.neonCyan,
               unselectedLabelColor: CyberpunkTheme.textTertiary,
-              labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+              labelStyle:
+                  const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
               tabs: const [
                 Tab(text: 'Filters'),
                 Tab(text: 'Adjust'),
@@ -215,7 +221,8 @@ class _PhotoFiltersPageState extends State<PhotoFiltersPage>
     );
 
     // Apply filter
-    final filterCf = photoFilters[_selectedFilterIndex].getColorFilter(_filterIntensity);
+    final filterCf =
+        photoFilters[_selectedFilterIndex].getColorFilter(_filterIntensity);
     if (filterCf != null) {
       image = ColorFiltered(colorFilter: filterCf, child: image);
     }

@@ -153,12 +153,16 @@ class UserPreferences {
 
   List<String> _extractTags(String content) {
     final tagRegex = RegExp(r'#(\w+)');
-    return tagRegex.allMatches(content).map((m) => m.group(1)!.toLowerCase()).toList();
+    return tagRegex
+        .allMatches(content)
+        .map((m) => m.group(1)!.toLowerCase())
+        .toList();
   }
 
   void _trimMap(Map<String, double> map, int maxSize) {
     if (map.length <= maxSize) return;
-    final entries = map.entries.toList()..sort((a, b) => a.value.compareTo(b.value));
+    final entries = map.entries.toList()
+      ..sort((a, b) => a.value.compareTo(b.value));
     final toRemove = entries.take(map.length - maxSize);
     for (final e in toRemove) {
       map.remove(e.key);

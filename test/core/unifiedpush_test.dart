@@ -29,7 +29,8 @@ void main() {
         'body': 'user456 liked your post',
       };
 
-      final messageBytes = Uint8List.fromList(utf8.encode(json.encode(payload)));
+      final messageBytes =
+          Uint8List.fromList(utf8.encode(json.encode(payload)));
       final decoded = String.fromCharCodes(messageBytes);
       final data = json.decode(decoded) as Map<String, dynamic>;
 
@@ -43,7 +44,8 @@ void main() {
         'body': 'user789 shared your post',
       };
 
-      final messageBytes = Uint8List.fromList(utf8.encode(json.encode(payload)));
+      final messageBytes =
+          Uint8List.fromList(utf8.encode(json.encode(payload)));
       final decoded = String.fromCharCodes(messageBytes);
       final data = json.decode(decoded) as Map<String, dynamic>;
 
@@ -57,7 +59,8 @@ void main() {
         'body': 'user mentioned you in a post',
       };
 
-      final messageBytes = Uint8List.fromList(utf8.encode(json.encode(payload)));
+      final messageBytes =
+          Uint8List.fromList(utf8.encode(json.encode(payload)));
       final decoded = String.fromCharCodes(messageBytes);
       final data = json.decode(decoded) as Map<String, dynamic>;
 
@@ -65,7 +68,8 @@ void main() {
     });
 
     test('handles non-JSON push message gracefully', () {
-      final messageBytes = Uint8List.fromList(utf8.encode('plain text notification'));
+      final messageBytes =
+          Uint8List.fromList(utf8.encode('plain text notification'));
       final decoded = String.fromCharCodes(messageBytes);
 
       dynamic parsedData;
@@ -93,7 +97,8 @@ void main() {
       };
 
       final data = json.decode(json.encode(payload)) as Map<String, dynamic>;
-      final notificationType = data['notification_type'] ?? data['type'] ?? 'status';
+      final notificationType =
+          data['notification_type'] ?? data['type'] ?? 'status';
       expect(notificationType, 'follow_request');
     });
   });

@@ -81,9 +81,14 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
             onPressed: _isCreating ? null : _createGroup,
             child: _isCreating
                 ? const SizedBox(
-                    width: 20, height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: CyberpunkTheme.neonCyan))
-                : const Text('Create', style: TextStyle(color: CyberpunkTheme.neonCyan, fontWeight: FontWeight.w600)),
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: CyberpunkTheme.neonCyan))
+                : const Text('Create',
+                    style: TextStyle(
+                        color: CyberpunkTheme.neonCyan,
+                        fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -91,7 +96,11 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
         padding: const EdgeInsets.all(16),
         children: [
           // Name
-          const Text('Group Name', style: TextStyle(color: CyberpunkTheme.neonCyan, fontSize: 14, fontWeight: FontWeight.w600)),
+          const Text('Group Name',
+              style: TextStyle(
+                  color: CyberpunkTheme.neonCyan,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           TextField(
             controller: _nameController,
@@ -101,27 +110,41 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
           const SizedBox(height: 20),
 
           // Description
-          const Text('Description', style: TextStyle(color: CyberpunkTheme.neonCyan, fontSize: 14, fontWeight: FontWeight.w600)),
+          const Text('Description',
+              style: TextStyle(
+                  color: CyberpunkTheme.neonCyan,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           TextField(
             controller: _descriptionController,
-            decoration: const InputDecoration(hintText: 'What is this group about?'),
+            decoration:
+                const InputDecoration(hintText: 'What is this group about?'),
             maxLines: 4,
             maxLength: 500,
           ),
           const SizedBox(height: 20),
 
           // Category
-          const Text('Category', style: TextStyle(color: CyberpunkTheme.neonCyan, fontSize: 14, fontWeight: FontWeight.w600)),
+          const Text('Category',
+              style: TextStyle(
+                  color: CyberpunkTheme.neonCyan,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           TextField(
             controller: _categoryController,
-            decoration: const InputDecoration(hintText: 'e.g., Technology, Art, Music'),
+            decoration:
+                const InputDecoration(hintText: 'e.g., Technology, Art, Music'),
           ),
           const SizedBox(height: 20),
 
           // Privacy
-          const Text('Privacy', style: TextStyle(color: CyberpunkTheme.neonCyan, fontSize: 14, fontWeight: FontWeight.w600)),
+          const Text('Privacy',
+              style: TextStyle(
+                  color: CyberpunkTheme.neonCyan,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(
@@ -139,7 +162,9 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                   title: Text(
                     option == 'public' ? 'Public' : 'Private',
                     style: TextStyle(
-                      color: isSelected ? CyberpunkTheme.neonCyan : CyberpunkTheme.textWhite,
+                      color: isSelected
+                          ? CyberpunkTheme.neonCyan
+                          : CyberpunkTheme.textWhite,
                       fontSize: 14,
                     ),
                   ),
@@ -147,7 +172,8 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                     option == 'public'
                         ? 'Anyone can find and join this group'
                         : 'Members must be approved to join',
-                    style: const TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 12),
+                    style: const TextStyle(
+                        color: CyberpunkTheme.textTertiary, fontSize: 12),
                   ),
                   activeColor: CyberpunkTheme.neonCyan,
                   dense: true,

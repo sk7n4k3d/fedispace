@@ -93,7 +93,8 @@ class _NavItem extends StatefulWidget {
   State<_NavItem> createState() => _NavItemState();
 }
 
-class _NavItemState extends State<_NavItem> with SingleTickerProviderStateMixin {
+class _NavItemState extends State<_NavItem>
+    with SingleTickerProviderStateMixin {
   late AnimationController _glowController;
   late Animation<double> _glowAnimation;
 
@@ -131,7 +132,8 @@ class _NavItemState extends State<_NavItem> with SingleTickerProviderStateMixin 
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.isActive ? CyberpunkTheme.neonCyan : CyberpunkTheme.textTertiary;
+    final color =
+        widget.isActive ? CyberpunkTheme.neonCyan : CyberpunkTheme.textTertiary;
 
     return Expanded(
       child: InkWell(
@@ -154,7 +156,8 @@ class _NavItemState extends State<_NavItem> with SingleTickerProviderStateMixin 
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: CyberpunkTheme.neonCyan.withOpacity(_glowAnimation.value),
+                              color: CyberpunkTheme.neonCyan
+                                  .withOpacity(_glowAnimation.value),
                               blurRadius: 16,
                               spreadRadius: 2,
                             ),
@@ -197,7 +200,8 @@ class _ProfileNavItem extends StatefulWidget {
   State<_ProfileNavItem> createState() => _ProfileNavItemState();
 }
 
-class _ProfileNavItemState extends State<_ProfileNavItem> with SingleTickerProviderStateMixin {
+class _ProfileNavItemState extends State<_ProfileNavItem>
+    with SingleTickerProviderStateMixin {
   late AnimationController _glowController;
   late Animation<double> _glowAnimation;
 
@@ -255,7 +259,8 @@ class _ProfileNavItemState extends State<_ProfileNavItem> with SingleTickerProvi
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: CyberpunkTheme.neonCyan.withOpacity(_glowAnimation.value),
+                              color: CyberpunkTheme.neonCyan
+                                  .withOpacity(_glowAnimation.value),
                               blurRadius: 14,
                               spreadRadius: 1,
                             ),
@@ -285,7 +290,8 @@ class _ProfileNavItemState extends State<_ProfileNavItem> with SingleTickerProvi
                         ? CachedNetworkImageProvider(widget.imageUrl!)
                         : null,
                     child: widget.imageUrl == null
-                        ? const Icon(Icons.person, size: 16, color: CyberpunkTheme.textTertiary)
+                        ? const Icon(Icons.person,
+                            size: 16, color: CyberpunkTheme.textTertiary)
                         : null,
                   ),
                 ),

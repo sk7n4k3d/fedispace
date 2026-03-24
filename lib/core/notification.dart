@@ -52,7 +52,9 @@ class _Notification extends State<Notif> with TickerProviderStateMixin {
     final domain = widget.apiService.domainURL();
     return PopScope(
         canPop: false,
-        onPopInvokedWithResult: (didPop, _) { if (!didPop) _onWillPop(); },
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) _onWillPop();
+        },
         child: FutureBuilder(
             future: getData(),
             builder: (ctx, snapshot) {
@@ -92,7 +94,8 @@ void onTap(context, id, ApiService apiService) async {
     if (currentAccount.id == id) {
       Navigator.of(context).pushNamed('/Profile');
     } else {
-      Navigator.of(context).pushNamed('/UserProfile', arguments: {'userId': id});
+      Navigator.of(context)
+          .pushNamed('/UserProfile', arguments: {'userId': id});
     }
   } catch (e) {
     Navigator.of(context).pushNamed('/UserProfile', arguments: {'userId': id});
@@ -152,12 +155,14 @@ Widget _body2(domain, data, ApiService apiService) {
                         placeholder: (context, url) => const SizedBox(
                           height: 95.0,
                           width: 80.0,
-                          child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                          child: Center(
+                              child: CircularProgressIndicator(strokeWidth: 2)),
                         ),
                         errorWidget: (context, url, error) => const SizedBox(
                           height: 95.0,
                           width: 80.0,
-                          child: Icon(Icons.person, size: 40, color: Colors.grey),
+                          child:
+                              Icon(Icons.person, size: 40, color: Colors.grey),
                         ),
                       ),
                     ),
@@ -182,8 +187,12 @@ Widget _body2(domain, data, ApiService apiService) {
                             padding: const EdgeInsets.only(top: 5),
                             child: Text(
                               "As liked your post",
-                              style:
-                                  TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color, fontSize: 15),
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.color,
+                                  fontSize: 15),
                             ),
                           ),
                         ],
@@ -192,8 +201,12 @@ Widget _body2(domain, data, ApiService apiService) {
                             padding: const EdgeInsets.only(top: 5),
                             child: Text(
                               "Following you",
-                              style:
-                                  TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color, fontSize: 15),
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.color,
+                                  fontSize: 15),
                             ),
                           ),
                         ],
@@ -202,8 +215,12 @@ Widget _body2(domain, data, ApiService apiService) {
                             padding: const EdgeInsets.only(top: 5),
                             child: Text(
                               "Requested to follow you",
-                              style:
-                                  TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color, fontSize: 15),
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.color,
+                                  fontSize: 15),
                             ),
                           ),
                         ],
@@ -212,8 +229,12 @@ Widget _body2(domain, data, ApiService apiService) {
                             padding: const EdgeInsets.only(top: 5),
                             child: Text(
                               "Mentioned you in their status",
-                              style:
-                                  TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color, fontSize: 15),
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.color,
+                                  fontSize: 15),
                             ),
                           ),
                         ],

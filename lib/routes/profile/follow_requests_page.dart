@@ -11,7 +11,8 @@ import 'package:google_fonts/google_fonts.dart';
 class FollowRequestsPage extends StatefulWidget {
   final ApiService apiService;
 
-  const FollowRequestsPage({Key? key, required this.apiService}) : super(key: key);
+  const FollowRequestsPage({Key? key, required this.apiService})
+      : super(key: key);
 
   @override
   State<FollowRequestsPage> createState() => _FollowRequestsPageState();
@@ -89,7 +90,8 @@ class _FollowRequestsPageState extends State<FollowRequestsPage> {
         backgroundColor: CyberpunkTheme.backgroundBlack,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: CyberpunkTheme.textWhite, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded,
+              color: CyberpunkTheme.textWhite, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -103,7 +105,8 @@ class _FollowRequestsPageState extends State<FollowRequestsPage> {
         centerTitle: true,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan))
+          ? const Center(
+              child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan))
           : _requests.isEmpty
               ? _buildEmptyState()
               : RefreshIndicator(
@@ -125,23 +128,29 @@ class _FollowRequestsPageState extends State<FollowRequestsPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 80, height: 80,
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: CyberpunkTheme.cardDark,
               border: Border.all(color: CyberpunkTheme.borderDark),
             ),
-            child: const Icon(Icons.person_add_disabled_rounded, size: 36, color: CyberpunkTheme.textTertiary),
+            child: const Icon(Icons.person_add_disabled_rounded,
+                size: 36, color: CyberpunkTheme.textTertiary),
           ),
           const SizedBox(height: 20),
           Text(
             S.of(context).noPendingRequests,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: CyberpunkTheme.textWhite),
+            style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: CyberpunkTheme.textWhite),
           ),
           const SizedBox(height: 6),
           Text(
             S.of(context).allCaughtUp,
-            style: const TextStyle(fontSize: 14, color: CyberpunkTheme.textTertiary),
+            style: const TextStyle(
+                fontSize: 14, color: CyberpunkTheme.textTertiary),
           ),
         ],
       ),
@@ -165,7 +174,8 @@ class _FollowRequestsPageState extends State<FollowRequestsPage> {
             GestureDetector(
               onTap: () {
                 if (account.id != null) {
-                  Navigator.pushNamed(context, '/UserProfile', arguments: {'userId': account.id});
+                  Navigator.pushNamed(context, '/UserProfile',
+                      arguments: {'userId': account.id});
                 }
               },
               child: Container(
@@ -182,10 +192,13 @@ class _FollowRequestsPageState extends State<FollowRequestsPage> {
                 child: CircleAvatar(
                   radius: 24,
                   backgroundColor: CyberpunkTheme.backgroundBlack,
-                  backgroundImage: (account.avatar != null && account.avatar!.isNotEmpty)
-                      ? CachedNetworkImageProvider(account.avatar!) : null,
+                  backgroundImage:
+                      (account.avatar != null && account.avatar!.isNotEmpty)
+                          ? CachedNetworkImageProvider(account.avatar!)
+                          : null,
                   child: (account.avatar == null || account.avatar!.isEmpty)
-                      ? const Icon(Icons.person_rounded, size: 24, color: CyberpunkTheme.textTertiary)
+                      ? const Icon(Icons.person_rounded,
+                          size: 24, color: CyberpunkTheme.textTertiary)
                       : null,
                 ),
               ),
@@ -198,16 +211,24 @@ class _FollowRequestsPageState extends State<FollowRequestsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    (account.display_name != null && account.display_name!.isNotEmpty)
-                        ? account.display_name! : (account.username ?? ''),
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: CyberpunkTheme.textWhite),
-                    maxLines: 1, overflow: TextOverflow.ellipsis,
+                    (account.display_name != null &&
+                            account.display_name!.isNotEmpty)
+                        ? account.display_name!
+                        : (account.username ?? ''),
+                    style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: CyberpunkTheme.textWhite),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
                   Text(
                     '@${account.username ?? ''}',
-                    style: const TextStyle(fontSize: 13, color: CyberpunkTheme.textSecondary),
-                    maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 13, color: CyberpunkTheme.textSecondary),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -216,27 +237,35 @@ class _FollowRequestsPageState extends State<FollowRequestsPage> {
             // Action buttons
             if (isProcessing)
               const SizedBox(
-                width: 24, height: 24,
-                child: CircularProgressIndicator(strokeWidth: 2, color: CyberpunkTheme.neonCyan),
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: CyberpunkTheme.neonCyan),
               )
             else ...[
               // Accept
               GestureDetector(
                 onTap: () => _accept(account),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     gradient: const LinearGradient(
                       colors: [CyberpunkTheme.neonCyan, Color(0xFF00E5FF)],
                     ),
                     boxShadow: [
-                      BoxShadow(color: CyberpunkTheme.neonCyan.withOpacity(0.3), blurRadius: 8),
+                      BoxShadow(
+                          color: CyberpunkTheme.neonCyan.withOpacity(0.3),
+                          blurRadius: 8),
                     ],
                   ),
                   child: const Text(
                     'Accept',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.black),
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black),
                   ),
                 ),
               ),
@@ -245,13 +274,15 @@ class _FollowRequestsPageState extends State<FollowRequestsPage> {
               GestureDetector(
                 onTap: () => _reject(account),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: CyberpunkTheme.borderDark),
                     color: CyberpunkTheme.surfaceDark,
                   ),
-                  child: const Icon(Icons.close_rounded, size: 16, color: CyberpunkTheme.textTertiary),
+                  child: const Icon(Icons.close_rounded,
+                      size: 16, color: CyberpunkTheme.textTertiary),
                 ),
               ),
             ],

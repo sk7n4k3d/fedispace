@@ -14,16 +14,19 @@ class BetterVideoPlayerDataSource {
 
   /// 工厂初始化数据源
   factory BetterVideoPlayerDataSource.network(String url) {
-    return BetterVideoPlayerDataSource(BetterVideoPlayerDataSourceType.network, url);
+    return BetterVideoPlayerDataSource(
+        BetterVideoPlayerDataSourceType.network, url);
   }
 
   /// 工厂初始化数据源
   factory BetterVideoPlayerDataSource.file(String url) {
-    return BetterVideoPlayerDataSource(BetterVideoPlayerDataSourceType.file, url);
+    return BetterVideoPlayerDataSource(
+        BetterVideoPlayerDataSourceType.file, url);
   }
 
   /// 工厂初始化数据源
   factory BetterVideoPlayerDataSource.asset(String url) {
-    return BetterVideoPlayerDataSource(BetterVideoPlayerDataSourceType.asset, url);
+    return BetterVideoPlayerDataSource(
+        BetterVideoPlayerDataSourceType.asset, url);
   }
 }

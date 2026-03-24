@@ -7,12 +7,12 @@ class CyberpunkTheme {
   static const Color surfaceDark = Color(0xFF101014);
   static const Color cardDark = Color(0xFF14141A);
   static const Color borderDark = Color(0xFF1E1E1E);
-  
+
   // Accent colors
   static const Color neonCyan = Color(0xFF00F3FF);
   static const Color neonPink = Color(0xFFFF00FF);
   static const Color neonYellow = Color(0xFFFAFF00);
-  
+
   // Derived accents (softer)
   static const Color cyanMuted = Color(0xFF00B8C4);
   static const Color pinkMuted = Color(0xFFCC00CC);
@@ -22,12 +22,12 @@ class CyberpunkTheme {
   static const Color neonAmber = Color(0xFFF39C12);
   static const Color infoBlue = Color(0xFF00B8FF);
   static const Color errorRed = Color(0xFFFF4757);
-  
+
   // Text
   static const Color textWhite = Color(0xFFF0F0F0);
   static const Color textSecondary = Color(0xFF8A8A8A);
   static const Color textTertiary = Color(0xFF555555);
-  
+
   // Glassmorphism
   static const Color glassWhite = Color(0x0DFFFFFF);
   static const Color glassBorder = Color(0x1AFFFFFF);
@@ -65,22 +65,32 @@ class CyberpunkTheme {
       scaffoldBackgroundColor: backgroundBlack,
       cardColor: cardDark,
       canvasColor: backgroundBlack,
-      
+
       // Typography — Inter everywhere, clean and modern
       textTheme: TextTheme(
-        displayLarge: inter.copyWith(color: textWhite, fontWeight: FontWeight.w700, fontSize: 28),
-        displayMedium: inter.copyWith(color: textWhite, fontWeight: FontWeight.w700, fontSize: 24),
-        displaySmall: inter.copyWith(color: textWhite, fontWeight: FontWeight.w600, fontSize: 20),
-        headlineLarge: inter.copyWith(color: textWhite, fontWeight: FontWeight.w700, fontSize: 22),
-        headlineMedium: inter.copyWith(color: neonCyan, fontWeight: FontWeight.w600, fontSize: 18),
-        headlineSmall: inter.copyWith(color: textWhite, fontWeight: FontWeight.w600, fontSize: 16),
-        titleLarge: inter.copyWith(color: textWhite, fontWeight: FontWeight.w600, fontSize: 18),
-        titleMedium: inter.copyWith(color: textWhite, fontWeight: FontWeight.w500, fontSize: 16),
-        titleSmall: inter.copyWith(color: textSecondary, fontWeight: FontWeight.w500, fontSize: 14),
+        displayLarge: inter.copyWith(
+            color: textWhite, fontWeight: FontWeight.w700, fontSize: 28),
+        displayMedium: inter.copyWith(
+            color: textWhite, fontWeight: FontWeight.w700, fontSize: 24),
+        displaySmall: inter.copyWith(
+            color: textWhite, fontWeight: FontWeight.w600, fontSize: 20),
+        headlineLarge: inter.copyWith(
+            color: textWhite, fontWeight: FontWeight.w700, fontSize: 22),
+        headlineMedium: inter.copyWith(
+            color: neonCyan, fontWeight: FontWeight.w600, fontSize: 18),
+        headlineSmall: inter.copyWith(
+            color: textWhite, fontWeight: FontWeight.w600, fontSize: 16),
+        titleLarge: inter.copyWith(
+            color: textWhite, fontWeight: FontWeight.w600, fontSize: 18),
+        titleMedium: inter.copyWith(
+            color: textWhite, fontWeight: FontWeight.w500, fontSize: 16),
+        titleSmall: inter.copyWith(
+            color: textSecondary, fontWeight: FontWeight.w500, fontSize: 14),
         bodyLarge: inter.copyWith(color: textWhite, fontSize: 15),
         bodyMedium: inter.copyWith(color: textWhite, fontSize: 14),
         bodySmall: inter.copyWith(color: textSecondary, fontSize: 12),
-        labelLarge: inter.copyWith(color: textWhite, fontWeight: FontWeight.w600, fontSize: 14),
+        labelLarge: inter.copyWith(
+            color: textWhite, fontWeight: FontWeight.w600, fontSize: 14),
         labelMedium: inter.copyWith(color: textSecondary, fontSize: 12),
         labelSmall: inter.copyWith(color: textTertiary, fontSize: 11),
       ),
@@ -138,7 +148,8 @@ class CyberpunkTheme {
         ),
         hintStyle: inter.copyWith(color: textTertiary, fontSize: 14),
         labelStyle: inter.copyWith(color: textSecondary, fontSize: 14),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
 
       // Icon Theme
@@ -192,8 +203,10 @@ class CyberpunkTheme {
       // Dialog
       dialogTheme: DialogThemeData(
         backgroundColor: cardDark,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radiusXL)),
-        titleTextStyle: inter.copyWith(color: textWhite, fontWeight: FontWeight.w600, fontSize: 18),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radiusXL)),
+        titleTextStyle: inter.copyWith(
+            color: textWhite, fontWeight: FontWeight.w600, fontSize: 18),
         contentTextStyle: inter.copyWith(color: textSecondary, fontSize: 14),
       ),
 
@@ -213,7 +226,8 @@ class CyberpunkTheme {
           return textTertiary;
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) return neonCyan.withOpacity(0.3);
+          if (states.contains(WidgetState.selected))
+            return neonCyan.withOpacity(0.3);
           return borderDark;
         }),
       ),

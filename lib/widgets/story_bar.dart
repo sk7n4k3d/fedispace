@@ -75,12 +75,13 @@ class _StoryBarState extends State<StoryBar> {
 
   Widget _buildMyStoryAvatar() {
     final hasStory = _myStory != null && _myStory!.items.isNotEmpty;
-    
+
     return GestureDetector(
       onTap: () {
         if (hasStory) {
           // Open Story Viewer
-          Navigator.pushNamed(context, '/StoryViewer', arguments: {'story': _myStory});
+          Navigator.pushNamed(context, '/StoryViewer',
+              arguments: {'story': _myStory});
         } else {
           // Open Camera to create story
           Navigator.push(
@@ -104,15 +105,17 @@ class _StoryBarState extends State<StoryBar> {
                   padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: hasStory 
-                      ? Border.all(color: CyberpunkTheme.neonCyan, width: 2)
-                      : null,
+                    border: hasStory
+                        ? Border.all(color: CyberpunkTheme.neonCyan, width: 2)
+                        : null,
                   ),
                   child: CircleAvatar(
                     radius: 30,
-                    backgroundImage: widget.apiService.currentAccount?.avatar != null
-                        ? CachedNetworkImageProvider(widget.apiService.currentAccount!.avatar)
-                        : null,
+                    backgroundImage:
+                        widget.apiService.currentAccount?.avatar != null
+                            ? CachedNetworkImageProvider(
+                                widget.apiService.currentAccount!.avatar)
+                            : null,
                     backgroundColor: CyberpunkTheme.cardDark,
                   ),
                 ),
@@ -126,7 +129,8 @@ class _StoryBarState extends State<StoryBar> {
                         color: CyberpunkTheme.neonCyan,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.add, size: 16, color: Colors.white),
+                      child:
+                          const Icon(Icons.add, size: 16, color: Colors.white),
                     ),
                   ),
               ],
@@ -145,7 +149,8 @@ class _StoryBarState extends State<StoryBar> {
   Widget _buildStoryAvatar(Story story) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/StoryViewer', arguments: {'story': story});
+        Navigator.pushNamed(context, '/StoryViewer',
+            arguments: {'story': story});
       },
       child: Padding(
         padding: const EdgeInsets.only(right: 16),
@@ -162,14 +167,16 @@ class _StoryBarState extends State<StoryBar> {
                 ),
               ),
               child: Container(
-                padding: const EdgeInsets.all(2), // White border between gradient and image
+                padding: const EdgeInsets.all(
+                    2), // White border between gradient and image
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  color: CyberpunkTheme.backgroundBlack, 
+                  color: CyberpunkTheme.backgroundBlack,
                 ),
                 child: CircleAvatar(
                   radius: 28,
-                  backgroundImage: CachedNetworkImageProvider(story.account.avatar),
+                  backgroundImage:
+                      CachedNetworkImageProvider(story.account.avatar),
                 ),
               ),
             ),

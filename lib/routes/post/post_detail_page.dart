@@ -37,7 +37,7 @@ class PostDetailPage extends StatefulWidget {
 class _PostDetailPageState extends State<PostDetailPage> {
   final TextEditingController _commentController = TextEditingController();
   final FocusNode _commentFocus = FocusNode();
-  
+
   List<Status> _comments = [];
   bool _isLoadingComments = false;
   bool _isFavorited = false;
@@ -118,7 +118,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
     final currentAccount = widget.apiService.currentAccount;
     final optimisticComment = Status(
       id: 'temp_${DateTime.now().millisecondsSinceEpoch}',
-      content: '<p>${text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')}</p>',
+      content:
+          '<p>${text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')}</p>',
       account: currentAccount ?? widget.post.account,
       favorited: false,
       reblogged: false,
@@ -154,7 +155,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
     try {
       final replyId = optimisticComment.in_reply_to_id;
-      await widget.apiService.createPosts(inReplyToId: replyId, content: commentText);
+      await widget.apiService
+          .createPosts(inReplyToId: replyId, content: commentText);
       // Don't auto-reload — optimistic comment stays visible
       // User can pull-to-refresh to sync with server
     } catch (error, stackTrace) {
@@ -200,24 +202,31 @@ class _PostDetailPageState extends State<PostDetailPage> {
   // ── More options ──────────────────────────────────────────────────
 
   void _showMoreOptions() {
-    final isOwnPost = widget.post.account.id == widget.apiService.currentAccount?.id;
+    final isOwnPost =
+        widget.post.account.id == widget.apiService.currentAccount?.id;
     showModalBottomSheet(
       context: context,
       backgroundColor: CyberpunkTheme.surfaceDark,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(CyberpunkTheme.radiusRound)),
+        borderRadius: BorderRadius.vertical(
+            top: Radius.circular(CyberpunkTheme.radiusRound)),
       ),
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 40, height: 4,
+              width: 40,
+              height: 4,
               margin: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(color: CyberpunkTheme.textTertiary, borderRadius: BorderRadius.circular(2)),
+              decoration: BoxDecoration(
+                  color: CyberpunkTheme.textTertiary,
+                  borderRadius: BorderRadius.circular(2)),
             ),
             if (isOwnPost) ...[
-              _optionTile(Icons.push_pin_outlined, _isPinned ? 'Unpin from profile' : 'Pin to profile', () async {
+              _optionTile(Icons.push_pin_outlined,
+                  _isPinned ? 'Unpin from profile' : 'Pin to profile',
+                  () async {
                 Navigator.pop(ctx);
                 final ok = _isPinned
                     ? await widget.apiService.unpinStatus(widget.post.id)
@@ -225,8 +234,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 if (mounted) {
                   if (ok) setState(() => _isPinned = !_isPinned);
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(ok ? (_isPinned ? 'Pinned!' : 'Unpinned!') : 'Failed', style: const TextStyle(color: Colors.white)),
-                    backgroundColor: ok ? CyberpunkTheme.neonCyan.withOpacity(0.8) : Colors.red,
+                    content: Text(
+                        ok ? (_isPinned ? 'Pinned!' : 'Unpinned!') : 'Failed',
+                        style: const TextStyle(color: Colors.white)),
+                    backgroundColor: ok
+                        ? CyberpunkTheme.neonCyan.withOpacity(0.8)
+                        : Colors.red,
                     behavior: SnackBarBehavior.floating,
                   ));
                 }
@@ -240,8 +253,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 final ok = await widget.apiService.archivePost(widget.post.id);
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(ok ? 'Archived' : 'Failed to archive', style: const TextStyle(color: Colors.white)),
-                    backgroundColor: ok ? CyberpunkTheme.neonCyan.withOpacity(0.8) : Colors.red,
+                    content: Text(ok ? 'Archived' : 'Failed to archive',
+                        style: const TextStyle(color: Colors.white)),
+                    backgroundColor: ok
+                        ? CyberpunkTheme.neonCyan.withOpacity(0.8)
+                        : Colors.red,
                     behavior: SnackBarBehavior.floating,
                   ));
                   if (ok) Navigator.pop(context);
@@ -252,13 +268,16 @@ class _PostDetailPageState extends State<PostDetailPage> {
               Navigator.pop(ctx);
               _showEditHistory();
             }),
-            _optionTile(Icons.collections_bookmark_outlined, 'Add to collection', () async {
+            _optionTile(
+                Icons.collections_bookmark_outlined, 'Add to collection',
+                () async {
               Navigator.pop(ctx);
               final collections = await widget.apiService.getMyCollections();
               if (!mounted) return;
               if (collections.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(S.of(context).noCollections, style: const TextStyle(color: Colors.white)),
+                  content: Text(S.of(context).noCollections,
+                      style: const TextStyle(color: Colors.white)),
                   backgroundColor: CyberpunkTheme.surfaceDark,
                   behavior: SnackBarBehavior.floating,
                 ));
@@ -267,37 +286,57 @@ class _PostDetailPageState extends State<PostDetailPage> {
               showModalBottomSheet(
                 context: context,
                 backgroundColor: CyberpunkTheme.surfaceDark,
-                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(CyberpunkTheme.radiusRound))),
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(CyberpunkTheme.radiusRound))),
                 builder: (c2) => SafeArea(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(16),
-                        child: Text(S.of(context).pickCollection, style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 16, fontWeight: FontWeight.w700)),
+                        child: Text(S.of(context).pickCollection,
+                            style: const TextStyle(
+                                color: CyberpunkTheme.textWhite,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700)),
                       ),
                       ...collections.map((col) => ListTile(
-                        title: Text(col['title'] ?? 'Untitled', style: const TextStyle(color: CyberpunkTheme.textWhite)),
-                        leading: const Icon(Icons.collections_outlined, color: CyberpunkTheme.neonCyan),
-                        onTap: () async {
-                          Navigator.pop(c2);
-                          final ok = await widget.apiService.addToCollection(col['id'].toString(), widget.post.id);
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text(ok ? S.of(context).success : S.of(context).error, style: const TextStyle(color: Colors.white)),
-                              backgroundColor: ok ? CyberpunkTheme.neonCyan.withOpacity(0.8) : Colors.red,
-                              behavior: SnackBarBehavior.floating,
-                            ));
-                          }
-                        },
-                      )),
+                            title: Text(col['title'] ?? 'Untitled',
+                                style: const TextStyle(
+                                    color: CyberpunkTheme.textWhite)),
+                            leading: const Icon(Icons.collections_outlined,
+                                color: CyberpunkTheme.neonCyan),
+                            onTap: () async {
+                              Navigator.pop(c2);
+                              final ok = await widget.apiService
+                                  .addToCollection(
+                                      col['id'].toString(), widget.post.id);
+                              if (mounted) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content: Text(
+                                      ok
+                                          ? S.of(context).success
+                                          : S.of(context).error,
+                                      style:
+                                          const TextStyle(color: Colors.white)),
+                                  backgroundColor: ok
+                                      ? CyberpunkTheme.neonCyan.withOpacity(0.8)
+                                      : Colors.red,
+                                  behavior: SnackBarBehavior.floating,
+                                ));
+                              }
+                            },
+                          )),
                     ],
                   ),
                 ),
               );
             }),
             if (isOwnPost)
-              _optionTile(Icons.delete_outline_rounded, 'Delete post', () async {
+              _optionTile(Icons.delete_outline_rounded, 'Delete post',
+                  () async {
                 Navigator.pop(ctx);
                 final ok = await widget.apiService.deleteStatus(widget.post.id);
                 if (mounted && ok != null) Navigator.pop(context);
@@ -319,11 +358,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
     return GestureDetector(
       onTap: () {
         if (url.isNotEmpty) {
-              final uri = Uri.parse(url);
-              if (uri.scheme == 'http' || uri.scheme == 'https') {
-                launchUrl(uri, mode: LaunchMode.externalApplication);
-              }
-            }
+          final uri = Uri.parse(url);
+          if (uri.scheme == 'http' || uri.scheme == 'https') {
+            launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        }
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -350,14 +389,27 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (title.isNotEmpty)
-                    Text(title, style: const TextStyle(color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w600, fontSize: 14), maxLines: 2, overflow: TextOverflow.ellipsis),
+                    Text(title,
+                        style: const TextStyle(
+                            color: CyberpunkTheme.textWhite,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis),
                   if (description.isNotEmpty) ...[
                     const SizedBox(height: 4),
-                    Text(description, style: const TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 12), maxLines: 3, overflow: TextOverflow.ellipsis),
+                    Text(description,
+                        style: const TextStyle(
+                            color: CyberpunkTheme.textSecondary, fontSize: 12),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis),
                   ],
                   if (url.isNotEmpty) ...[
                     const SizedBox(height: 4),
-                    Text(Uri.tryParse(url)?.host ?? url, style: TextStyle(color: CyberpunkTheme.neonCyan.withOpacity(0.7), fontSize: 11)),
+                    Text(Uri.tryParse(url)?.host ?? url,
+                        style: TextStyle(
+                            color: CyberpunkTheme.neonCyan.withOpacity(0.7),
+                            fontSize: 11)),
                   ],
                 ],
               ),
@@ -368,23 +420,33 @@ class _PostDetailPageState extends State<PostDetailPage> {
     );
   }
 
-  Widget _optionTile(IconData icon, String label, VoidCallback onTap, {Color? color}) {
+  Widget _optionTile(IconData icon, String label, VoidCallback onTap,
+      {Color? color}) {
     return ListTile(
       leading: Icon(icon, color: color ?? CyberpunkTheme.textWhite, size: 22),
-      title: Text(label, style: TextStyle(color: color ?? CyberpunkTheme.textWhite, fontSize: 15)),
+      title: Text(label,
+          style: TextStyle(
+              color: color ?? CyberpunkTheme.textWhite, fontSize: 15)),
       onTap: onTap,
       dense: true,
     );
   }
 
   void _showEditDialog() {
-    final controller = TextEditingController(text: widget.post.content.replaceAll(RegExp(r'<[^>]*>'), ''));
+    final controller = TextEditingController(
+        text: widget.post.content.replaceAll(RegExp(r'<[^>]*>'), ''));
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: CyberpunkTheme.surfaceDark,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(CyberpunkTheme.radiusRound), side: const BorderSide(color: CyberpunkTheme.borderDark)),
-        title: Text(S.of(context).editPost, style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 16, fontWeight: FontWeight.w700)),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(CyberpunkTheme.radiusRound),
+            side: const BorderSide(color: CyberpunkTheme.borderDark)),
+        title: Text(S.of(context).editPost,
+            style: const TextStyle(
+                color: CyberpunkTheme.textWhite,
+                fontSize: 16,
+                fontWeight: FontWeight.w700)),
         content: TextField(
           controller: controller,
           maxLines: 6,
@@ -394,25 +456,38 @@ class _PostDetailPageState extends State<PostDetailPage> {
             hintStyle: const TextStyle(color: CyberpunkTheme.textTertiary),
             filled: true,
             fillColor: CyberpunkTheme.cardDark,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(S.of(context).cancel, style: const TextStyle(color: CyberpunkTheme.textTertiary))),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(S.of(context).cancel,
+                  style: const TextStyle(color: CyberpunkTheme.textTertiary))),
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              final ok = await widget.apiService.editStatus(widget.post.id, content: controller.text);
+              final ok = await widget.apiService
+                  .editStatus(widget.post.id, content: controller.text);
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(ok ? 'Post updated!' : 'Failed to edit', style: const TextStyle(color: Colors.white)),
-                  backgroundColor: ok ? CyberpunkTheme.neonCyan.withOpacity(0.8) : Colors.red,
+                  content: Text(ok ? 'Post updated!' : 'Failed to edit',
+                      style: const TextStyle(color: Colors.white)),
+                  backgroundColor: ok
+                      ? CyberpunkTheme.neonCyan.withOpacity(0.8)
+                      : Colors.red,
                   behavior: SnackBarBehavior.floating,
                 ));
               }
             },
-            style: TextButton.styleFrom(backgroundColor: CyberpunkTheme.neonCyan.withOpacity(0.1)),
-            child: Text(S.of(context).save, style: const TextStyle(color: CyberpunkTheme.neonCyan, fontWeight: FontWeight.w600)),
+            style: TextButton.styleFrom(
+                backgroundColor: CyberpunkTheme.neonCyan.withOpacity(0.1)),
+            child: Text(S.of(context).save,
+                style: const TextStyle(
+                    color: CyberpunkTheme.neonCyan,
+                    fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -424,7 +499,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
     if (!mounted) return;
     if (history.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(S.of(context).noEditHistory, style: const TextStyle(color: Colors.white)),
+        content: Text(S.of(context).noEditHistory,
+            style: const TextStyle(color: Colors.white)),
         backgroundColor: CyberpunkTheme.surfaceDark,
         behavior: SnackBarBehavior.floating,
       ));
@@ -434,7 +510,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
       context: context,
       backgroundColor: CyberpunkTheme.surfaceDark,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(CyberpunkTheme.radiusRound))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+              top: Radius.circular(CyberpunkTheme.radiusRound))),
       builder: (ctx) => DraggableScrollableSheet(
         initialChildSize: 0.5,
         expand: false,
@@ -442,26 +520,41 @@ class _PostDetailPageState extends State<PostDetailPage> {
           controller: scroller,
           padding: const EdgeInsets.all(16),
           itemCount: history.length + 1,
-          separatorBuilder: (_, __) => const Divider(color: CyberpunkTheme.borderDark, height: 1),
+          separatorBuilder: (_, __) =>
+              const Divider(color: CyberpunkTheme.borderDark, height: 1),
           itemBuilder: (_, i) {
             if (i == 0) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
-                child: Text('Edit history (${history.length} revisions)', style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 16, fontWeight: FontWeight.w700)),
+                child: Text('Edit history (${history.length} revisions)',
+                    style: const TextStyle(
+                        color: CyberpunkTheme.textWhite,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700)),
               );
             }
             final rev = history[i - 1];
-            final content = (rev['content'] ?? '').toString().replaceAll(RegExp(r'<[^>]*>'), '');
-            final createdAt = rev['created_at'] != null ? DateTime.tryParse(rev['created_at'].toString()) : null;
+            final content = (rev['content'] ?? '')
+                .toString()
+                .replaceAll(RegExp(r'<[^>]*>'), '');
+            final createdAt = rev['created_at'] != null
+                ? DateTime.tryParse(rev['created_at'].toString())
+                : null;
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (createdAt != null)
-                    Text(timeago.format(createdAt), style: const TextStyle(color: CyberpunkTheme.neonCyan, fontSize: 12)),
+                    Text(timeago.format(createdAt),
+                        style: const TextStyle(
+                            color: CyberpunkTheme.neonCyan, fontSize: 12)),
                   const SizedBox(height: 4),
-                  Text(content, style: const TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 14, height: 1.4)),
+                  Text(content,
+                      style: const TextStyle(
+                          color: CyberpunkTheme.textSecondary,
+                          fontSize: 14,
+                          height: 1.4)),
                 ],
               ),
             );
@@ -492,11 +585,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
         iconTheme: const IconThemeData(color: CyberpunkTheme.neonCyan),
         actions: [
           IconButton(
-            icon: const Icon(Icons.share_outlined, size: 24, color: CyberpunkTheme.textSecondary),
+            icon: const Icon(Icons.share_outlined,
+                size: 24, color: CyberpunkTheme.textSecondary),
             onPressed: () => SocialActions.shareStatus(widget.post),
           ),
           IconButton(
-            icon: const Icon(Icons.more_vert_rounded, size: 24, color: CyberpunkTheme.textSecondary),
+            icon: const Icon(Icons.more_vert_rounded,
+                size: 24, color: CyberpunkTheme.textSecondary),
             onPressed: _showMoreOptions,
           ),
         ],
@@ -546,9 +641,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
             child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: CyberpunkTheme.neonCyan.withOpacity(0.4), width: 1.5),
+                border: Border.all(
+                    color: CyberpunkTheme.neonCyan.withOpacity(0.4),
+                    width: 1.5),
                 boxShadow: [
-                  BoxShadow(color: CyberpunkTheme.neonCyan.withOpacity(0.15), blurRadius: 8),
+                  BoxShadow(
+                      color: CyberpunkTheme.neonCyan.withOpacity(0.15),
+                      blurRadius: 8),
                 ],
               ),
               child: Hero(
@@ -560,7 +659,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       ? CachedNetworkImageProvider(widget.post.avatar)
                       : null,
                   child: widget.post.avatar.isEmpty
-                      ? const Icon(Icons.person, size: 22, color: CyberpunkTheme.textTertiary)
+                      ? const Icon(Icons.person,
+                          size: 22, color: CyberpunkTheme.textTertiary)
                       : null,
                 ),
               ),
@@ -594,14 +694,19 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ),
           ),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_horiz_rounded, color: CyberpunkTheme.textSecondary),
+            icon: const Icon(Icons.more_horiz_rounded,
+                color: CyberpunkTheme.textSecondary),
             color: CyberpunkTheme.surfaceDark,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             onSelected: (val) {
               if (val == 'share') SocialActions.shareStatus(widget.post);
             },
             itemBuilder: (ctx) => [
-              const PopupMenuItem(value: 'share', child: Text('Share', style: TextStyle(color: CyberpunkTheme.textWhite))),
+              const PopupMenuItem(
+                  value: 'share',
+                  child: Text('Share',
+                      style: TextStyle(color: CyberpunkTheme.textWhite))),
             ],
           ),
         ],
@@ -632,7 +737,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
             itemBuilder: (context, index, realIdx) {
               final attachment = widget.post.attachement[index];
               final url = attachment["url"] ?? "";
-              final isVideo = url.toLowerCase().contains(".mp4") || url.toLowerCase().contains(".mov");
+              final isVideo = url.toLowerCase().contains(".mp4") ||
+                  url.toLowerCase().contains(".mov");
               if (isVideo) {
                 return SizedBox(
                   width: double.infinity,
@@ -641,7 +747,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 );
               } else {
                 return GestureDetector(
-                  onTap: () => _openFullScreenImage(url, 'post_image_${widget.post.id}_$index'),
+                  onTap: () => _openFullScreenImage(
+                      url, 'post_image_${widget.post.id}_$index'),
                   child: Hero(
                     tag: 'post_image_${widget.post.id}_$index',
                     child: CachedNetworkImage(
@@ -654,7 +761,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       ),
                       errorWidget: (context, url, error) => Container(
                         color: CyberpunkTheme.cardDark,
-                        child: const Icon(Icons.broken_image_rounded, color: CyberpunkTheme.textTertiary, size: 40),
+                        child: const Icon(Icons.broken_image_rounded,
+                            color: CyberpunkTheme.textTertiary, size: 40),
                       ),
                     ),
                   ),
@@ -698,7 +806,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         ? CyberpunkTheme.neonCyan
                         : CyberpunkTheme.textTertiary.withOpacity(0.5),
                     boxShadow: _carouselIndex == i
-                        ? [BoxShadow(color: CyberpunkTheme.neonCyan.withOpacity(0.5), blurRadius: 4)]
+                        ? [
+                            BoxShadow(
+                                color: CyberpunkTheme.neonCyan.withOpacity(0.5),
+                                blurRadius: 4)
+                          ]
                         : null,
                   ),
                 );
@@ -710,8 +822,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
 
     final firstMedia = widget.post.getFirstMedia();
-    final isVideoType = firstMedia != null && (firstMedia['type'] == 'video' || firstMedia['type'] == 'gifv');
-    final isVideoExtension = widget.post.attach.toLowerCase().contains('.mp4') || widget.post.attach.toLowerCase().contains('.mov');
+    final isVideoType = firstMedia != null &&
+        (firstMedia['type'] == 'video' || firstMedia['type'] == 'gifv');
+    final isVideoExtension =
+        widget.post.attach.toLowerCase().contains('.mp4') ||
+            widget.post.attach.toLowerCase().contains('.mov');
     final isVideo = isVideoType || isVideoExtension;
 
     if (isVideo) {
@@ -723,7 +838,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
 
     return GestureDetector(
-      onTap: () => _openFullScreenImage(widget.post.attach, 'post_image_${widget.post.id}'),
+      onTap: () => _openFullScreenImage(
+          widget.post.attach, 'post_image_${widget.post.id}'),
       child: AspectRatio(
         aspectRatio: 1.0,
         child: Hero(
@@ -737,7 +853,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ),
             errorWidget: (context, url, error) => Container(
               color: CyberpunkTheme.cardDark,
-              child: const Icon(Icons.broken_image_rounded, color: CyberpunkTheme.textTertiary, size: 40),
+              child: const Icon(Icons.broken_image_rounded,
+                  color: CyberpunkTheme.textTertiary, size: 40),
             ),
           ),
         ),
@@ -772,9 +889,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
       child: Row(
         children: [
           _actionIcon(
-            _isFavorited ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+            _isFavorited
+                ? Icons.favorite_rounded
+                : Icons.favorite_border_rounded,
             onTap: _toggleLike,
-            color: _isFavorited ? CyberpunkTheme.neonPink : CyberpunkTheme.textWhite,
+            color: _isFavorited
+                ? CyberpunkTheme.neonPink
+                : CyberpunkTheme.textWhite,
             glowColor: _isFavorited ? CyberpunkTheme.neonPink : null,
           ),
           const SizedBox(width: 20),
@@ -791,9 +912,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
           ),
           const Spacer(),
           _actionIcon(
-            _isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+            _isBookmarked
+                ? Icons.bookmark_rounded
+                : Icons.bookmark_border_rounded,
             onTap: _toggleBookmark,
-            color: _isBookmarked ? CyberpunkTheme.neonCyan : CyberpunkTheme.textWhite,
+            color: _isBookmarked
+                ? CyberpunkTheme.neonCyan
+                : CyberpunkTheme.textWhite,
             glowColor: _isBookmarked ? CyberpunkTheme.neonCyan : null,
           ),
         ],
@@ -801,7 +926,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
     );
   }
 
-  Widget _actionIcon(IconData icon, {required VoidCallback onTap, required Color color, Color? glowColor}) {
+  Widget _actionIcon(IconData icon,
+      {required VoidCallback onTap, required Color color, Color? glowColor}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -809,7 +935,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
         decoration: glowColor != null
             ? BoxDecoration(
                 shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: glowColor.withOpacity(0.4), blurRadius: 10)],
+                boxShadow: [
+                  BoxShadow(color: glowColor.withOpacity(0.4), blurRadius: 10)
+                ],
               )
             : null,
         child: Icon(icon, size: 28, color: color),
@@ -872,14 +1000,16 @@ class _PostDetailPageState extends State<PostDetailPage> {
           future: fetcher(),
           builder: (ctx, snap) {
             return Container(
-              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.5),
+              constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.5),
               padding: const EdgeInsets.only(top: 12),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // Handle bar
                   Container(
-                    width: 36, height: 4,
+                    width: 36,
+                    height: 4,
                     decoration: BoxDecoration(
                       color: CyberpunkTheme.borderDark,
                       borderRadius: BorderRadius.circular(2),
@@ -892,7 +1022,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     children: [
                       Icon(icon, size: 20, color: iconColor),
                       const SizedBox(width: 8),
-                      Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: CyberpunkTheme.textWhite)),
+                      Text(title,
+                          style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: CyberpunkTheme.textWhite)),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -901,12 +1035,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   if (snap.connectionState == ConnectionState.waiting)
                     const Padding(
                       padding: EdgeInsets.all(32),
-                      child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan),
+                      child: CircularProgressIndicator(
+                          color: CyberpunkTheme.neonCyan),
                     )
                   else if (!snap.hasData || snap.data!.isEmpty)
                     const Padding(
                       padding: EdgeInsets.all(32),
-                      child: Text('No one yet', style: TextStyle(color: CyberpunkTheme.textTertiary)),
+                      child: Text('No one yet',
+                          style: TextStyle(color: CyberpunkTheme.textTertiary)),
                     )
                   else
                     Flexible(
@@ -918,19 +1054,31 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           final a = snap.data![i];
                           return ListTile(
                             leading: CircleAvatar(
-                              backgroundImage: (a.avatar != null && a.avatar!.isNotEmpty)
-                                  ? NetworkImage(a.avatar!) : null,
+                              backgroundImage:
+                                  (a.avatar != null && a.avatar!.isNotEmpty)
+                                      ? NetworkImage(a.avatar!)
+                                      : null,
                               backgroundColor: CyberpunkTheme.surfaceDark,
                               child: (a.avatar == null || a.avatar!.isEmpty)
-                                  ? const Icon(Icons.person, color: CyberpunkTheme.textTertiary) : null,
+                                  ? const Icon(Icons.person,
+                                      color: CyberpunkTheme.textTertiary)
+                                  : null,
                             ),
                             title: Text(
-                              (a.display_name != null && a.display_name!.isNotEmpty) ? a.display_name! : (a.username ?? ''),
-                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: CyberpunkTheme.textWhite),
+                              (a.display_name != null &&
+                                      a.display_name!.isNotEmpty)
+                                  ? a.display_name!
+                                  : (a.username ?? ''),
+                              style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: CyberpunkTheme.textWhite),
                             ),
                             subtitle: Text(
                               '@${a.username ?? ''}',
-                              style: const TextStyle(fontSize: 13, color: CyberpunkTheme.textSecondary),
+                              style: const TextStyle(
+                                  fontSize: 13,
+                                  color: CyberpunkTheme.textSecondary),
                             ),
                             onTap: () {
                               Navigator.pop(ctx);
@@ -973,7 +1121,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
           children: [
             TextSpan(
               text: '${widget.post.acct}  ',
-              style: const TextStyle(fontWeight: FontWeight.w700, color: CyberpunkTheme.neonCyan),
+              style: const TextStyle(
+                  fontWeight: FontWeight.w700, color: CyberpunkTheme.neonCyan),
               recognizer: TapGestureRecognizer()
                 ..onTap = () => _navigateToProfile(widget.post.account.id),
             ),
@@ -1001,23 +1150,29 @@ class _PostDetailPageState extends State<PostDetailPage> {
       if (matched.startsWith('#')) {
         spans.add(TextSpan(
           text: matched,
-          style: const TextStyle(color: CyberpunkTheme.neonCyan, fontWeight: FontWeight.w600),
+          style: const TextStyle(
+              color: CyberpunkTheme.neonCyan, fontWeight: FontWeight.w600),
           recognizer: TapGestureRecognizer()
             ..onTap = () {
-              Navigator.pushNamed(context, '/TagTimeline', arguments: {'tag': matched.substring(1)});
+              Navigator.pushNamed(context, '/TagTimeline',
+                  arguments: {'tag': matched.substring(1)});
             },
         ));
       } else if (matched.startsWith('@')) {
         spans.add(TextSpan(
           text: matched,
-          style: const TextStyle(color: CyberpunkTheme.neonCyan, fontWeight: FontWeight.w600),
+          style: const TextStyle(
+              color: CyberpunkTheme.neonCyan, fontWeight: FontWeight.w600),
           recognizer: TapGestureRecognizer()
-            ..onTap = () => appLogger.info('Mention tapped: ${matched.substring(1)}'),
+            ..onTap =
+                () => appLogger.info('Mention tapped: ${matched.substring(1)}'),
         ));
       } else {
         spans.add(TextSpan(
           text: matched,
-          style: TextStyle(color: CyberpunkTheme.neonCyan.withOpacity(0.8), decoration: TextDecoration.underline),
+          style: TextStyle(
+              color: CyberpunkTheme.neonCyan.withOpacity(0.8),
+              decoration: TextDecoration.underline),
           recognizer: TapGestureRecognizer()
             ..onTap = () async {
               final uri = Uri.tryParse(matched);
@@ -1083,7 +1238,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
         padding: const EdgeInsets.all(40),
         child: Center(
           child: SizedBox(
-            width: 28, height: 28,
+            width: 28,
+            height: 28,
             child: CircularProgressIndicator(
               strokeWidth: 2,
               valueColor: AlwaysStoppedAnimation(CyberpunkTheme.neonCyan),
@@ -1099,16 +1255,22 @@ class _PostDetailPageState extends State<PostDetailPage> {
         child: Center(
           child: Column(
             children: [
-              Icon(Icons.mode_comment_outlined, size: 44, color: CyberpunkTheme.textTertiary.withOpacity(0.5)),
+              Icon(Icons.mode_comment_outlined,
+                  size: 44,
+                  color: CyberpunkTheme.textTertiary.withOpacity(0.5)),
               const SizedBox(height: 12),
               const Text(
                 'No comments yet',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: CyberpunkTheme.textSecondary),
+                style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                    color: CyberpunkTheme.textSecondary),
               ),
               const SizedBox(height: 4),
               const Text(
                 'Be the first to comment',
-                style: TextStyle(fontSize: 14, color: CyberpunkTheme.textTertiary),
+                style:
+                    TextStyle(fontSize: 14, color: CyberpunkTheme.textTertiary),
               ),
             ],
           ),
@@ -1164,7 +1326,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   ? CachedNetworkImageProvider(comment.avatar)
                   : null,
               child: comment.avatar.isEmpty
-                  ? const Icon(Icons.person, size: 18, color: CyberpunkTheme.textTertiary)
+                  ? const Icon(Icons.person,
+                      size: 18, color: CyberpunkTheme.textTertiary)
                   : null,
             ),
           ),
@@ -1189,7 +1352,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           fontSize: 14,
                         ),
                         recognizer: TapGestureRecognizer()
-                          ..onTap = () => _navigateToProfile(comment.account.id),
+                          ..onTap =
+                              () => _navigateToProfile(comment.account.id),
                       ),
                       ..._buildRichContentSpans(cleanContent),
                     ],
@@ -1201,7 +1365,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     if (createdAt != null)
                       Text(
                         timeago.format(createdAt, locale: 'en_short'),
-                        style: const TextStyle(fontSize: 12, color: CyberpunkTheme.textTertiary),
+                        style: const TextStyle(
+                            fontSize: 12, color: CyberpunkTheme.textTertiary),
                       ),
                     if (comment.favourites_count > 0) ...[
                       const SizedBox(width: 14),
@@ -1247,9 +1412,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
             child: Padding(
               padding: const EdgeInsets.only(left: 8, top: 4),
               child: Icon(
-                comment.favorited ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                comment.favorited
+                    ? Icons.favorite_rounded
+                    : Icons.favorite_border_rounded,
                 size: 18,
-                color: comment.favorited ? CyberpunkTheme.neonPink : CyberpunkTheme.textTertiary,
+                color: comment.favorited
+                    ? CyberpunkTheme.neonPink
+                    : CyberpunkTheme.textTertiary,
               ),
             ),
           ),
@@ -1265,7 +1434,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
       decoration: BoxDecoration(
         color: CyberpunkTheme.surfaceDark,
         border: Border(
-          top: BorderSide(color: CyberpunkTheme.neonCyan.withOpacity(0.15), width: 0.5),
+          top: BorderSide(
+              color: CyberpunkTheme.neonCyan.withOpacity(0.15), width: 0.5),
         ),
       ),
       child: Column(
@@ -1279,12 +1449,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
               color: CyberpunkTheme.neonCyan.withOpacity(0.06),
               child: Row(
                 children: [
-                  const Icon(Icons.reply_rounded, size: 16, color: CyberpunkTheme.neonCyan),
+                  const Icon(Icons.reply_rounded,
+                      size: 16, color: CyberpunkTheme.neonCyan),
                   const SizedBox(width: 8),
                   const Expanded(
                     child: Text(
                       'Replying to comment',
-                      style: TextStyle(fontSize: 13, color: CyberpunkTheme.textSecondary),
+                      style: TextStyle(
+                          fontSize: 13, color: CyberpunkTheme.textSecondary),
                     ),
                   ),
                   GestureDetector(
@@ -1292,7 +1464,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       _replyToId = null;
                       _commentController.clear();
                     }),
-                    child: const Icon(Icons.close_rounded, size: 18, color: CyberpunkTheme.textSecondary),
+                    child: const Icon(Icons.close_rounded,
+                        size: 18, color: CyberpunkTheme.textSecondary),
                   ),
                 ],
               ),
@@ -1318,10 +1491,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           color: CyberpunkTheme.textWhite,
                         ),
                         decoration: InputDecoration(
-                          hintText: _replyToId != null ? 'Write a reply...' : 'Add a comment...',
+                          hintText: _replyToId != null
+                              ? 'Write a reply...'
+                              : 'Add a comment...',
                           border: InputBorder.none,
-                          hintStyle: const TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 15),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                          hintStyle: const TextStyle(
+                              color: CyberpunkTheme.textTertiary, fontSize: 15),
+                          contentPadding:
+                              const EdgeInsets.symmetric(vertical: 12),
                         ),
                         maxLines: null,
                         textCapitalization: TextCapitalization.sentences,
@@ -1346,7 +1523,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           ),
                         ],
                       ),
-                      child: const Icon(Icons.send_rounded, size: 20, color: Colors.white),
+                      child: const Icon(Icons.send_rounded,
+                          size: 20, color: Colors.white),
                     ),
                   ),
                 ],
@@ -1358,7 +1536,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
     );
   }
 }
-
 
 // ── Full-screen image viewer with pinch-to-zoom ──────────────────────────
 class _FullScreenImageView extends StatefulWidget {
@@ -1375,7 +1552,8 @@ class _FullScreenImageView extends StatefulWidget {
 }
 
 class _FullScreenImageViewState extends State<_FullScreenImageView> {
-  final TransformationController _transformController = TransformationController();
+  final TransformationController _transformController =
+      TransformationController();
   TapDownDetails? _doubleTapDetails;
 
   @override
@@ -1403,7 +1581,8 @@ class _FullScreenImageViewState extends State<_FullScreenImageView> {
         onVerticalDragEnd: (details) {
           // Only allow swipe-to-close when not zoomed
           if (_transformController.value == Matrix4.identity() &&
-              details.primaryVelocity != null && details.primaryVelocity! > 300) {
+              details.primaryVelocity != null &&
+              details.primaryVelocity! > 300) {
             Navigator.of(context).pop();
           }
         },
@@ -1423,7 +1602,8 @@ class _FullScreenImageViewState extends State<_FullScreenImageView> {
                       imageUrl: widget.imageUrl,
                       fit: BoxFit.contain,
                       placeholder: (_, __) => const Center(
-                        child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan),
+                        child: CircularProgressIndicator(
+                            color: CyberpunkTheme.neonCyan),
                       ),
                       errorWidget: (_, __, ___) => const Icon(
                         Icons.broken_image_rounded,
@@ -1447,7 +1627,8 @@ class _FullScreenImageViewState extends State<_FullScreenImageView> {
                     color: Colors.black.withOpacity(0.5),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.close_rounded, color: Colors.white, size: 24),
+                  child: const Icon(Icons.close_rounded,
+                      color: Colors.white, size: 24),
                 ),
               ),
             ),

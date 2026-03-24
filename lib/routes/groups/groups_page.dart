@@ -15,7 +15,8 @@ class GroupsPage extends StatefulWidget {
   State<GroupsPage> createState() => _GroupsPageState();
 }
 
-class _GroupsPageState extends State<GroupsPage> with SingleTickerProviderStateMixin {
+class _GroupsPageState extends State<GroupsPage>
+    with SingleTickerProviderStateMixin {
   late final GroupsApi _groupsApi;
   late final TabController _tabController;
   bool _isLoading = true;
@@ -84,26 +85,32 @@ class _GroupsPageState extends State<GroupsPage> with SingleTickerProviderStateM
         child: const Icon(Icons.add, color: Colors.black),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan))
+          ? const Center(
+              child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan))
           : TabBarView(
               controller: _tabController,
               children: [
                 _buildGroupList(_popularGroups, emptyText: 'No groups found'),
-                _buildGroupList(_joinedGroups, emptyText: 'You haven\'t joined any groups'),
+                _buildGroupList(_joinedGroups,
+                    emptyText: 'You haven\'t joined any groups'),
               ],
             ),
     );
   }
 
-  Widget _buildGroupList(List<Map<String, dynamic>> groups, {required String emptyText}) {
+  Widget _buildGroupList(List<Map<String, dynamic>> groups,
+      {required String emptyText}) {
     if (groups.isEmpty) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.group_outlined, color: CyberpunkTheme.textTertiary, size: 64),
+            const Icon(Icons.group_outlined,
+                color: CyberpunkTheme.textTertiary, size: 64),
             const SizedBox(height: 16),
-            Text(emptyText, style: const TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 16)),
+            Text(emptyText,
+                style: const TextStyle(
+                    color: CyberpunkTheme.textSecondary, fontSize: 16)),
           ],
         ),
       );
@@ -158,45 +165,60 @@ class _GroupsPageState extends State<GroupsPage> with SingleTickerProviderStateM
                 color: CyberpunkTheme.neonCyan.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.group_rounded, color: CyberpunkTheme.neonCyan),
+              child: const Icon(Icons.group_rounded,
+                  color: CyberpunkTheme.neonCyan),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: const TextStyle(
-                    color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w600, fontSize: 15)),
+                  Text(name,
+                      style: const TextStyle(
+                          color: CyberpunkTheme.textWhite,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15)),
                   if (description.isNotEmpty) ...[
                     const SizedBox(height: 4),
-                    Text(description, maxLines: 2, overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 13)),
+                    Text(description,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            color: CyberpunkTheme.textSecondary, fontSize: 13)),
                   ],
                   const SizedBox(height: 6),
                   Row(
                     children: [
                       if (category.isNotEmpty) ...[
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
                             color: CyberpunkTheme.neonPink.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Text(category, style: const TextStyle(
-                            color: CyberpunkTheme.neonPink, fontSize: 11, fontWeight: FontWeight.w500)),
+                          child: Text(category,
+                              style: const TextStyle(
+                                  color: CyberpunkTheme.neonPink,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500)),
                         ),
                         const SizedBox(width: 8),
                       ],
-                      Icon(Icons.people_outline, size: 14, color: CyberpunkTheme.textTertiary),
+                      Icon(Icons.people_outline,
+                          size: 14, color: CyberpunkTheme.textTertiary),
                       const SizedBox(width: 4),
                       Text('$memberCount members',
-                        style: const TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 12)),
+                          style: const TextStyle(
+                              color: CyberpunkTheme.textTertiary,
+                              fontSize: 12)),
                     ],
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: CyberpunkTheme.textTertiary),
+            const Icon(Icons.chevron_right_rounded,
+                color: CyberpunkTheme.textTertiary),
           ],
         ),
       ),

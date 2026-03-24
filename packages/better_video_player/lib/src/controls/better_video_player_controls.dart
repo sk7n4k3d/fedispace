@@ -10,7 +10,8 @@ import 'package:provider/provider.dart';
 class BetterVideoPlayerControls extends StatefulWidget {
   final bool isFullScreen;
 
-  const BetterVideoPlayerControls({Key? key, required this.isFullScreen}) : super(key: key);
+  const BetterVideoPlayerControls({Key? key, required this.isFullScreen})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -20,7 +21,6 @@ class BetterVideoPlayerControls extends StatefulWidget {
 
 class BetterVideoPlayerControlsState extends State<BetterVideoPlayerControls>
     with HideStuff<BetterVideoPlayerControls> {
-
   bool absorbing = false;
 
   @override
@@ -35,8 +35,10 @@ class BetterVideoPlayerControlsState extends State<BetterVideoPlayerControls>
   Widget build(BuildContext context) {
     final controller = context.watch<BetterVideoPlayerController>();
 
-    final isInitialized = controller.value.videoPlayerController?.value.isInitialized ?? false;
-    final isPlaying = controller.value.videoPlayerController?.value.isPlaying ?? false;
+    final isInitialized =
+        controller.value.videoPlayerController?.value.isInitialized ?? false;
+    final isPlaying =
+        controller.value.videoPlayerController?.value.isPlaying ?? false;
 
     if (isPlaying && isAlwaysShow()) {
       // hide when video is playing
@@ -58,15 +60,19 @@ class BetterVideoPlayerControlsState extends State<BetterVideoPlayerControls>
             absorbing: absorbing || _isHide,
             child: Stack(
               children: [
-                if (controller.value.videoPlayerController?.value.hasError ?? false) // 发生错误
+                if (controller.value.videoPlayerController?.value.hasError ??
+                    false) // 发生错误
                   buildError(_onRestart)
                 else if (controller.value.isLoading) // 加载中
                   Center(child: buildLoading())
-                else if (controller.value.isVideoFinish && !controller.value.configuration.looping) // 播放完成
+                else if (controller.value.isVideoFinish &&
+                    !controller.value.configuration.looping) // 播放完成
                   buildReplay(_onPlayPause)
                 else if (controller.value.wifiInterrupted) // wifi中断
                   buildWifiInterrupted(_onPlayPause)
-                else if (!(controller.value.videoPlayerController?.value.isPlaying ?? false)) // 暂停
+                else if (!(controller
+                        .value.videoPlayerController?.value.isPlaying ??
+                    false)) // 暂停
                   buildCenterPause(_onPlayPause)
                 else
                   const SizedBox(),
@@ -144,7 +150,8 @@ class BetterVideoPlayerControlsState extends State<BetterVideoPlayerControls>
                 ),
               ),
               if (controller.value.videoPlayerController != null)
-                buildExpand(widget.isFullScreen ? _onReduceCollapse : _onExpandCollapse)
+                buildExpand(
+                    widget.isFullScreen ? _onReduceCollapse : _onExpandCollapse)
               else
                 SizedBox(width: 9),
             ],
@@ -348,11 +355,11 @@ class BetterVideoPlayerControlsState extends State<BetterVideoPlayerControls>
           absorbing = false;
         });
       });
-
     } else {
       controller.value = controller.value.copyWith(isPauseFromUser: false);
 
-      if (controller.value.videoPlayerController?.value.isInitialized ?? false) {
+      if (controller.value.videoPlayerController?.value.isInitialized ??
+          false) {
         setState(() {
           absorbing = true;
         });

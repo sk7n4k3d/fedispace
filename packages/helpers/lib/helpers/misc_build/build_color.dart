@@ -50,7 +50,9 @@ class BuildColor {
   ///```dart
   ///return Theme.of(context).bottomAppBarColor
   ///```
-  Color get bottomAppBar => Theme.of(_context).bottomAppBarTheme.color ?? Theme.of(_context).colorScheme.surface;
+  Color get bottomAppBar =>
+      Theme.of(_context).bottomAppBarTheme.color ??
+      Theme.of(_context).colorScheme.surface;
 
   ///```dart
   ///return Theme.of(context).cardColor
@@ -106,7 +108,9 @@ class BuildColor {
     'https://flutter.dev/docs/release/breaking-changes/theme-data-accent-properties#migration-guide. '
     'This feature was deprecated after v2.3.0-0.1.pre.',
   )
-  Color get button => Theme.of(_context).buttonTheme.colorScheme?.secondary ?? Theme.of(_context).colorScheme.secondary;
+  Color get button =>
+      Theme.of(_context).buttonTheme.colorScheme?.secondary ??
+      Theme.of(_context).colorScheme.secondary;
 
   ///```dart
   ///return Theme.of(context).secondaryHeaderColor

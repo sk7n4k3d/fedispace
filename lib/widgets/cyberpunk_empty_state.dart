@@ -69,7 +69,8 @@ class _CyberpunkEmptyStateState extends State<CyberpunkEmptyState>
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: widget.accentColor.withOpacity(_pulseAnimation.value * 0.3),
+                        color: widget.accentColor
+                            .withOpacity(_pulseAnimation.value * 0.3),
                         blurRadius: 24,
                         spreadRadius: 2,
                       ),
@@ -115,7 +116,8 @@ class _CyberpunkEmptyStateState extends State<CyberpunkEmptyState>
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(CyberpunkTheme.radiusM),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
                 child: Text(
                   widget.actionLabel!,

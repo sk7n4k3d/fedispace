@@ -35,7 +35,6 @@ import 'package:fedispace/routes/messages/conversation_detail_page.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:flutter/material.dart';
 
-
 /// Global bouncing scroll physics for premium feel
 class BouncingScrollBehavior extends ScrollBehavior {
   @override
@@ -79,12 +78,13 @@ class MyAppState extends State<MyApp> {
   }
 
   @pragma('vm:entry-point')
-  static Future<void> _onNotificationAction(ReceivedAction receivedAction) async {
+  static Future<void> _onNotificationAction(
+      ReceivedAction receivedAction) async {
     final payload = receivedAction.payload;
     if (payload != null && payload['type'] == 'dm') {
       final context = navigatorKey.currentContext;
       if (context == null) return;
-      
+
       // Navigate to the DM list; the user can then select the conversation
       Navigator.of(context).pushNamed('/DirectMessages');
     }
@@ -113,7 +113,8 @@ class MyAppState extends State<MyApp> {
     try {
       // Use platform channel to get the initial intent data
       const channel = MethodChannel('space.echelon4.fedispace/shortcuts');
-      final String? shortcutData = await channel.invokeMethod('getInitialShortcut');
+      final String? shortcutData =
+          await channel.invokeMethod('getInitialShortcut');
       if (shortcutData != null && shortcutData.isNotEmpty) {
         _navigateFromShortcut(shortcutData);
       }
@@ -126,12 +127,12 @@ class MyAppState extends State<MyApp> {
   void _navigateFromShortcut(String path) {
     final context = navigatorKey.currentContext;
     if (context == null) return;
-    
+
     // Wait a moment for navigation to be ready after login
     Future.delayed(const Duration(milliseconds: 800), () {
       final ctx = navigatorKey.currentContext;
       if (ctx == null) return;
-      
+
       if (path.contains('new_post')) {
         Navigator.of(ctx).pushNamed('/sendPosts');
       } else if (path.contains('search')) {
@@ -146,12 +147,16 @@ class MyAppState extends State<MyApp> {
     final prefs = await SharedPreferences.getInstance();
     final code = prefs.getString('app_locale');
     if (code != null && code.isNotEmpty) {
-      setState(() { _locale = Locale(code); });
+      setState(() {
+        _locale = Locale(code);
+      });
     }
   }
 
   void setLocale(Locale locale) {
-    setState(() { _locale = locale; });
+    setState(() {
+      _locale = locale;
+    });
   }
 
   @override
@@ -162,14 +167,18 @@ class MyAppState extends State<MyApp> {
 
   void _setupShareIntentListener() {
     // Handle shared content when app is opened from share
-    ReceiveSharingIntent.instance.getInitialMedia().then((List<SharedMediaFile> value) {
+    ReceiveSharingIntent.instance
+        .getInitialMedia()
+        .then((List<SharedMediaFile> value) {
       if (value.isNotEmpty) {
         _handleSharedFiles(value);
       }
     });
 
     // Handle shared content while app is running
-    _intentSub = ReceiveSharingIntent.instance.getMediaStream().listen((List<SharedMediaFile> value) {
+    _intentSub = ReceiveSharingIntent.instance
+        .getMediaStream()
+        .listen((List<SharedMediaFile> value) {
       if (value.isNotEmpty) {
         _handleSharedFiles(value);
       }
@@ -189,7 +198,8 @@ class MyAppState extends State<MyApp> {
           .toList();
 
       // Collect text
-      final textFiles = files.where((f) => f.type == SharedMediaType.text).toList();
+      final textFiles =
+          files.where((f) => f.type == SharedMediaType.text).toList();
       final sharedText = textFiles.isNotEmpty ? textFiles.first.path : null;
 
       if (imagePaths.isNotEmpty || sharedText != null) {
@@ -226,19 +236,26 @@ class MyAppState extends State<MyApp> {
       },
       initialRoute: '/Login',
       routes: {
-        '/Login': (context) =>
-            HomeScreen(apiService: widget.apiService, unifiedPushService: widget.unifiedPush),
+        '/Login': (context) => HomeScreen(
+            apiService: widget.apiService,
+            unifiedPushService: widget.unifiedPush),
         '/MainScreen': (context) => MainScreen(apiService: widget.apiService),
-        '/Notifications': (context) => NotificationsPage(apiService: widget.apiService),
-        '/EditProfile': (context) => EditProfilePage(apiService: widget.apiService),
+        '/Notifications': (context) =>
+            NotificationsPage(apiService: widget.apiService),
+        '/EditProfile': (context) =>
+            EditProfilePage(apiService: widget.apiService),
         '/Settings': (context) => SettingsPage(apiService: widget.apiService),
-        '/MutedBlocked': (context) => MutedBlockedPage(apiService: widget.apiService),
+        '/MutedBlocked': (context) =>
+            MutedBlockedPage(apiService: widget.apiService),
         '/UserProfile': (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-          return UserProfilePage(apiService: widget.apiService, userId: args['userId']);
+          final args = ModalRoute.of(context)!.settings.arguments
+              as Map<String, dynamic>;
+          return UserProfilePage(
+              apiService: widget.apiService, userId: args['userId']);
         },
         '/FollowersList': (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          final args = ModalRoute.of(context)!.settings.arguments
+              as Map<String, dynamic>;
           return FollowersListPage(
             apiService: widget.apiService,
             userId: args['userId'],
@@ -246,56 +263,65 @@ class MyAppState extends State<MyApp> {
           );
         },
         '/Bookmarks': (context) => BookmarksPage(apiService: widget.apiService),
-        '/LikedPosts': (context) => LikedPostsPage(apiService: widget.apiService),
+        '/LikedPosts': (context) =>
+            LikedPostsPage(apiService: widget.apiService),
         '/PostDetail': (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-          return PostDetailPage(apiService: widget.apiService, post: args['post']);
+          final args = ModalRoute.of(context)!.settings.arguments
+              as Map<String, dynamic>;
+          return PostDetailPage(
+              apiService: widget.apiService, post: args['post']);
         },
         '/statusDetail': (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          final args = ModalRoute.of(context)!.settings.arguments
+              as Map<String, dynamic>;
           return FutureBuilder<Status>(
             future: widget.apiService.getStatus(args['statusId']),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                return PostDetailPage(apiService: widget.apiService, post: snapshot.data!);
+                return PostDetailPage(
+                    apiService: widget.apiService, post: snapshot.data!);
               } else if (snapshot.hasError) {
                 return Scaffold(
                   appBar: AppBar(title: const Text('Error')),
-                  body: Center(child: Text('Failed to load post: ${snapshot.error}')),
+                  body: Center(
+                      child: Text('Failed to load post: ${snapshot.error}')),
                 );
               }
               return const Scaffold(
-                body: Center(child: CircularProgressIndicator(color: Color(0xFF00F3FF))),
+                body: Center(
+                    child: CircularProgressIndicator(color: Color(0xFF00F3FF))),
               );
             },
           );
         },
-        '/DirectMessages': (context) => DirectMessagesPage(apiService: widget.apiService),
+        '/DirectMessages': (context) =>
+            DirectMessagesPage(apiService: widget.apiService),
         '/TimeLine': (context) =>
             TimelineLegacy(apiService: widget.apiService, typeTimeLine: "home"),
-        '/Local': (context) =>
-            TimelineLegacy(apiService: widget.apiService, typeTimeLine: "public"),
+        '/Local': (context) => TimelineLegacy(
+            apiService: widget.apiService, typeTimeLine: "public"),
         '/Photo': (context) =>
             TimelineLegacy(apiService: widget.apiService, typeTimeLine: "home"),
-        '/Bookmark': (context) =>
-            BookmarksPage(apiService: widget.apiService),
+        '/Bookmark': (context) => BookmarksPage(apiService: widget.apiService),
         '/Profile': (context) => Profile(apiService: widget.apiService),
-        '/Live': (context) =>
-            TimelineLegacy(apiService: widget.apiService, typeTimeLine: "public"),
+        '/Live': (context) => TimelineLegacy(
+            apiService: widget.apiService, typeTimeLine: "public"),
         '/Camera': (context) => CameraScreen(apiService: widget.apiService),
         '/StoryViewer': (context) => StoryViewer(
-            story: (ModalRoute.of(context)!.settings.arguments as Map)['story'],
-            apiService: widget.apiService,
-          ),
-        '/Notification': (context) => NotificationsPage(apiService: widget.apiService),
+              story:
+                  (ModalRoute.of(context)!.settings.arguments as Map)['story'],
+              apiService: widget.apiService,
+            ),
+        '/Notification': (context) =>
+            NotificationsPage(apiService: widget.apiService),
         '/View': (context) => const post_view.View(),
-        '/Search': (context) =>
-            SearchPage(apiService: widget.apiService),
+        '/Search': (context) => SearchPage(apiService: widget.apiService),
         '/Desc': (context) => Desc(apiService: widget.apiService),
         '/sendPosts': (context) => SendPosts(apiService: widget.apiService),
         '/presentation': (context) => const Presentation(),
         '/TagTimeline': (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          final args = ModalRoute.of(context)!.settings.arguments
+              as Map<String, dynamic>;
           return TagTimeline(apiService: widget.apiService, tag: args['tag']);
         },
       },

@@ -42,7 +42,8 @@ void main() {
           'messages': [
             {
               'role': 'system',
-              'content': 'You are a translator. Translate the following text to French. Return ONLY the translated text, nothing else.',
+              'content':
+                  'You are a translator. Translate the following text to French. Return ONLY the translated text, nothing else.',
             },
             {
               'role': 'user',
@@ -56,7 +57,8 @@ void main() {
 
       expect(response.statusCode, 200);
       final data = json.decode(response.body);
-      final translated = data['choices']?[0]?['message']?['content']?.toString().trim();
+      final translated =
+          data['choices']?[0]?['message']?['content']?.toString().trim();
       expect(translated, 'Bonjour le monde');
 
       client.close();
@@ -89,7 +91,8 @@ void main() {
       String? translated;
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        translated = data['choices']?[0]?['message']?['content']?.toString().trim();
+        translated =
+            data['choices']?[0]?['message']?['content']?.toString().trim();
       }
       expect(translated, null);
 
@@ -134,7 +137,8 @@ void main() {
       String? translated;
       try {
         final data = json.decode(response.body);
-        translated = data['choices']?[0]?['message']?['content']?.toString().trim();
+        translated =
+            data['choices']?[0]?['message']?['content']?.toString().trim();
       } catch (e) {
         translated = null;
       }
@@ -208,7 +212,8 @@ void main() {
         'messages': [
           {
             'role': 'system',
-            'content': 'You are a translator. Translate the following text to $targetLang. Return ONLY the translated text, nothing else.',
+            'content':
+                'You are a translator. Translate the following text to $targetLang. Return ONLY the translated text, nothing else.',
           },
           {
             'role': 'user',

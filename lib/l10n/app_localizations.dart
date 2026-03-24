@@ -229,23 +229,52 @@ class AppLocalizations {
   String get serverPickerFilterSmall => _t('serverPickerFilterSmall');
   String get serverPickerNoResults => _t('serverPickerNoResults');
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
-  
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
+
   static const List<Locale> supportedLocales = [
-    Locale('en'), Locale('fr'), Locale('es'), Locale('de'),
-    Locale('it'), Locale('pt'), Locale('nl'), Locale('ru'),
-    Locale('zh'), Locale('ja'), Locale('ko'), Locale('ar'),
-    Locale('hi'), Locale('tr'), Locale('pl'), Locale('uk'),
+    Locale('en'),
+    Locale('fr'),
+    Locale('es'),
+    Locale('de'),
+    Locale('it'),
+    Locale('pt'),
+    Locale('nl'),
+    Locale('ru'),
+    Locale('zh'),
+    Locale('ja'),
+    Locale('ko'),
+    Locale('ar'),
+    Locale('hi'),
+    Locale('tr'),
+    Locale('pl'),
+    Locale('uk'),
   ];
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
-  bool isSupported(Locale locale) =>
-      ['en','fr','es','de','it','pt','nl','ru','zh','ja','ko','ar','hi','tr','pl','uk']
-          .contains(locale.languageCode);
+  bool isSupported(Locale locale) => [
+        'en',
+        'fr',
+        'es',
+        'de',
+        'it',
+        'pt',
+        'nl',
+        'ru',
+        'zh',
+        'ja',
+        'ko',
+        'ar',
+        'hi',
+        'tr',
+        'pl',
+        'uk'
+      ].contains(locale.languageCode);
 
   @override
   Future<AppLocalizations> load(Locale locale) async {

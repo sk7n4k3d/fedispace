@@ -7,7 +7,6 @@ class StoryCarouselResult {
   StoryCarouselResult({this.self, required this.others});
 }
 
-
 class Story {
   final Account account;
   final List<StoryItem> items;
@@ -102,7 +101,9 @@ class StoryItem {
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at']) ?? DateTime.now()
           : DateTime.now(),
-      expiresAt: json['expires_at'] != null ? DateTime.tryParse(json['expires_at']) : null,
+      expiresAt: json['expires_at'] != null
+          ? DateTime.tryParse(json['expires_at'])
+          : null,
       seen: json['seen'] ?? false,
     );
   }
@@ -119,7 +120,9 @@ class StoryItem {
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at']) ?? DateTime.now()
           : DateTime.now(),
-      expiresAt: json['expires_at'] != null ? DateTime.tryParse(json['expires_at']) : null,
+      expiresAt: json['expires_at'] != null
+          ? DateTime.tryParse(json['expires_at'])
+          : null,
       seen: json['seen'] ?? false,
     );
   }

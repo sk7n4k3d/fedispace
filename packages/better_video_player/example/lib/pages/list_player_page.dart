@@ -24,7 +24,8 @@ class _ListPlayerPageState extends State<ListPlayerPage> {
           SliverToBoxAdapter(child: const SizedBox(height: 8)),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 100),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 100),
               child: Text(
                 "100 video player in ListView.",
                 style: TextStyle(fontSize: 16),
@@ -60,7 +61,11 @@ class ItemWidget extends StatefulWidget {
 
   final VoidCallback onPlayButtonPressed;
 
-  const ItemWidget({Key? key, required this.playingIndex, required this.index, required this.onPlayButtonPressed})
+  const ItemWidget(
+      {Key? key,
+      required this.playingIndex,
+      required this.index,
+      required this.onPlayButtonPressed})
       : super(key: key);
 
   @override
@@ -69,7 +74,8 @@ class ItemWidget extends StatefulWidget {
   }
 }
 
-class ItemWidgetState extends State<ItemWidget> with AutomaticKeepAliveClientMixin {
+class ItemWidgetState extends State<ItemWidget>
+    with AutomaticKeepAliveClientMixin {
   BetterVideoPlayerController playerController = BetterVideoPlayerController();
 
   @override
@@ -82,7 +88,8 @@ class ItemWidgetState extends State<ItemWidget> with AutomaticKeepAliveClientMix
   void didUpdateWidget(covariant ItemWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.playingIndex == oldWidget.index && widget.playingIndex != widget.index) {
+    if (oldWidget.playingIndex == oldWidget.index &&
+        widget.playingIndex != widget.index) {
       final oldPlayerController = playerController;
       Future.delayed(Duration(milliseconds: 500), () {
         oldPlayerController.dispose();
@@ -102,7 +109,8 @@ class ItemWidgetState extends State<ItemWidget> with AutomaticKeepAliveClientMix
         child: Stack(
           fit: StackFit.expand,
           children: [
-            if (widget.playingIndex != widget.index) Image.network(kTestVideoThumbnail, fit: BoxFit.contain),
+            if (widget.playingIndex != widget.index)
+              Image.network(kTestVideoThumbnail, fit: BoxFit.contain),
             // play button
             if (widget.playingIndex != widget.index)
               Center(
@@ -132,7 +140,8 @@ class ItemWidgetState extends State<ItemWidget> with AutomaticKeepAliveClientMix
                   kTestVideoUrl,
                 ),
                 configuration: BetterVideoPlayerConfiguration(
-                  placeholder: Image.network(kTestVideoThumbnail, fit: BoxFit.contain),
+                  placeholder:
+                      Image.network(kTestVideoThumbnail, fit: BoxFit.contain),
                 ),
               ),
           ],

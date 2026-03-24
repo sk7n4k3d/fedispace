@@ -12,13 +12,15 @@ import 'package:google_fonts/google_fonts.dart';
 class NotificationsPage extends StatefulWidget {
   final ApiService apiService;
 
-  const NotificationsPage({Key? key, required this.apiService}) : super(key: key);
+  const NotificationsPage({Key? key, required this.apiService})
+      : super(key: key);
 
   @override
   State<NotificationsPage> createState() => _NotificationsPageState();
 }
 
-class _NotificationsPageState extends State<NotificationsPage> with SingleTickerProviderStateMixin {
+class _NotificationsPageState extends State<NotificationsPage>
+    with SingleTickerProviderStateMixin {
   List<dynamic> _notifications = [];
   bool _isLoading = true;
   late AnimationController _pulseController;
@@ -45,7 +47,7 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
     try {
       appLogger.debug('Loading notifications...');
       final response = await widget.apiService.getNotification();
-      
+
       List<dynamic> parsed = [];
 
       if (response != null) {
@@ -59,7 +61,7 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
           parsed = response;
         }
       }
-      
+
       if (!mounted) return;
       setState(() {
         _notifications = parsed;
@@ -80,10 +82,12 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-               content: Text(S.of(context).notificationsCleared, style: GoogleFonts.inter(color: Colors.white)),
+              content: Text(S.of(context).notificationsCleared,
+                  style: GoogleFonts.inter(color: Colors.white)),
               backgroundColor: CyberpunkTheme.cardDark,
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
           );
         }
@@ -102,20 +106,31 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(color: CyberpunkTheme.borderDark),
         ),
-         title: Text(S.of(context).clearAll, style: GoogleFonts.inter(color: CyberpunkTheme.textWhite, fontSize: 18, fontWeight: FontWeight.w700)),
-         content: Text(S.of(context).clearAllConfirm, style: GoogleFonts.inter(color: CyberpunkTheme.textSecondary, height: 1.5)),
+        title: Text(S.of(context).clearAll,
+            style: GoogleFonts.inter(
+                color: CyberpunkTheme.textWhite,
+                fontSize: 18,
+                fontWeight: FontWeight.w700)),
+        content: Text(S.of(context).clearAllConfirm,
+            style: GoogleFonts.inter(
+                color: CyberpunkTheme.textSecondary, height: 1.5)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-             child: Text(S.of(context).cancel, style: GoogleFonts.inter(color: CyberpunkTheme.textTertiary)),
+            child: Text(S.of(context).cancel,
+                style: GoogleFonts.inter(color: CyberpunkTheme.textTertiary)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(
               backgroundColor: CyberpunkTheme.neonPink.withOpacity(0.1),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
-             child: Text(S.of(context).clearAll, style: GoogleFonts.inter(color: CyberpunkTheme.neonPink, fontWeight: FontWeight.w600)),
+            child: Text(S.of(context).clearAll,
+                style: GoogleFonts.inter(
+                    color: CyberpunkTheme.neonPink,
+                    fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -142,7 +157,8 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      CyberpunkTheme.neonPink.withOpacity(0.05 + _pulseController.value * 0.03),
+                      CyberpunkTheme.neonPink
+                          .withOpacity(0.05 + _pulseController.value * 0.03),
                       Colors.transparent,
                     ],
                   ),
@@ -162,7 +178,8 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      CyberpunkTheme.neonCyan.withOpacity(0.04 + _pulseController.value * 0.02),
+                      CyberpunkTheme.neonCyan
+                          .withOpacity(0.04 + _pulseController.value * 0.02),
                       Colors.transparent,
                     ],
                   ),
@@ -183,11 +200,12 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
                       // Back button
                       if (Navigator.canPop(context))
                         IconButton(
-                          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: CyberpunkTheme.textWhite),
+                          icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                              size: 20, color: CyberpunkTheme.textWhite),
                           onPressed: () => Navigator.pop(context),
                         ),
                       Text(
-                         S.of(context).notifications,
+                        S.of(context).notifications,
                         style: GoogleFonts.inter(
                           fontSize: 28,
                           fontWeight: FontWeight.w800,
@@ -199,13 +217,15 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
                       AnimatedBuilder(
                         animation: _pulseController,
                         builder: (context, _) => Container(
-                          width: 8, height: 8,
+                          width: 8,
+                          height: 8,
                           decoration: BoxDecoration(
                             color: CyberpunkTheme.neonPink,
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: CyberpunkTheme.neonPink.withOpacity(0.3 + _pulseController.value * 0.4),
+                                color: CyberpunkTheme.neonPink.withOpacity(
+                                    0.3 + _pulseController.value * 0.4),
                                 blurRadius: 6 + _pulseController.value * 4,
                               ),
                             ],
@@ -215,22 +235,25 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
                       const Spacer(),
                       // Follow Requests
                       IconButton(
-                        icon: const Icon(Icons.person_add_alt_1_outlined, color: CyberpunkTheme.textTertiary, size: 22),
+                        icon: const Icon(Icons.person_add_alt_1_outlined,
+                            color: CyberpunkTheme.textTertiary, size: 22),
                         onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (ctx) => FollowRequestsPage(apiService: widget.apiService),
+                              builder: (ctx) => FollowRequestsPage(
+                                  apiService: widget.apiService),
                             ),
                           );
                         },
-                         tooltip: S.of(context).followRequests,
+                        tooltip: S.of(context).followRequests,
                       ),
                       if (_notifications.isNotEmpty)
                         IconButton(
-                          icon: const Icon(Icons.delete_sweep_outlined, color: CyberpunkTheme.textTertiary, size: 22),
+                          icon: const Icon(Icons.delete_sweep_outlined,
+                              color: CyberpunkTheme.textTertiary, size: 22),
                           onPressed: _showClearDialog,
-                           tooltip: S.of(context).clearAll,
+                          tooltip: S.of(context).clearAll,
                         ),
                     ],
                   ),
@@ -244,14 +267,17 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
                     child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 5),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             color: CyberpunkTheme.neonCyan.withOpacity(0.08),
-                            border: Border.all(color: CyberpunkTheme.neonCyan.withOpacity(0.15)),
+                            border: Border.all(
+                                color:
+                                    CyberpunkTheme.neonCyan.withOpacity(0.15)),
                           ),
                           child: Text(
-                             '${_notifications.length} ${S.of(context).notifications.toLowerCase()}',
+                            '${_notifications.length} ${S.of(context).notifications.toLowerCase()}',
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -282,14 +308,17 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              width: 32, height: 32,
+              width: 32,
+              height: 32,
               child: CircularProgressIndicator(
                 strokeWidth: 2.5,
                 valueColor: AlwaysStoppedAnimation(CyberpunkTheme.neonCyan),
               ),
             ),
             const SizedBox(height: 16),
-             Text(S.of(context).loading, style: GoogleFonts.inter(color: CyberpunkTheme.textTertiary, fontSize: 14)),
+            Text(S.of(context).loading,
+                style: GoogleFonts.inter(
+                    color: CyberpunkTheme.textTertiary, fontSize: 14)),
           ],
         ),
       );
@@ -325,36 +354,44 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
           AnimatedBuilder(
             animation: _pulseController,
             builder: (context, _) => Container(
-              width: 80, height: 80,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    CyberpunkTheme.neonPink.withOpacity(0.06 + _pulseController.value * 0.04),
+                    CyberpunkTheme.neonPink
+                        .withOpacity(0.06 + _pulseController.value * 0.04),
                     CyberpunkTheme.surfaceDark,
                   ],
                 ),
                 border: Border.all(
-                  color: CyberpunkTheme.neonPink.withOpacity(0.1 + _pulseController.value * 0.1),
+                  color: CyberpunkTheme.neonPink
+                      .withOpacity(0.1 + _pulseController.value * 0.1),
                   width: 1.5,
                 ),
               ),
               child: Icon(
                 Icons.notifications_none_rounded,
                 size: 36,
-                color: CyberpunkTheme.neonPink.withOpacity(0.5 + _pulseController.value * 0.2),
+                color: CyberpunkTheme.neonPink
+                    .withOpacity(0.5 + _pulseController.value * 0.2),
               ),
             ),
           ),
           const SizedBox(height: 24),
           Text(
-             S.of(context).noResults,
-            style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, color: CyberpunkTheme.textWhite),
+            S.of(context).noResults,
+            style: GoogleFonts.inter(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: CyberpunkTheme.textWhite),
           ),
           const SizedBox(height: 8),
           Text(
-             S.of(context).notifications,
-            style: GoogleFonts.inter(fontSize: 14, color: CyberpunkTheme.textSecondary),
+            S.of(context).notifications,
+            style: GoogleFonts.inter(
+                fontSize: 14, color: CyberpunkTheme.textSecondary),
           ),
         ],
       ),
@@ -365,7 +402,10 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
     final type = notification['type'];
     final account = notification['account'];
 
-    if (type == 'mention' || type == 'favourite' || type == 'reblog' || type == 'status') {
+    if (type == 'mention' ||
+        type == 'favourite' ||
+        type == 'reblog' ||
+        type == 'status') {
       if (notification['status'] != null) {
         Navigator.pushNamed(context, '/statusDetail', arguments: {
           'statusId': notification['status']['id'],
@@ -373,7 +413,8 @@ class _NotificationsPageState extends State<NotificationsPage> with SingleTicker
         });
       }
     } else if (type == 'follow') {
-      Navigator.pushNamed(context, '/UserProfile', arguments: {'userId': account['id']});
+      Navigator.pushNamed(context, '/UserProfile',
+          arguments: {'userId': account['id']});
     }
   }
 }
@@ -430,7 +471,8 @@ class _NotificationCard extends StatelessWidget {
         break;
     }
 
-    final String displayName = account?['display_name'] ?? account?['username'] ?? '';
+    final String displayName =
+        account?['display_name'] ?? account?['username'] ?? '';
     final String avatar = account?['avatar'] ?? '';
 
     String timeText = '';
@@ -503,9 +545,12 @@ class _NotificationCard extends StatelessWidget {
                       child: CircleAvatar(
                         radius: 22,
                         backgroundColor: const Color(0xFF0D0D12),
-                        backgroundImage: avatar.isNotEmpty ? CachedNetworkImageProvider(avatar) : null,
+                        backgroundImage: avatar.isNotEmpty
+                            ? CachedNetworkImageProvider(avatar)
+                            : null,
                         child: avatar.isEmpty
-                            ? const Icon(Icons.person_rounded, size: 22, color: CyberpunkTheme.textTertiary)
+                            ? const Icon(Icons.person_rounded,
+                                size: 22, color: CyberpunkTheme.textTertiary)
                             : null,
                       ),
                     ),
@@ -518,7 +563,8 @@ class _NotificationCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: const Color(0xFF0D0D12),
                           shape: BoxShape.circle,
-                          border: Border.all(color: accentColor.withOpacity(0.3), width: 1.5),
+                          border: Border.all(
+                              color: accentColor.withOpacity(0.3), width: 1.5),
                           boxShadow: [
                             BoxShadow(
                               color: accentColor.withOpacity(0.2),
@@ -581,7 +627,8 @@ class _NotificationCard extends StatelessWidget {
                 // Accent dot indicator
                 const SizedBox(width: 8),
                 Container(
-                  width: 6, height: 6,
+                  width: 6,
+                  height: 6,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: accentColor.withOpacity(0.5),

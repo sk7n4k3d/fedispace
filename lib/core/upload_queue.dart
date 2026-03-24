@@ -50,7 +50,8 @@ class PostDraft {
 class UploadQueue {
   static const String _queueKey = 'upload_queue';
   final List<PostDraft> _queue = [];
-  final StreamController<int> _pendingController = StreamController<int>.broadcast();
+  final StreamController<int> _pendingController =
+      StreamController<int>.broadcast();
   bool _isProcessing = false;
 
   /// Stream of pending queue size.
@@ -66,7 +67,8 @@ class UploadQueue {
     if (json != null) {
       try {
         final List<dynamic> data = jsonDecode(json);
-        _queue.addAll(data.map((e) => PostDraft.fromJson(e as Map<String, dynamic>)));
+        _queue.addAll(
+            data.map((e) => PostDraft.fromJson(e as Map<String, dynamic>)));
         _pendingController.add(_queue.length);
       } catch (_) {}
     }
@@ -91,7 +93,8 @@ class UploadQueue {
 
   /// Process the queue -- call this when connectivity is restored.
   /// [postFn] is the actual function to post (e.g., apiService.postStatus).
-  Future<void> processQueue(Future<bool> Function(PostDraft draft) postFn) async {
+  Future<void> processQueue(
+      Future<bool> Function(PostDraft draft) postFn) async {
     if (_isProcessing || _queue.isEmpty) return;
     _isProcessing = true;
 

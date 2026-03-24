@@ -177,30 +177,36 @@ class _DraftsPageState extends State<DraftsPage> {
             ),
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: 20),
-            child: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 28),
+            child: const Icon(Icons.delete_outline,
+                color: Colors.redAccent, size: 28),
           ),
           confirmDismiss: (_) async {
             return await showDialog<bool>(
-              context: context,
-              builder: (ctx) => AlertDialog(
-                backgroundColor: CyberpunkTheme.cardDark,
-                title: const Text('Delete Draft', style: TextStyle(color: CyberpunkTheme.textWhite)),
-                content: const Text(
-                  'This draft will be permanently deleted.',
-                  style: TextStyle(color: CyberpunkTheme.textSecondary),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx, false),
-                    child: const Text('Cancel', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    backgroundColor: CyberpunkTheme.cardDark,
+                    title: const Text('Delete Draft',
+                        style: TextStyle(color: CyberpunkTheme.textWhite)),
+                    content: const Text(
+                      'This draft will be permanently deleted.',
+                      style: TextStyle(color: CyberpunkTheme.textSecondary),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: const Text('Cancel',
+                            style:
+                                TextStyle(color: CyberpunkTheme.textSecondary)),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: const Text('Delete',
+                            style: TextStyle(color: Colors.redAccent)),
+                      ),
+                    ],
                   ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx, true),
-                    child: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
-                  ),
-                ],
-              ),
-            ) ?? false;
+                ) ??
+                false;
           },
           onDismissed: (_) => _deleteDraft(draft),
           child: _DraftCard(
@@ -222,7 +228,8 @@ class _DraftCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasMedia = draft.mediaFilePaths.isNotEmpty;
-    final firstMediaExists = hasMedia && File(draft.mediaFilePaths.first).existsSync();
+    final firstMediaExists =
+        hasMedia && File(draft.mediaFilePaths.first).existsSync();
 
     return GestureDetector(
       onTap: onTap,
@@ -281,7 +288,9 @@ class _DraftCard extends StatelessWidget {
                     children: [
                       // Caption preview
                       Text(
-                        draft.caption.isNotEmpty ? draft.caption : '(No caption)',
+                        draft.caption.isNotEmpty
+                            ? draft.caption
+                            : '(No caption)',
                         style: TextStyle(
                           color: draft.caption.isNotEmpty
                               ? CyberpunkTheme.textWhite
@@ -322,7 +331,8 @@ class _DraftCard extends StatelessWidget {
                           if (draft.sensitive) ...[
                             const SizedBox(width: 10),
                             Icon(Icons.warning_amber_rounded,
-                                size: 12, color: Colors.orange.withOpacity(0.7)),
+                                size: 12,
+                                color: Colors.orange.withOpacity(0.7)),
                           ],
                         ],
                       ),

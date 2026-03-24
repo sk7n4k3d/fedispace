@@ -90,7 +90,8 @@ class _LoopsLoginPageState extends State<LoopsLoginPage>
         widget.onAuthenticated();
       } else {
         debugPrint('[LOOPS AUTH] Step 6b: No code in callback URL');
-        setState(() => _error = 'Authorization failed - no code received. URL: $result');
+        setState(() =>
+            _error = 'Authorization failed - no code received. URL: $result');
       }
     } catch (e, stackTrace) {
       debugPrint('[LOOPS AUTH] ERROR: $e');
@@ -271,8 +272,8 @@ class _LoopsLoginPageState extends State<LoopsLoginPage>
                               onPressed: _isLoading ? null : widget.onSkip,
                               style: OutlinedButton.styleFrom(
                                 side: BorderSide(
-                                  color:
-                                      CyberpunkTheme.textTertiary.withOpacity(0.5),
+                                  color: CyberpunkTheme.textTertiary
+                                      .withOpacity(0.5),
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),

@@ -6,12 +6,13 @@ import 'package:fedispace/core/logger.dart';
 /// Helper class for social media actions
 class SocialActions {
   /// Share a status to other apps
-  static Future<void> shareStatus(Status status, {BuildContext? context}) async {
+  static Future<void> shareStatus(Status status,
+      {BuildContext? context}) async {
     try {
       final String shareText = _buildShareText(status);
-      
+
       appLogger.debug('Sharing status: ${status.id}');
-      
+
       await Share.share(
         shareText,
         subject: 'Check out this post!',
@@ -24,12 +25,12 @@ class SocialActions {
   /// Build share text from status
   static String _buildShareText(Status status) {
     final buffer = StringBuffer();
-    
+
     // Add author info
     if (status.account != null) {
       buffer.writeln('@${status.account!.username}:');
     }
-    
+
     // Add content
     if (status.content != null && status.content!.isNotEmpty) {
       // Strip HTML tags from content
@@ -37,12 +38,12 @@ class SocialActions {
       buffer.writeln(cleanContent);
       buffer.writeln();
     }
-    
+
     // Add URL
     if (status.url != null && status.url!.isNotEmpty) {
       buffer.writeln(status.url);
     }
-    
+
     return buffer.toString().trim();
   }
 

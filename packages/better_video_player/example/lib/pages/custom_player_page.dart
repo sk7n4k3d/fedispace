@@ -82,7 +82,8 @@ class _CustomPlayerPageState extends State<CustomPlayerPage> {
 class _CustomControls extends BetterVideoPlayerControls {
   final bool isFullScreen;
 
-  const _CustomControls({Key? key, required this.isFullScreen}) : super(key: key, isFullScreen: isFullScreen);
+  const _CustomControls({Key? key, required this.isFullScreen})
+      : super(key: key, isFullScreen: isFullScreen);
 
   @override
   State<StatefulWidget> createState() {
@@ -129,7 +130,8 @@ class _CustomControlsState extends BetterVideoPlayerControlsState {
               children: [
                 Container(
                   margin: EdgeInsets.all(10),
-                  child: Image.asset("images/replay.png", width: 26, height: 26),
+                  child:
+                      Image.asset("images/replay.png", width: 26, height: 26),
                 ),
                 Text(
                   "重新播放",

@@ -38,7 +38,7 @@ class _LikedPostsPageState extends State<LikedPostsPage> {
       appLogger.debug('Loading liked posts');
       // Using favorites endpoint
       final response = await widget.apiService.getFav(maxId);
-      
+
       final List<Status> posts = response;
 
       if (!mounted) return;

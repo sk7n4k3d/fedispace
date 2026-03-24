@@ -40,7 +40,7 @@ class _FollowersListPageState extends State<FollowersListPage> {
     try {
       appLogger.debug(
           'Loading ${widget.isFollowers ? 'followers' : 'following'}: ${widget.userId}');
-      
+
       final List<AccountUsers> accounts;
       if (widget.isFollowers) {
         accounts = await widget.apiService.getFollowers(

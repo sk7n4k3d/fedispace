@@ -81,13 +81,14 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
     try {
       // Log available keys for debugging
       appLogger.debug('_extractMediaUrls keys: ${data.keys.toList()}');
-      
+
       final attachments = data['media_attachments'];
       if (attachments is List) {
         appLogger.debug('Found ${attachments.length} media_attachments');
         for (var att in attachments) {
           if (att is Map) {
-            appLogger.debug('Attachment keys: ${att.keys.toList()}, type: ${att['type']}');
+            appLogger.debug(
+                'Attachment keys: ${att.keys.toList()}, type: ${att['type']}');
             final url = att['url'] ?? att['preview_url'] ?? att['remote_url'];
             if (url != null && url.toString().isNotEmpty) {
               appLogger.debug('Found media URL: $url');
@@ -98,11 +99,12 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
       } else {
         appLogger.debug('No media_attachments found (value: $attachments)');
       }
-      
+
       // Fallback: check for 'attachments' key (some Pixelfed versions use this)
       final altAttachments = data['attachments'];
       if (altAttachments is List && urls.isEmpty) {
-        appLogger.debug('Checking fallback \'attachments\' key: ${altAttachments.length} items');
+        appLogger.debug(
+            'Checking fallback \'attachments\' key: ${altAttachments.length} items');
         for (var att in altAttachments) {
           if (att is Map) {
             final url = att['url'] ?? att['preview_url'] ?? att['remote_url'];
@@ -148,7 +150,8 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
     return urls;
   }
 
-  Future<void> _loadMessages({bool showLoading = true, bool detectNew = false}) async {
+  Future<void> _loadMessages(
+      {bool showLoading = true, bool detectNew = false}) async {
     if (showLoading) {
       setState(() {
         _isLoading = true;
@@ -156,60 +159,72 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
     }
 
     try {
-      appLogger.debug('Loading messages for partner: ${widget.recipientId} (${widget.recipientUsername})');
-      
+      appLogger.debug(
+          'Loading messages for partner: ${widget.recipientId} (${widget.recipientUsername})');
+
       // Try Pixelfed-specific thread endpoint first (full history)
-      List<dynamic> threadData = await widget.apiService.getDirectThread(widget.recipientId);
-      
+      List<dynamic> threadData =
+          await widget.apiService.getDirectThread(widget.recipientId);
+
       appLogger.debug('getDirectThread returned ${threadData.length} items');
-      
+
       final List<_Message> loadedMessages = [];
-      
-       if (threadData.isNotEmpty) {
+
+      if (threadData.isNotEmpty) {
         appLogger.debug('Parsing ${threadData.length} thread items');
         // Parse the thread data - could be messages, status objects, or conversation objects
         for (var item in threadData) {
           try {
             if (item is! Map) continue;
             var data = Map<String, dynamic>.from(item);
-            
+
             appLogger.debug('Thread item keys: ${data.keys.toList()}');
-            
+
             // If this is a conversation wrapper, unwrap to get the actual status
             if (data.containsKey('last_status') && data['last_status'] is Map) {
-              appLogger.debug('Unwrapping last_status from conversation wrapper');
+              appLogger
+                  .debug('Unwrapping last_status from conversation wrapper');
               data = Map<String, dynamic>.from(data['last_status']);
               appLogger.debug('Unwrapped status keys: ${data.keys.toList()}');
             }
-            
+
             // Try to detect format: chat message vs status object
             String content = '';
             bool isMe = false;
             DateTime timestamp = DateTime.now();
             String id = data['id']?.toString() ?? '';
             List<String> mediaUrls = _extractMediaUrls(data);
-            
-            appLogger.debug('Message $id: found ${mediaUrls.length} media URLs');
-            
-            if (data.containsKey('text') || data.containsKey('body') || data.containsKey('message')) {
+
+            appLogger
+                .debug('Message $id: found ${mediaUrls.length} media URLs');
+
+            if (data.containsKey('text') ||
+                data.containsKey('body') ||
+                data.containsKey('message')) {
               // Chat message format: {id, body/text/message, created_at, is_author, type, ...}
               content = data['text'] ?? data['body'] ?? data['message'] ?? '';
-              isMe = data['is_author'] == true || data['isAuthor'] == true || data['is_sender'] == true;
+              isMe = data['is_author'] == true ||
+                  data['isAuthor'] == true ||
+                  data['is_sender'] == true;
               if (data['created_at'] != null) {
-                timestamp = DateTime.tryParse(data['created_at']) ?? DateTime.now();
+                timestamp =
+                    DateTime.tryParse(data['created_at']) ?? DateTime.now();
               }
             } else if (data.containsKey('content') || mediaUrls.isNotEmpty) {
               // Status object format: {id, content, account, created_at, media_attachments, ...}
-              content = data['content_text'] ?? data['content']?.replaceAll(RegExp(r'<[^>]*>'), '') ?? '';
+              content = data['content_text'] ??
+                  data['content']?.replaceAll(RegExp(r'<[^>]*>'), '') ??
+                  '';
               final account = data['account'];
               if (account != null) {
                 isMe = account['id']?.toString() != widget.recipientId;
               }
               if (data['created_at'] != null) {
-                timestamp = DateTime.tryParse(data['created_at']) ?? DateTime.now();
+                timestamp =
+                    DateTime.tryParse(data['created_at']) ?? DateTime.now();
               }
             }
-            
+
             if (content.isNotEmpty || mediaUrls.isNotEmpty) {
               loadedMessages.add(_Message(
                 id: id,
@@ -224,35 +239,40 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
           }
         }
       }
-      
+
       // If thread endpoint returned nothing useful, fallback to merged inbox/sent
       if (loadedMessages.isEmpty) {
-        appLogger.debug('Thread endpoint empty, falling back to merged inbox/sent');
-        final mergedMessages = await widget.apiService.getAllConversationMessages(widget.recipientId);
-        
+        appLogger
+            .debug('Thread endpoint empty, falling back to merged inbox/sent');
+        final mergedMessages = await widget.apiService
+            .getAllConversationMessages(widget.recipientId);
+
         for (var msgData in mergedMessages) {
           try {
-            final String content = msgData['content_text'] ?? 
-                msgData['content']?.replaceAll(RegExp(r'<[^>]*>'), '') ?? 
-                msgData['body'] ?? '';
-            
+            final String content = msgData['content_text'] ??
+                msgData['content']?.replaceAll(RegExp(r'<[^>]*>'), '') ??
+                msgData['body'] ??
+                '';
+
             List<String> mediaUrls = _extractMediaUrls(msgData);
-            
+
             bool isMe = false;
             if (msgData['_direction'] == 'sent') {
               final account = msgData['account'];
-              isMe = account != null ? account['id']?.toString() != widget.recipientId : true;
+              isMe = account != null
+                  ? account['id']?.toString() != widget.recipientId
+                  : true;
             } else {
               final account = msgData['account'];
               if (account != null) {
                 isMe = account['id']?.toString() != widget.recipientId;
               }
             }
-            
-            final DateTime timestamp = msgData['created_at'] != null 
+
+            final DateTime timestamp = msgData['created_at'] != null
                 ? DateTime.tryParse(msgData['created_at']) ?? DateTime.now()
                 : DateTime.now();
-            
+
             if (content.isNotEmpty || mediaUrls.isNotEmpty) {
               loadedMessages.add(_Message(
                 id: msgData['id']?.toString() ?? '',
@@ -267,10 +287,10 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
           }
         }
       }
-      
+
       // Sort newest first (for reverse ListView)
       loadedMessages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-      
+
       // Detect new messages from the other person
       if (detectNew && _knownMessageIds.isNotEmpty) {
         for (var msg in loadedMessages) {
@@ -281,20 +301,20 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
           }
         }
       }
-      
+
       // Track all known message IDs
       _knownMessageIds.clear();
       for (var msg in loadedMessages) {
         _knownMessageIds.add(msg.id);
       }
-      
+
       if (!mounted) return;
       setState(() {
-          _messages.clear();
-          _messages.addAll(loadedMessages);
-          _isLoading = false;
+        _messages.clear();
+        _messages.addAll(loadedMessages);
+        _isLoading = false;
       });
-      
+
       // Clear highlight after 3 seconds
       if (detectNew) {
         Future.delayed(const Duration(seconds: 3), () {
@@ -307,7 +327,6 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
           }
         });
       }
-
     } catch (error, stackTrace) {
       appLogger.error('Error loading messages', error, stackTrace);
       if (!mounted) return;
@@ -325,9 +344,13 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
           id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
           channelKey: 'mention', // Reuse existing channel
           title: 'New message from ${widget.recipientName}',
-          body: msg.content.length > 100 ? '${msg.content.substring(0, 100)}...' : msg.content,
+          body: msg.content.length > 100
+              ? '${msg.content.substring(0, 100)}...'
+              : msg.content,
           bigPicture: widget.recipientAvatar,
-          notificationLayout: widget.recipientAvatar != null ? NotificationLayout.BigPicture : NotificationLayout.Default,
+          notificationLayout: widget.recipientAvatar != null
+              ? NotificationLayout.BigPicture
+              : NotificationLayout.Default,
           category: NotificationCategory.Message,
         ),
       );
@@ -339,64 +362,68 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
   _Message _parseMessage(Map<String, dynamic> data) {
     // Handle Chat API response (Pixelfed specific)
     // { "id": 123, "body": "Hello", "created_at": "...", "sender_id": 456, "is_sender": true/false, "type": "text|photo|photos", "media": "url" }
-    
+
     if (data.containsKey('body') || data.containsKey('message')) {
-        final String msgType = (data['type'] ?? 'text').toString();
-        String content = data['body'] ?? data['message'] ?? data['text'] ?? '';
-        final bool isMe = data['is_sender'] == true || 
-            data['isAuthor'] == true ||
-            (data['sender_id'] != null && data['sender_id'].toString() != widget.recipientId);
-        
-        // Extract media URLs from photo messages (matching pixelfed-rn behavior)
-        List<String> mediaUrls = [];
-        if (['photo', 'photos'].contains(msgType)) {
-          final media = data['media'];
-          if (media is String && media.isNotEmpty) {
-            mediaUrls.add(media);
-          } else if (media is List) {
-            for (var m in media) {
-              if (m is String && m.isNotEmpty) mediaUrls.add(m);
-              if (m is Map) {
-                final url = m['url'] ?? m['preview_url'];
-                if (url != null) mediaUrls.add(url.toString());
-              }
+      final String msgType = (data['type'] ?? 'text').toString();
+      String content = data['body'] ?? data['message'] ?? data['text'] ?? '';
+      final bool isMe = data['is_sender'] == true ||
+          data['isAuthor'] == true ||
+          (data['sender_id'] != null &&
+              data['sender_id'].toString() != widget.recipientId);
+
+      // Extract media URLs from photo messages (matching pixelfed-rn behavior)
+      List<String> mediaUrls = [];
+      if (['photo', 'photos'].contains(msgType)) {
+        final media = data['media'];
+        if (media is String && media.isNotEmpty) {
+          mediaUrls.add(media);
+        } else if (media is List) {
+          for (var m in media) {
+            if (m is String && m.isNotEmpty) mediaUrls.add(m);
+            if (m is Map) {
+              final url = m['url'] ?? m['preview_url'];
+              if (url != null) mediaUrls.add(url.toString());
             }
           }
         }
-        
-        // Also check media_attachments if present
-        if (mediaUrls.isEmpty) {
-          mediaUrls.addAll(_extractMediaUrls(data));
-        }
+      }
 
-        // For story replies/reactions, prefix the content
-        if (['story:reply', 'story:comment', 'story:react'].contains(msgType)) {
-          content = 'Story reply: "$content"';
-        }
-         
-        return _Message(
-          id: data['id']?.toString() ?? '',
-          content: content,
-          timestamp: data['created_at'] != null ? DateTime.tryParse(data['created_at'].toString()) ?? DateTime.now() : DateTime.now(),
-          isFromMe: isMe,
-          mediaUrls: mediaUrls,
-        );
+      // Also check media_attachments if present
+      if (mediaUrls.isEmpty) {
+        mediaUrls.addAll(_extractMediaUrls(data));
+      }
+
+      // For story replies/reactions, prefix the content
+      if (['story:reply', 'story:comment', 'story:react'].contains(msgType)) {
+        content = 'Story reply: "$content"';
+      }
+
+      return _Message(
+        id: data['id']?.toString() ?? '',
+        content: content,
+        timestamp: data['created_at'] != null
+            ? DateTime.tryParse(data['created_at'].toString()) ?? DateTime.now()
+            : DateTime.now(),
+        isFromMe: isMe,
+        mediaUrls: mediaUrls,
+      );
     }
 
     // Fallback for Status objects (if any)
     final account = data['account'];
-    final String content = data['content']?.replaceAll(RegExp(r'<[^>]*>'), '') ?? '';
-    final DateTime timestamp = data['created_at'] != null 
-        ? DateTime.parse(data['created_at']) 
+    final String content =
+        data['content']?.replaceAll(RegExp(r'<[^>]*>'), '') ?? '';
+    final DateTime timestamp = data['created_at'] != null
+        ? DateTime.parse(data['created_at'])
         : DateTime.now();
-    
+
     bool isMe = false;
     if (account != null) {
       if (account['username'] != widget.recipientUsername) {
-         isMe = true;
+        isMe = true;
       }
     }
-    
+
     return _Message(
       id: data['id'] ?? '',
       content: content,
@@ -423,35 +450,39 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
         recipientId: widget.recipientId,
         content: text,
       );
-      
+
       if (result != null) {
         final sentText = _messageController.text.trim();
         _messageController.clear();
-        
+
         // Check for API error
         if (result is Map<String, dynamic> && result.containsKey('error')) {
           appLogger.error('API Error: ${result['error']}');
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error: ${result['error']}'), backgroundColor: Colors.red),
+              SnackBar(
+                  content: Text('Error: ${result['error']}'),
+                  backgroundColor: Colors.red),
             );
           }
         } else {
           // Add message locally for instant feedback
           setState(() {
-            _messages.insert(0, _Message(
-              id: DateTime.now().millisecondsSinceEpoch.toString(),
-              content: sentText,
-              timestamp: DateTime.now(),
-              isFromMe: true,
-            ));
+            _messages.insert(
+                0,
+                _Message(
+                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  content: sentText,
+                  timestamp: DateTime.now(),
+                  isFromMe: true,
+                ));
           });
         }
-        
+
         // Optionally reload to sync
-        // _loadMessages(); 
+        // _loadMessages();
       }
-      
+
       setState(() {
         _isSending = false;
       });
@@ -461,12 +492,12 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
         _isSending = false;
       });
       if (mounted) {
-         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Send failed: $error'),
-              backgroundColor: Colors.red,
-            ),
-         );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Send failed: $error'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -484,13 +515,15 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
               CircleAvatar(
                 radius: 16,
                 backgroundColor: CyberpunkTheme.cardDark,
-                backgroundImage: CachedNetworkImageProvider(widget.recipientAvatar!),
+                backgroundImage:
+                    CachedNetworkImageProvider(widget.recipientAvatar!),
               )
             else
               const CircleAvatar(
                 radius: 16,
                 backgroundColor: CyberpunkTheme.cardDark,
-                child: Icon(Icons.person, size: 16, color: CyberpunkTheme.textTertiary),
+                child: Icon(Icons.person,
+                    size: 16, color: CyberpunkTheme.textTertiary),
               ),
             const SizedBox(width: 12),
             Expanded(
@@ -500,12 +533,16 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
                 children: [
                   Text(
                     widget.recipientName,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: CyberpunkTheme.textWhite),
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: CyberpunkTheme.textWhite),
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
                     '@${widget.recipientUsername}',
-                    style: const TextStyle(fontSize: 12, color: CyberpunkTheme.textSecondary),
+                    style: const TextStyle(
+                        fontSize: 12, color: CyberpunkTheme.textSecondary),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -516,9 +553,13 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
         actions: [
           IconButton(
             icon: Icon(
-              _isMuted ? Icons.notifications_off_outlined : Icons.notifications_outlined,
+              _isMuted
+                  ? Icons.notifications_off_outlined
+                  : Icons.notifications_outlined,
               size: 22,
-              color: _isMuted ? CyberpunkTheme.neonPink : CyberpunkTheme.textSecondary,
+              color: _isMuted
+                  ? CyberpunkTheme.neonPink
+                  : CyberpunkTheme.textSecondary,
             ),
             tooltip: _isMuted ? 'Unmute' : 'Mute',
             onPressed: () async {
@@ -530,9 +571,11 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.info_outline_rounded, size: 22, color: CyberpunkTheme.textSecondary),
+            icon: const Icon(Icons.info_outline_rounded,
+                size: 22, color: CyberpunkTheme.textSecondary),
             onPressed: () {
-              Navigator.pushNamed(context, '/UserProfile', arguments: {'userId': widget.recipientId});
+              Navigator.pushNamed(context, '/UserProfile',
+                  arguments: {'userId': widget.recipientId});
             },
           ),
         ],
@@ -551,11 +594,17 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.waving_hand_outlined, size: 56, color: CyberpunkTheme.neonCyan.withOpacity(0.3)),
+                            Icon(Icons.waving_hand_outlined,
+                                size: 56,
+                                color:
+                                    CyberpunkTheme.neonCyan.withOpacity(0.3)),
                             const SizedBox(height: 16),
                             Text(
                               'Say hi to ${widget.recipientName}!',
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: CyberpunkTheme.textWhite),
+                              style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: CyberpunkTheme.textWhite),
                             ),
                           ],
                         ),
@@ -572,7 +621,9 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
                           itemBuilder: (context, index) {
                             final message = _messages[index];
                             return GestureDetector(
-                              onLongPress: message.isFromMe ? () => _showDeleteDialog(message) : null,
+                              onLongPress: message.isFromMe
+                                  ? () => _showDeleteDialog(message)
+                                  : null,
                               child: _MessageBubble(message: message),
                             );
                           },
@@ -605,10 +656,12 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
             Expanded(
               child: TextField(
                 controller: _messageController,
-                style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 15),
+                style: const TextStyle(
+                    color: CyberpunkTheme.textWhite, fontSize: 15),
                 decoration: InputDecoration(
                   hintText: 'Message...',
-                  hintStyle: const TextStyle(color: CyberpunkTheme.textTertiary),
+                  hintStyle:
+                      const TextStyle(color: CyberpunkTheme.textTertiary),
                   filled: true,
                   fillColor: CyberpunkTheme.cardDark,
                   border: OutlineInputBorder(
@@ -621,9 +674,11 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(22),
-                    borderSide: BorderSide(color: CyberpunkTheme.neonCyan.withOpacity(0.4)),
+                    borderSide: BorderSide(
+                        color: CyberpunkTheme.neonCyan.withOpacity(0.4)),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 ),
                 maxLines: null,
                 textInputAction: TextInputAction.send,
@@ -663,7 +718,11 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(children: [
-              SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: CyberpunkTheme.neonCyan)),
+              SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: CyberpunkTheme.neonCyan)),
               SizedBox(width: 12),
               Text('Sending photo...'),
             ]),
@@ -673,23 +732,31 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
         );
       }
       debugPrint('[DM-UI] Calling uploadDirectMessageMedia(${image.path})');
-      final result = await widget.apiService.uploadDirectMessageMedia(image.path, widget.recipientId);
+      final result = await widget.apiService
+          .uploadDirectMessageMedia(image.path, widget.recipientId);
       debugPrint('[DM-UI] Upload result: $result');
       if (result != null) {
-        debugPrint('[DM-UI] Upload SUCCESS, url: $result, adding optimistic message');
+        debugPrint(
+            '[DM-UI] Upload SUCCESS, url: $result, adding optimistic message');
         if (mounted) ScaffoldMessenger.of(context).hideCurrentSnackBar();
         appLogger.debug('DM media uploaded: $result');
         // Add optimistic photo message immediately
         if (mounted) {
           setState(() {
-            _messages.insert(0, _Message(
-              id: 'optimistic_$result',
-              content: '',
-              timestamp: DateTime.now(),
-              isFromMe: true,
-              mediaUrls: [result.toString().startsWith('http') ? result.toString() : ''],
-              isNew: true,
-            ));
+            _messages.insert(
+                0,
+                _Message(
+                  id: 'optimistic_$result',
+                  content: '',
+                  timestamp: DateTime.now(),
+                  isFromMe: true,
+                  mediaUrls: [
+                    result.toString().startsWith('http')
+                        ? result.toString()
+                        : ''
+                  ],
+                  isNew: true,
+                ));
           });
         }
         // Also refresh to get the real message from server
@@ -699,7 +766,9 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
         if (mounted) ScaffoldMessenger.of(context).hideCurrentSnackBar();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to send photo'), backgroundColor: Colors.red),
+            const SnackBar(
+                content: Text('Failed to send photo'),
+                backgroundColor: Colors.red),
           );
         }
       }
@@ -719,26 +788,38 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
           borderRadius: BorderRadius.circular(CyberpunkTheme.radiusRound),
           side: BorderSide(color: CyberpunkTheme.borderDark),
         ),
-        title: Text(S.of(context).deleteMessage, style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 16, fontWeight: FontWeight.w700)),
-        content: const Text('This action cannot be undone.', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+        title: Text(S.of(context).deleteMessage,
+            style: const TextStyle(
+                color: CyberpunkTheme.textWhite,
+                fontSize: 16,
+                fontWeight: FontWeight.w700)),
+        content: const Text('This action cannot be undone.',
+            style: TextStyle(color: CyberpunkTheme.textSecondary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(S.of(context).cancel, style: const TextStyle(color: CyberpunkTheme.textTertiary)),
+            child: Text(S.of(context).cancel,
+                style: const TextStyle(color: CyberpunkTheme.textTertiary)),
           ),
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              final ok = await widget.apiService.deleteDirectMessage(message.id);
+              final ok =
+                  await widget.apiService.deleteDirectMessage(message.id);
               if (ok) {
-                setState(() => _messages.removeWhere((m) => m.id == message.id));
+                setState(
+                    () => _messages.removeWhere((m) => m.id == message.id));
               }
             },
             style: TextButton.styleFrom(
               backgroundColor: CyberpunkTheme.neonPink.withOpacity(0.1),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
-            child: Text(S.of(context).delete, style: const TextStyle(color: CyberpunkTheme.neonPink, fontWeight: FontWeight.w600)),
+            child: Text(S.of(context).delete,
+                style: const TextStyle(
+                    color: CyberpunkTheme.neonPink,
+                    fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -778,10 +859,10 @@ class _MessageBubble extends StatelessWidget {
     final bubbleColor = message.isFromMe
         ? CyberpunkTheme.neonCyan.withOpacity(0.15)
         : CyberpunkTheme.cardDark;
-    
+
     final hasMedia = message.mediaUrls.isNotEmpty;
     final hasText = message.content.isNotEmpty;
-    
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 500),
       padding: const EdgeInsets.only(bottom: 6),
@@ -803,7 +884,9 @@ class _MessageBubble extends StatelessWidget {
                 bottomRight: Radius.circular(message.isFromMe ? 4 : 18),
               ),
               border: message.isFromMe
-                  ? Border.all(color: CyberpunkTheme.neonCyan.withOpacity(0.2), width: 0.5)
+                  ? Border.all(
+                      color: CyberpunkTheme.neonCyan.withOpacity(0.2),
+                      width: 0.5)
                   : Border.all(color: CyberpunkTheme.borderDark, width: 0.5),
               boxShadow: message.isNew
                   ? [
@@ -820,27 +903,31 @@ class _MessageBubble extends StatelessWidget {
               children: [
                 if (hasMedia)
                   ...message.mediaUrls.map((url) => ClipRRect(
-                    borderRadius: hasText 
-                        ? const BorderRadius.vertical(top: Radius.circular(18))
-                        : BorderRadius.circular(18),
-                    child: CachedNetworkImage(
-                      imageUrl: url,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        height: 150,
-                        color: CyberpunkTheme.cardDark,
-                        child: const Center(child: InstagramLoadingIndicator(size: 16)),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        height: 80,
-                        color: CyberpunkTheme.cardDark,
-                        child: const Icon(Icons.broken_image_outlined, size: 24, color: CyberpunkTheme.textTertiary),
-                      ),
-                    ),
-                  )),
+                        borderRadius: hasText
+                            ? const BorderRadius.vertical(
+                                top: Radius.circular(18))
+                            : BorderRadius.circular(18),
+                        child: CachedNetworkImage(
+                          imageUrl: url,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            height: 150,
+                            color: CyberpunkTheme.cardDark,
+                            child: const Center(
+                                child: InstagramLoadingIndicator(size: 16)),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            height: 80,
+                            color: CyberpunkTheme.cardDark,
+                            child: const Icon(Icons.broken_image_outlined,
+                                size: 24, color: CyberpunkTheme.textTertiary),
+                          ),
+                        ),
+                      )),
                 if (hasText)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
                     child: Text(
                       message.content,
                       style: const TextStyle(

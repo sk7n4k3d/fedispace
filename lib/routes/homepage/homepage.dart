@@ -62,7 +62,6 @@ class _HomeScreen extends State<HomeScreen> with TickerProviderStateMixin {
           apiService: widget.apiService,
           unifiedPushService: widget.unifiedPushService,
         ),
-
         SizedBox(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
@@ -75,8 +74,8 @@ class _HomeScreen extends State<HomeScreen> with TickerProviderStateMixin {
                   S.of(context).loginCommunityTagline,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                      fontStyle: FontStyle.italic,
-                      color: Colors.white70,
+                    fontStyle: FontStyle.italic,
+                    color: Colors.white70,
                   ),
                 ),
                 Row(
@@ -95,12 +94,14 @@ class _HomeScreen extends State<HomeScreen> with TickerProviderStateMixin {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFFF2D55).withValues(alpha: 0.6),
+                              color: const Color(0xFFFF2D55)
+                                  .withValues(alpha: 0.6),
                               blurRadius: 12,
                               spreadRadius: 2,
                             ),
                             BoxShadow(
-                              color: const Color(0xFF00F3FF).withValues(alpha: 0.2),
+                              color: const Color(0xFF00F3FF)
+                                  .withValues(alpha: 0.2),
                               blurRadius: 20,
                               spreadRadius: 1,
                             ),

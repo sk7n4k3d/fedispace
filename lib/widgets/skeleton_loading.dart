@@ -191,13 +191,15 @@ class ProfileSkeleton extends StatelessWidget {
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: List.generate(3, (_) => Column(
-                      children: const [
-                        _SkeletonBox(width: 40, height: 16),
-                        SizedBox(height: 4),
-                        _SkeletonBox(width: 50, height: 10),
-                      ],
-                    )),
+                    children: List.generate(
+                        3,
+                        (_) => Column(
+                              children: const [
+                                _SkeletonBox(width: 40, height: 16),
+                                SizedBox(height: 4),
+                                _SkeletonBox(width: 50, height: 10),
+                              ],
+                            )),
                   ),
                 ),
               ],
@@ -215,7 +217,8 @@ class ProfileSkeleton extends StatelessWidget {
             const _SkeletonBox(width: 250, height: 12),
             const SizedBox(height: 16),
             // Action button
-            const _SkeletonBox(width: double.infinity, height: 36, borderRadius: 10),
+            const _SkeletonBox(
+                width: double.infinity, height: 36, borderRadius: 10),
             const SizedBox(height: 16),
             Container(height: 0.5, color: CyberpunkTheme.borderDark),
             const SizedBox(height: 2),
@@ -265,11 +268,13 @@ class SearchSkeleton extends StatelessWidget {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: List.generate(6, (i) => _SkeletonBox(
-                width: 60.0 + (i * 15 % 40),
-                height: 28,
-                borderRadius: 14,
-              )),
+              children: List.generate(
+                  6,
+                  (i) => _SkeletonBox(
+                        width: 60.0 + (i * 15 % 40),
+                        height: 28,
+                        borderRadius: 14,
+                      )),
             ),
             const SizedBox(height: 20),
             // Grid

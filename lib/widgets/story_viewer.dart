@@ -12,13 +12,15 @@ class StoryViewer extends StatefulWidget {
   final Story story;
   final ApiService? apiService;
 
-  const StoryViewer({Key? key, required this.story, this.apiService}) : super(key: key);
+  const StoryViewer({Key? key, required this.story, this.apiService})
+      : super(key: key);
 
   @override
   State<StoryViewer> createState() => _StoryViewerState();
 }
 
-class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStateMixin {
+class _StoryViewerState extends State<StoryViewer>
+    with SingleTickerProviderStateMixin {
   late PageController _pageController;
   late AnimationController _animController;
   VideoPlayerController? _videoController;
@@ -34,13 +36,15 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
 
     // Check if this is our own story
     if (widget.apiService?.currentAccount != null) {
-      _isOwnStory = widget.story.account.id == widget.apiService!.currentAccount!.id;
+      _isOwnStory =
+          widget.story.account.id == widget.apiService!.currentAccount!.id;
     }
 
     // Start first story
     if (widget.story.items.isNotEmpty) {
       final firstItem = widget.story.items.first;
-      appLogger.info('StoryViewer: Loading first item type=${firstItem.type} url=${firstItem.url}');
+      appLogger.info(
+          'StoryViewer: Loading first item type=${firstItem.type} url=${firstItem.url}');
       _loadStory(item: firstItem);
 
       // Mark as viewed
@@ -105,7 +109,8 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
         });
     } else {
       // Photo — default duration
-      _animController.duration = Duration(seconds: item.duration > 0 ? item.duration : 5);
+      _animController.duration =
+          Duration(seconds: item.duration > 0 ? item.duration : 5);
       _animController.forward();
     }
   }
@@ -150,7 +155,8 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 36, height: 4,
+              width: 36,
+              height: 4,
               margin: const EdgeInsets.only(top: 12, bottom: 16),
               decoration: BoxDecoration(
                 color: Colors.white24,
@@ -161,20 +167,26 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
               padding: const EdgeInsets.only(bottom: 16),
               child: Text(
                 '${viewers.length} viewer${viewers.length == 1 ? '' : 's'}',
-                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700),
               ),
             ),
             ...viewers.take(20).map((a) => ListTile(
-              leading: CircleAvatar(
-                backgroundImage: CachedNetworkImageProvider(a.avatar),
-              ),
-              title: Text(a.displayName, style: const TextStyle(color: Colors.white)),
-              subtitle: Text('@${a.username}', style: const TextStyle(color: Colors.white60)),
-            )),
+                  leading: CircleAvatar(
+                    backgroundImage: CachedNetworkImageProvider(a.avatar),
+                  ),
+                  title: Text(a.displayName,
+                      style: const TextStyle(color: Colors.white)),
+                  subtitle: Text('@${a.username}',
+                      style: const TextStyle(color: Colors.white60)),
+                )),
             if (viewers.isEmpty)
               const Padding(
                 padding: EdgeInsets.all(24),
-                child: Text('No viewers yet', style: TextStyle(color: Colors.white54, fontSize: 15)),
+                child: Text('No viewers yet',
+                    style: TextStyle(color: Colors.white54, fontSize: 15)),
               ),
             const SizedBox(height: 16),
           ],
@@ -189,12 +201,15 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A2E),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Delete Story', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-        content: const Text('Are you sure you want to delete this story?', style: TextStyle(color: Colors.white70)),
+        title: const Text('Delete Story',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+        content: const Text('Are you sure you want to delete this story?',
+            style: TextStyle(color: Colors.white70)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+            child:
+                const Text('Cancel', style: TextStyle(color: Colors.white54)),
           ),
           TextButton(
             onPressed: () async {
@@ -220,7 +235,9 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
                 });
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w700)),
+            child: const Text('Delete',
+                style: TextStyle(
+                    color: Colors.redAccent, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -242,7 +259,8 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
           ),
         );
       }
-      return const Center(child: CircularProgressIndicator(color: Colors.white));
+      return const Center(
+          child: CircularProgressIndicator(color: Colors.white));
     }
 
     // Image content (photo or any non-video type)
@@ -271,7 +289,8 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
           child: CircularProgressIndicator(
             color: Colors.white,
             value: loadingProgress.expectedTotalBytes != null
-                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                ? loadingProgress.cumulativeBytesLoaded /
+                    loadingProgress.expectedTotalBytes!
                 : null,
           ),
         );
@@ -290,7 +309,9 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
               ),
               const SizedBox(height: 4),
               Text(
-                imageUrl.length > 60 ? '...${imageUrl.substring(imageUrl.length - 60)}' : imageUrl,
+                imageUrl.length > 60
+                    ? '...${imageUrl.substring(imageUrl.length - 60)}'
+                    : imageUrl,
                 style: const TextStyle(color: Colors.white38, fontSize: 10),
                 textAlign: TextAlign.center,
               ),
@@ -310,11 +331,13 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('No stories', style: TextStyle(color: Colors.white54, fontSize: 18)),
+              const Text('No stories',
+                  style: TextStyle(color: Colors.white54, fontSize: 18)),
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Go back', style: TextStyle(color: Colors.white)),
+                child: const Text('Go back',
+                    style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
@@ -337,7 +360,9 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
 
             // ── Top gradient overlay ──────────────────────────────
             Positioned(
-              top: 0, left: 0, right: 0,
+              top: 0,
+              left: 0,
+              right: 0,
               height: 140,
               child: Container(
                 decoration: BoxDecoration(
@@ -359,27 +384,36 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
                 animation: _animController,
                 builder: (context, child) {
                   return Row(
-                    children: widget.story.items.asMap().map((i, e) {
-                      return MapEntry(
-                        i,
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 2),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(2),
-                              child: LinearProgressIndicator(
-                                value: i == _currentIndex
-                                    ? _animController.value
-                                    : i < _currentIndex ? 1.0 : 0.0,
-                                backgroundColor: Colors.white.withOpacity(0.3),
-                                valueColor: const AlwaysStoppedAnimation(Colors.white),
-                                minHeight: 2.5,
+                    children: widget.story.items
+                        .asMap()
+                        .map((i, e) {
+                          return MapEntry(
+                            i,
+                            Expanded(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 2),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(2),
+                                  child: LinearProgressIndicator(
+                                    value: i == _currentIndex
+                                        ? _animController.value
+                                        : i < _currentIndex
+                                            ? 1.0
+                                            : 0.0,
+                                    backgroundColor:
+                                        Colors.white.withOpacity(0.3),
+                                    valueColor: const AlwaysStoppedAnimation(
+                                        Colors.white),
+                                    minHeight: 2.5,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                      );
-                    }).values.toList(),
+                          );
+                        })
+                        .values
+                        .toList(),
                   );
                 },
               ),
@@ -394,7 +428,8 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
                 children: [
                   CircleAvatar(
                     radius: 18,
-                    backgroundImage: CachedNetworkImageProvider(widget.story.account.avatar),
+                    backgroundImage:
+                        CachedNetworkImageProvider(widget.story.account.avatar),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -416,7 +451,8 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
                         color: Colors.black38,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.close, color: Colors.white, size: 22),
+                      child: const Icon(Icons.close,
+                          color: Colors.white, size: 22),
                     ),
                   ),
                 ],
@@ -425,7 +461,9 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
 
             // ── Bottom gradient overlay ───────────────────────────
             Positioned(
-              bottom: 0, left: 0, right: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
               height: _isOwnStory ? 180 : 120,
               child: Container(
                 decoration: BoxDecoration(
@@ -451,16 +489,19 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
                     GestureDetector(
                       onTap: _showViewers,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 28, vertical: 14),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(40),
-                          border: Border.all(color: Colors.white.withOpacity(0.25)),
+                          border:
+                              Border.all(color: Colors.white.withOpacity(0.25)),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.visibility_rounded, color: Colors.white, size: 28),
+                            Icon(Icons.visibility_rounded,
+                                color: Colors.white, size: 28),
                             SizedBox(width: 10),
                             Text(
                               'Viewers',
@@ -478,16 +519,19 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
                     GestureDetector(
                       onTap: _confirmDelete,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 28, vertical: 14),
                         decoration: BoxDecoration(
                           color: Colors.redAccent.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(40),
-                          border: Border.all(color: Colors.redAccent.withOpacity(0.4)),
+                          border: Border.all(
+                              color: Colors.redAccent.withOpacity(0.4)),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.delete_rounded, color: Colors.redAccent, size: 28),
+                            Icon(Icons.delete_rounded,
+                                color: Colors.redAccent, size: 28),
                             SizedBox(width: 10),
                             Text(
                               'Delete',
@@ -513,19 +557,22 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
                 right: 0,
                 child: SafeArea(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
                       children: [
                         Expanded(
                           child: TextField(
                             controller: _replyController,
-                            style: const TextStyle(color: Colors.white, fontSize: 14),
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 14),
                             decoration: InputDecoration(
                               hintText: 'Reply to story...',
                               hintStyle: const TextStyle(color: Colors.white54),
                               filled: true,
                               fillColor: Colors.white.withOpacity(0.15),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(28),
                                 borderSide: BorderSide.none,
@@ -546,7 +593,8 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
                               _replyController.clear();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Reply sent!', style: TextStyle(color: Colors.white)),
+                                  content: Text('Reply sent!',
+                                      style: TextStyle(color: Colors.white)),
                                   behavior: SnackBarBehavior.floating,
                                 ),
                               );
@@ -558,7 +606,8 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
                               color: Colors.white.withOpacity(0.15),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.send_rounded, color: Colors.white, size: 22),
+                            child: const Icon(Icons.send_rounded,
+                                color: Colors.white, size: 22),
                           ),
                         ),
                       ],

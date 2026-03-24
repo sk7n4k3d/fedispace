@@ -43,7 +43,8 @@ class QrProfilePage extends StatelessWidget {
                   : null,
               backgroundColor: CyberpunkTheme.surfaceDark,
               child: avatarUrl.isEmpty
-                  ? const Icon(Icons.person, size: 40, color: CyberpunkTheme.textTertiary)
+                  ? const Icon(Icons.person,
+                      size: 40, color: CyberpunkTheme.textTertiary)
                   : null,
             ),
             const SizedBox(height: 12),
@@ -53,7 +54,9 @@ class QrProfilePage extends StatelessWidget {
                 color: CyberpunkTheme.neonCyan,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                shadows: [Shadow(color: CyberpunkTheme.neonCyan, blurRadius: 8)],
+                shadows: [
+                  Shadow(color: CyberpunkTheme.neonCyan, blurRadius: 8)
+                ],
               ),
             ),
             const SizedBox(height: 32),
@@ -121,7 +124,8 @@ class QrProfilePage extends StatelessWidget {
               ),
               child: Text(
                 profileUrl,
-                style: const TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 12),
+                style: const TextStyle(
+                    color: CyberpunkTheme.textSecondary, fontSize: 12),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -131,7 +135,8 @@ class QrProfilePage extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('QR Scanner requires camera permission')),
+                  const SnackBar(
+                      content: Text('QR Scanner requires camera permission')),
                 );
               },
               icon: const Icon(Icons.qr_code_scanner_rounded),
@@ -139,8 +144,10 @@ class QrProfilePage extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 foregroundColor: CyberpunkTheme.neonCyan,
                 side: const BorderSide(color: CyberpunkTheme.neonCyan),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
             ),
           ],

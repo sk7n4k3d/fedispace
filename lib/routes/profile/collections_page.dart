@@ -12,7 +12,8 @@ class CollectionsPage extends StatefulWidget {
   final ApiService apiService;
   final String? accountId; // null = current user
 
-  const CollectionsPage({Key? key, required this.apiService, this.accountId}) : super(key: key);
+  const CollectionsPage({Key? key, required this.apiService, this.accountId})
+      : super(key: key);
 
   @override
   State<CollectionsPage> createState() => _CollectionsPageState();
@@ -47,15 +48,24 @@ class _CollectionsPageState extends State<CollectionsPage> {
     showModalBottomSheet(
       context: context,
       backgroundColor: CyberpunkTheme.surfaceDark,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, margin: const EdgeInsets.symmetric(vertical: 12), decoration: BoxDecoration(color: CyberpunkTheme.textTertiary, borderRadius: BorderRadius.circular(2))),
+            Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                    color: CyberpunkTheme.textTertiary,
+                    borderRadius: BorderRadius.circular(2))),
             ListTile(
-              leading: const Icon(Icons.edit_outlined, color: CyberpunkTheme.textWhite),
-              title: const Text('Rename collection', style: TextStyle(color: CyberpunkTheme.textWhite)),
+              leading: const Icon(Icons.edit_outlined,
+                  color: CyberpunkTheme.textWhite),
+              title: const Text('Rename collection',
+                  style: TextStyle(color: CyberpunkTheme.textWhite)),
               onTap: () {
                 Navigator.pop(ctx);
                 _showRenameDialog(collectionId, currentTitle);
@@ -63,7 +73,8 @@ class _CollectionsPageState extends State<CollectionsPage> {
             ),
             ListTile(
               leading: const Icon(Icons.delete_outline, color: Colors.red),
-              title: const Text('Delete collection', style: TextStyle(color: Colors.red)),
+              title: const Text('Delete collection',
+                  style: TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(ctx);
                 _showDeleteConfirm(collectionId);
@@ -82,7 +93,8 @@ class _CollectionsPageState extends State<CollectionsPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: CyberpunkTheme.surfaceDark,
-        title: const Text('Rename collection', style: TextStyle(color: CyberpunkTheme.textWhite)),
+        title: const Text('Rename collection',
+            style: TextStyle(color: CyberpunkTheme.textWhite)),
         content: TextField(
           controller: controller,
           style: const TextStyle(color: CyberpunkTheme.textWhite),
@@ -93,17 +105,23 @@ class _CollectionsPageState extends State<CollectionsPage> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(S.of(context).cancel)),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(S.of(context).cancel)),
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              final ok = await widget.apiService.updateCollection(collectionId, title: controller.text.trim());
+              final ok = await widget.apiService.updateCollection(collectionId,
+                  title: controller.text.trim());
               if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(ok ? S.of(context).success : S.of(context).error)));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(
+                        ok ? S.of(context).success : S.of(context).error)));
                 if (ok) _loadCollections();
               }
             },
-            child: Text(S.of(context).save, style: const TextStyle(color: CyberpunkTheme.neonCyan)),
+            child: Text(S.of(context).save,
+                style: const TextStyle(color: CyberpunkTheme.neonCyan)),
           ),
         ],
       ),
@@ -115,20 +133,27 @@ class _CollectionsPageState extends State<CollectionsPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: CyberpunkTheme.surfaceDark,
-        title: const Text('Delete collection?', style: TextStyle(color: CyberpunkTheme.textWhite)),
-        content: const Text('This cannot be undone.', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+        title: const Text('Delete collection?',
+            style: TextStyle(color: CyberpunkTheme.textWhite)),
+        content: const Text('This cannot be undone.',
+            style: TextStyle(color: CyberpunkTheme.textSecondary)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(S.of(context).cancel)),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(S.of(context).cancel)),
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
               final ok = await widget.apiService.deleteCollection(collectionId);
               if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(ok ? S.of(context).success : S.of(context).error)));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(
+                        ok ? S.of(context).success : S.of(context).error)));
                 if (ok) _loadCollections();
               }
             },
-            child: Text(S.of(context).delete, style: const TextStyle(color: Colors.red)),
+            child: Text(S.of(context).delete,
+                style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -142,7 +167,9 @@ class _CollectionsPageState extends State<CollectionsPage> {
       appBar: AppBar(
         backgroundColor: CyberpunkTheme.backgroundBlack,
         elevation: 0,
-        title: Text(S.of(context).collections, style: const TextStyle(color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700)),
+        title: Text(S.of(context).collections,
+            style: const TextStyle(
+                color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700)),
         iconTheme: const IconThemeData(color: CyberpunkTheme.neonCyan),
       ),
       body: _isLoading
@@ -152,9 +179,14 @@ class _CollectionsPageState extends State<CollectionsPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.collections_outlined, size: 56, color: CyberpunkTheme.neonCyan.withOpacity(0.3)),
+                      Icon(Icons.collections_outlined,
+                          size: 56,
+                          color: CyberpunkTheme.neonCyan.withOpacity(0.3)),
                       const SizedBox(height: 16),
-                      Text(S.of(context).noCollections, style: const TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 16)),
+                      Text(S.of(context).noCollections,
+                          style: const TextStyle(
+                              color: CyberpunkTheme.textSecondary,
+                              fontSize: 16)),
                     ],
                   ),
                 )
@@ -169,63 +201,89 @@ class _CollectionsPageState extends State<CollectionsPage> {
                       final title = col['title'] ?? 'Untitled';
                       final description = col['description'] ?? '';
                       final thumbUrl = col['thumb'] ?? col['thumbnail'] ?? '';
-                      final postCount = col['post_count'] ?? col['items_count'] ?? 0;
+                      final postCount =
+                          col['post_count'] ?? col['items_count'] ?? 0;
 
                       return GestureDetector(
-                        onTap: () => _openCollection(col['id'].toString(), title),
-                        onLongPress: () => _showCollectionOptions(col['id'].toString(), title),
+                        onTap: () =>
+                            _openCollection(col['id'].toString(), title),
+                        onLongPress: () =>
+                            _showCollectionOptions(col['id'].toString(), title),
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 12),
                           decoration: BoxDecoration(
                             color: CyberpunkTheme.cardDark,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: CyberpunkTheme.borderDark),
+                            border:
+                                Border.all(color: CyberpunkTheme.borderDark),
                           ),
                           child: Row(
                             children: [
                               if (thumbUrl.isNotEmpty)
                                 ClipRRect(
-                                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(12)),
+                                  borderRadius: const BorderRadius.horizontal(
+                                      left: Radius.circular(12)),
                                   child: CachedNetworkImage(
                                     imageUrl: thumbUrl,
                                     width: 80,
                                     height: 80,
                                     fit: BoxFit.cover,
                                     errorWidget: (_, __, ___) => Container(
-                                      width: 80, height: 80,
+                                      width: 80,
+                                      height: 80,
                                       color: CyberpunkTheme.surfaceDark,
-                                      child: const Icon(Icons.image, color: CyberpunkTheme.textTertiary),
+                                      child: const Icon(Icons.image,
+                                          color: CyberpunkTheme.textTertiary),
                                     ),
                                   ),
                                 )
                               else
                                 Container(
-                                  width: 80, height: 80,
+                                  width: 80,
+                                  height: 80,
                                   decoration: BoxDecoration(
                                     color: CyberpunkTheme.surfaceDark,
-                                    borderRadius: const BorderRadius.horizontal(left: Radius.circular(12)),
+                                    borderRadius: const BorderRadius.horizontal(
+                                        left: Radius.circular(12)),
                                   ),
-                                  child: const Icon(Icons.collections_outlined, color: CyberpunkTheme.neonCyan, size: 32),
+                                  child: const Icon(Icons.collections_outlined,
+                                      color: CyberpunkTheme.neonCyan, size: 32),
                                 ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text(title, style: const TextStyle(color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w600, fontSize: 15)),
+                                      Text(title,
+                                          style: const TextStyle(
+                                              color: CyberpunkTheme.textWhite,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 15)),
                                       if (description.isNotEmpty) ...[
                                         const SizedBox(height: 4),
-                                        Text(description, style: const TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                        Text(description,
+                                            style: const TextStyle(
+                                                color: CyberpunkTheme
+                                                    .textSecondary,
+                                                fontSize: 12),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis),
                                       ],
                                       const SizedBox(height: 4),
-                                      Text('$postCount posts', style: const TextStyle(color: CyberpunkTheme.neonCyan, fontSize: 12)),
+                                      Text('$postCount posts',
+                                          style: const TextStyle(
+                                              color: CyberpunkTheme.neonCyan,
+                                              fontSize: 12)),
                                     ],
                                   ),
                                 ),
                               ),
-                              const Icon(Icons.chevron_right, color: CyberpunkTheme.textTertiary),
+                              const Icon(Icons.chevron_right,
+                                  color: CyberpunkTheme.textTertiary),
                               const SizedBox(width: 8),
                             ],
                           ),
@@ -269,7 +327,13 @@ class _CollectionDetailPage extends StatelessWidget {
   final ApiService apiService;
   final VoidCallback? onUpdated;
 
-  const _CollectionDetailPage({required this.collectionId, required this.title, this.description = '', required this.items, required this.apiService, this.onUpdated});
+  const _CollectionDetailPage(
+      {required this.collectionId,
+      required this.title,
+      this.description = '',
+      required this.items,
+      required this.apiService,
+      this.onUpdated});
 
   @override
   Widget build(BuildContext context) {
@@ -278,11 +342,15 @@ class _CollectionDetailPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: CyberpunkTheme.backgroundBlack,
         elevation: 0,
-        title: Text(title, style: const TextStyle(color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700)),
+        title: Text(title,
+            style: const TextStyle(
+                color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700)),
         iconTheme: const IconThemeData(color: CyberpunkTheme.neonCyan),
       ),
       body: items.isEmpty
-          ? Center(child: Text(S.of(context).emptyCollection, style: const TextStyle(color: CyberpunkTheme.textSecondary)))
+          ? Center(
+              child: Text(S.of(context).emptyCollection,
+                  style: const TextStyle(color: CyberpunkTheme.textSecondary)))
           : GridView.builder(
               padding: const EdgeInsets.all(2),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -296,13 +364,16 @@ class _CollectionDetailPage extends StatelessWidget {
                 final imageUrl = post.hasMediaAttachments ? post.attach : '';
                 return GestureDetector(
                   onTap: () {
-                    Navigator.pushNamed(context, '/PostDetail', arguments: {'post': post, 'apiService': apiService});
+                    Navigator.pushNamed(context, '/PostDetail',
+                        arguments: {'post': post, 'apiService': apiService});
                   },
                   child: imageUrl.isNotEmpty
-                      ? CachedNetworkImage(imageUrl: imageUrl, fit: BoxFit.cover)
+                      ? CachedNetworkImage(
+                          imageUrl: imageUrl, fit: BoxFit.cover)
                       : Container(
                           color: CyberpunkTheme.cardDark,
-                          child: const Icon(Icons.article_outlined, color: CyberpunkTheme.textTertiary),
+                          child: const Icon(Icons.article_outlined,
+                              color: CyberpunkTheme.textTertiary),
                         ),
                 );
               },

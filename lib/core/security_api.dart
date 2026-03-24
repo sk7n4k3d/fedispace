@@ -61,7 +61,8 @@ class SecurityApi {
     }
   }
 
-  Future<bool> changePassword(String currentPassword, String newPassword) async {
+  Future<bool> changePassword(
+      String currentPassword, String newPassword) async {
     try {
       final response = await apiService.helper!.post(
         '$_baseUrl/api/v1/security/password',

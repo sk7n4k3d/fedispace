@@ -42,7 +42,8 @@ class NavBar extends StatelessWidget {
                 bottomRight: Radius.circular(20),
               ),
               border: Border(
-                right: BorderSide(color: CyberpunkTheme.neonCyan.withOpacity(0.15), width: 1),
+                right: BorderSide(
+                    color: CyberpunkTheme.neonCyan.withOpacity(0.15), width: 1),
               ),
             ),
             child: SafeArea(
@@ -56,14 +57,17 @@ class NavBar extends StatelessWidget {
                         Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: CyberpunkTheme.neonCyan.withOpacity(0.4), width: 1.5),
+                            border: Border.all(
+                                color: CyberpunkTheme.neonCyan.withOpacity(0.4),
+                                width: 1.5),
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(2),
                             child: CircleAvatar(
                               radius: 22,
                               backgroundColor: CyberpunkTheme.cardDark,
-                              backgroundImage: account?.avatarUrl != null && account!.avatarUrl.isNotEmpty
+                              backgroundImage: account?.avatarUrl != null &&
+                                      account!.avatarUrl.isNotEmpty
                                   ? CachedNetworkImageProvider(avatarurl())
                                   : null,
                             ),
@@ -98,9 +102,9 @@ class NavBar extends StatelessWidget {
                       ],
                     ),
                   ),
-                  
+
                   Container(height: 0.5, color: CyberpunkTheme.borderDark),
-                  
+
                   // Menu Items
                   Expanded(
                     child: ListView(
@@ -114,12 +118,14 @@ class NavBar extends StatelessWidget {
                         _DrawerItem(
                           icon: Icons.notifications_none_rounded,
                           label: 'Notifications',
-                          onTap: () => Navigator.pushNamed(context, '/Notification'),
+                          onTap: () =>
+                              Navigator.pushNamed(context, '/Notification'),
                         ),
                         _DrawerItem(
                           icon: Icons.mail_outline_rounded,
                           label: 'Messages',
-                          onTap: () => Navigator.pushNamed(context, '/DirectMessages'),
+                          onTap: () =>
+                              Navigator.pushNamed(context, '/DirectMessages'),
                         ),
                         _DrawerItem(
                           icon: Icons.explore_outlined,
@@ -131,23 +137,24 @@ class NavBar extends StatelessWidget {
                           label: 'Search',
                           onTap: () => Navigator.pushNamed(context, '/Search'),
                         ),
-                        
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: Container(height: 0.5, color: CyberpunkTheme.borderDark),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          child: Container(
+                              height: 0.5, color: CyberpunkTheme.borderDark),
                         ),
-                        
                         _DrawerItem(
                           icon: Icons.settings_outlined,
                           label: 'Settings',
-                          onTap: () => Navigator.pushNamed(context, '/Settings'),
+                          onTap: () =>
+                              Navigator.pushNamed(context, '/Settings'),
                         ),
                       ],
                     ),
                   ),
-                  
+
                   Container(height: 0.5, color: CyberpunkTheme.borderDark),
-                  
+
                   // Logout
                   _DrawerItem(
                     icon: Icons.logout_rounded,
@@ -168,14 +175,16 @@ class NavBar extends StatelessWidget {
             width: 260,
             color: CyberpunkTheme.surfaceDark,
             child: const Center(
-              child: Text('Error loading menu', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+              child: Text('Error loading menu',
+                  style: TextStyle(color: CyberpunkTheme.textSecondary)),
             ),
           );
         }
         return Container(
           width: 260,
           color: CyberpunkTheme.surfaceDark,
-          child: const Center(child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan)),
+          child: const Center(
+              child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan)),
         );
       },
     );
@@ -207,7 +216,8 @@ class _DrawerItem extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           child: Row(
             children: [
-              Icon(icon, size: 22, color: color ?? CyberpunkTheme.textSecondary),
+              Icon(icon,
+                  size: 22, color: color ?? CyberpunkTheme.textSecondary),
               const SizedBox(width: 16),
               Text(
                 label,

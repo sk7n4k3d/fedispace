@@ -19,8 +19,7 @@ class LoopsAuth {
   static Future<void> storeToken(String token) async =>
       await _storage.write(key: _tokenKey, value: token);
 
-  static Future<bool> isAuthenticated() async =>
-      await getStoredToken() != null;
+  static Future<bool> isAuthenticated() async => await getStoredToken() != null;
 
   static Future<LoopsApi> getAuthenticatedClient() async {
     final token = await getStoredToken();
@@ -34,12 +33,14 @@ class LoopsAuth {
       return {'client_id': clientId, 'client_secret': clientSecret};
     }
 
-    debugPrint('[LOOPS AUTH] registerApp: starting HTTP request to $_instanceUrl/api/v1/apps');
+    debugPrint(
+        '[LOOPS AUTH] registerApp: starting HTTP request to $_instanceUrl/api/v1/apps');
     final client = HttpClient();
     client.connectionTimeout = const Duration(seconds: 15);
     client.userAgent = 'Mozilla/5.0 (Linux; Android) FediSpace/0.1.5';
     try {
-      final request = await client.postUrl(Uri.parse('$_instanceUrl/api/v1/apps'));
+      final request =
+          await client.postUrl(Uri.parse('$_instanceUrl/api/v1/apps'));
       request.headers.set('Content-Type', 'application/json');
       request.headers.set('Accept', 'application/json');
       request.write(jsonEncode({
@@ -47,9 +48,11 @@ class LoopsAuth {
         'redirect_uris': [_redirectUri],
         'scopes': _scopes,
       }));
-      debugPrint('[LOOPS AUTH] registerApp: request sent, waiting for response...');
+      debugPrint(
+          '[LOOPS AUTH] registerApp: request sent, waiting for response...');
       final response = await request.close();
-      debugPrint('[LOOPS AUTH] registerApp: got response status ${response.statusCode}');
+      debugPrint(
+          '[LOOPS AUTH] registerApp: got response status ${response.statusCode}');
       final body = await response.transform(utf8.decoder).join();
       final result = jsonDecode(body) as Map<String, dynamic>;
       debugPrint('[LOOPS AUTH] registerApp: result=$result');
@@ -75,13 +78,16 @@ class LoopsAuth {
 
   static Future<void> exchangeCode(String code) async {
     final creds = await registerApp();
-    debugPrint('[LOOPS AUTH] registerApp: starting HTTP request to $_instanceUrl/api/v1/apps');
+    debugPrint(
+        '[LOOPS AUTH] registerApp: starting HTTP request to $_instanceUrl/api/v1/apps');
     final client = HttpClient();
     client.connectionTimeout = const Duration(seconds: 15);
     client.userAgent = 'Mozilla/5.0 (Linux; Android) FediSpace/0.1.5';
     try {
-      debugPrint('[LOOPS AUTH] exchangeCode: posting to $_instanceUrl/oauth/token');
-      final request = await client.postUrl(Uri.parse('$_instanceUrl/oauth/token'));
+      debugPrint(
+          '[LOOPS AUTH] exchangeCode: posting to $_instanceUrl/oauth/token');
+      final request =
+          await client.postUrl(Uri.parse('$_instanceUrl/oauth/token'));
       request.headers.set('Content-Type', 'application/json');
       request.headers.set('Accept', 'application/json');
       request.write(jsonEncode({
@@ -91,9 +97,11 @@ class LoopsAuth {
         'grant_type': 'authorization_code',
         'code': code,
       }));
-      debugPrint('[LOOPS AUTH] registerApp: request sent, waiting for response...');
+      debugPrint(
+          '[LOOPS AUTH] registerApp: request sent, waiting for response...');
       final response = await request.close();
-      debugPrint('[LOOPS AUTH] registerApp: got response status ${response.statusCode}');
+      debugPrint(
+          '[LOOPS AUTH] registerApp: got response status ${response.statusCode}');
       final body = await response.transform(utf8.decoder).join();
       final result = jsonDecode(body) as Map<String, dynamic>;
       final token = result['access_token']?.toString();

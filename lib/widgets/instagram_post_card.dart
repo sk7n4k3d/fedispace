@@ -44,7 +44,6 @@ class _InstagramPostCardState extends State<InstagramPostCard>
   late AnimationController _likeAnimationController;
   late Animation<double> _likeAnimation;
 
-  
   late bool _isFavorited;
   late int _favouritesCount;
   late bool _isBookmarked;
@@ -70,16 +69,15 @@ class _InstagramPostCardState extends State<InstagramPostCard>
         curve: Curves.easeOut,
       ),
     );
-
   }
-  
+
   @override
   void didUpdateWidget(InstagramPostCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.status != oldWidget.status) {
-       _isFavorited = widget.status.favorited;
-       _favouritesCount = widget.status.favourites_count;
-       _isBookmarked = widget.status.reblogged;
+      _isFavorited = widget.status.favorited;
+      _favouritesCount = widget.status.favourites_count;
+      _isBookmarked = widget.status.reblogged;
     }
   }
 
@@ -95,8 +93,8 @@ class _InstagramPostCardState extends State<InstagramPostCard>
       _likeAnimationController.forward(from: 0.0);
       widget.onLike?.call();
       setState(() {
-         _isFavorited = true;
-         _favouritesCount++;
+        _isFavorited = true;
+        _favouritesCount++;
       });
     } else {
       // Still show heart animation even if already liked
@@ -120,7 +118,8 @@ class _InstagramPostCardState extends State<InstagramPostCard>
         opaque: false,
         barrierColor: Colors.black87,
         pageBuilder: (context, animation, secondaryAnimation) {
-          return _FullScreenImageView(imageUrl: imageUrl, heroTag: 'post_image_${widget.status.id}');
+          return _FullScreenImageView(
+              imageUrl: imageUrl, heroTag: 'post_image_${widget.status.id}');
         },
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
@@ -131,7 +130,7 @@ class _InstagramPostCardState extends State<InstagramPostCard>
 
   Future<void> _translateContent() async {
     if (_isTranslating) return;
-    
+
     // Toggle off if already translated
     if (_translatedContent != null) {
       setState(() => _translatedContent = null);
@@ -141,7 +140,8 @@ class _InstagramPostCardState extends State<InstagramPostCard>
     setState(() => _isTranslating = true);
     try {
       final prefs = await SharedPreferences.getInstance();
-      final provider = prefs.getString('translate_provider') ?? 'libretranslate';
+      final provider =
+          prefs.getString('translate_provider') ?? 'libretranslate';
       final targetLang = prefs.getString('translate_target_lang') ?? 'en';
 
       // Strip HTML tags for translation
@@ -163,15 +163,21 @@ class _InstagramPostCardState extends State<InstagramPostCard>
 
       if (provider == 'openai') {
         // ── OpenAI translation ──
-        final endpoint = prefs.getString('openai_translate_endpoint') ?? 'https://api.openai.com/v1/chat/completions';
+        final endpoint = prefs.getString('openai_translate_endpoint') ??
+            'https://api.openai.com/v1/chat/completions';
         // SECURITY: Read API keys from encrypted secure storage
         const secureStorage = FlutterSecureStorage();
-        final apiKey = await secureStorage.read(key: 'openai_translate_api_key') ?? '';
+        final apiKey =
+            await secureStorage.read(key: 'openai_translate_api_key') ?? '';
         if (apiKey.isEmpty) {
           setState(() => _isTranslating = false);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: const Text('OpenAI API key not set. Go to Settings → Translation.'), backgroundColor: Colors.red.shade800, behavior: SnackBarBehavior.floating),
+              SnackBar(
+                  content: const Text(
+                      'OpenAI API key not set. Go to Settings → Translation.'),
+                  backgroundColor: Colors.red.shade800,
+                  behavior: SnackBarBehavior.floating),
             );
           }
           return;
@@ -179,11 +185,26 @@ class _InstagramPostCardState extends State<InstagramPostCard>
 
         // Map lang code to full name for better LLM understanding
         const langNames = {
-          'en': 'English', 'fr': 'French', 'es': 'Spanish', 'de': 'German',
-          'it': 'Italian', 'pt': 'Portuguese', 'nl': 'Dutch', 'ru': 'Russian',
-          'zh': 'Chinese', 'ja': 'Japanese', 'ko': 'Korean', 'ar': 'Arabic',
-          'hi': 'Hindi', 'tr': 'Turkish', 'pl': 'Polish', 'sv': 'Swedish',
-          'da': 'Danish', 'fi': 'Finnish', 'no': 'Norwegian', 'uk': 'Ukrainian',
+          'en': 'English',
+          'fr': 'French',
+          'es': 'Spanish',
+          'de': 'German',
+          'it': 'Italian',
+          'pt': 'Portuguese',
+          'nl': 'Dutch',
+          'ru': 'Russian',
+          'zh': 'Chinese',
+          'ja': 'Japanese',
+          'ko': 'Korean',
+          'ar': 'Arabic',
+          'hi': 'Hindi',
+          'tr': 'Turkish',
+          'pl': 'Polish',
+          'sv': 'Swedish',
+          'da': 'Danish',
+          'fi': 'Finnish',
+          'no': 'Norwegian',
+          'uk': 'Ukrainian',
         };
         final langName = langNames[targetLang] ?? targetLang;
 
@@ -196,7 +217,11 @@ class _InstagramPostCardState extends State<InstagramPostCard>
           body: jsonEncode({
             'model': 'gpt-4o-mini',
             'messages': [
-              {'role': 'system', 'content': 'You are a translator. Translate the following text to $langName. Return ONLY the translated text, nothing else.'},
+              {
+                'role': 'system',
+                'content':
+                    'You are a translator. Translate the following text to $langName. Return ONLY the translated text, nothing else.'
+              },
               {'role': 'user', 'content': plainText},
             ],
             'max_tokens': 1000,
@@ -206,7 +231,8 @@ class _InstagramPostCardState extends State<InstagramPostCard>
 
         if (response.statusCode == 200) {
           final data = jsonDecode(response.body);
-          translated = data['choices']?[0]?['message']?['content']?.toString().trim();
+          translated =
+              data['choices']?[0]?['message']?['content']?.toString().trim();
         } else {
           String errMsg = 'OpenAI translation failed (${response.statusCode})';
           try {
@@ -217,10 +243,12 @@ class _InstagramPostCardState extends State<InstagramPostCard>
         }
       } else {
         // ── LibreTranslate ──
-        final baseUrl = prefs.getString('libretranslate_url') ?? 'https://libretranslate.com';
+        final baseUrl = prefs.getString('libretranslate_url') ??
+            'https://libretranslate.com';
         // SECURITY: Read API keys from encrypted secure storage
         const secureStorage = FlutterSecureStorage();
-        final apiKey = await secureStorage.read(key: 'libretranslate_api_key') ?? '';
+        final apiKey =
+            await secureStorage.read(key: 'libretranslate_api_key') ?? '';
 
         final body = <String, dynamic>{
           'q': plainText,
@@ -259,7 +287,10 @@ class _InstagramPostCardState extends State<InstagramPostCard>
       setState(() => _isTranslating = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Translation error: $e'), backgroundColor: Colors.red.shade800, behavior: SnackBarBehavior.floating),
+          SnackBar(
+              content: Text('Translation error: $e'),
+              backgroundColor: Colors.red.shade800,
+              behavior: SnackBarBehavior.floating),
         );
       }
     }
@@ -277,7 +308,8 @@ class _InstagramPostCardState extends State<InstagramPostCard>
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 36, height: 4,
+              width: 36,
+              height: 4,
               margin: const EdgeInsets.only(top: 12, bottom: 16),
               decoration: BoxDecoration(
                 color: CyberpunkTheme.borderDark,
@@ -288,15 +320,16 @@ class _InstagramPostCardState extends State<InstagramPostCard>
               Navigator.pop(ctx);
               SocialActions.shareStatus(widget.status);
             }),
-            _sheetTile(Icons.open_in_browser_rounded, S.of(context).openInBrowser, () {
+            _sheetTile(
+                Icons.open_in_browser_rounded, S.of(context).openInBrowser, () {
               Navigator.pop(ctx);
               final url = widget.status.url;
               if (url.isNotEmpty) {
-              final uri = Uri.parse(url);
-              if (uri.scheme == 'http' || uri.scheme == 'https') {
-                launchUrl(uri, mode: LaunchMode.externalApplication);
+                final uri = Uri.parse(url);
+                if (uri.scheme == 'http' || uri.scheme == 'https') {
+                  launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
               }
-            }
             }),
             _sheetTile(Icons.link_rounded, S.of(context).copyLink, () {
               Navigator.pop(ctx);
@@ -308,7 +341,8 @@ class _InstagramPostCardState extends State<InstagramPostCard>
                     content: Text(S.of(context).linkCopied),
                     backgroundColor: CyberpunkTheme.cardDark,
                     behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
                   ),
                 );
               }
@@ -323,7 +357,9 @@ class _InstagramPostCardState extends State<InstagramPostCard>
   Widget _sheetTile(IconData icon, String label, VoidCallback onTap) {
     return ListTile(
       leading: Icon(icon, color: CyberpunkTheme.textWhite, size: 22),
-      title: Text(label, style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 15)),
+      title: Text(label,
+          style:
+              const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 15)),
       onTap: onTap,
       dense: true,
     );
@@ -361,7 +397,9 @@ class _InstagramPostCardState extends State<InstagramPostCard>
             child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: CyberpunkTheme.neonCyan.withOpacity(0.3), width: 1.5),
+                border: Border.all(
+                    color: CyberpunkTheme.neonCyan.withOpacity(0.3),
+                    width: 1.5),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(2),
@@ -374,7 +412,8 @@ class _InstagramPostCardState extends State<InstagramPostCard>
                         ? CachedNetworkImageProvider(widget.status.avatar)
                         : null,
                     child: widget.status.avatar.isEmpty
-                        ? const Icon(Icons.person, size: 16, color: CyberpunkTheme.textTertiary)
+                        ? const Icon(Icons.person,
+                            size: 16, color: CyberpunkTheme.textTertiary)
                         : null,
                   ),
                 ),
@@ -396,9 +435,10 @@ class _InstagramPostCardState extends State<InstagramPostCard>
             ),
           ),
           GestureDetector(
-          onTap: () => _showMoreSheet(context),
-          child: const Icon(Icons.more_horiz_rounded, size: 20, color: CyberpunkTheme.textSecondary),
-        ),
+            onTap: () => _showMoreSheet(context),
+            child: const Icon(Icons.more_horiz_rounded,
+                size: 20, color: CyberpunkTheme.textSecondary),
+          ),
         ],
       ),
     );
@@ -409,8 +449,11 @@ class _InstagramPostCardState extends State<InstagramPostCard>
   Widget _buildMedia(BuildContext context) {
     final allMedia = widget.status.getAllMedia();
     final firstMedia = widget.status.getFirstMedia();
-    final isVideoType = firstMedia != null && (firstMedia['type'] == 'video' || firstMedia['type'] == 'gifv');
-    final isVideoExtension = widget.status.attach.toLowerCase().contains('.mp4') || widget.status.attach.toLowerCase().contains('.mov');
+    final isVideoType = firstMedia != null &&
+        (firstMedia['type'] == 'video' || firstMedia['type'] == 'gifv');
+    final isVideoExtension =
+        widget.status.attach.toLowerCase().contains('.mp4') ||
+            widget.status.attach.toLowerCase().contains('.mov');
     final isVideo = isVideoType || isVideoExtension;
 
     // Multi-image carousel
@@ -444,7 +487,8 @@ class _InstagramPostCardState extends State<InstagramPostCard>
                     ),
                     errorWidget: (context, url, error) => Container(
                       color: CyberpunkTheme.cardDark,
-                      child: const Icon(Icons.broken_image_outlined, color: CyberpunkTheme.textTertiary, size: 32),
+                      child: const Icon(Icons.broken_image_outlined,
+                          color: CyberpunkTheme.textTertiary, size: 32),
                     ),
                   ),
                 );
@@ -463,7 +507,10 @@ class _InstagramPostCardState extends State<InstagramPostCard>
               ),
               child: Text(
                 '${_mediaPageIndex + 1}/${allMedia.length}',
-                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -483,7 +530,11 @@ class _InstagramPostCardState extends State<InstagramPostCard>
                         ? CyberpunkTheme.neonCyan
                         : CyberpunkTheme.textTertiary.withOpacity(0.5),
                     boxShadow: _mediaPageIndex == i
-                        ? [BoxShadow(color: CyberpunkTheme.neonCyan.withOpacity(0.5), blurRadius: 4)]
+                        ? [
+                            BoxShadow(
+                                color: CyberpunkTheme.neonCyan.withOpacity(0.5),
+                                blurRadius: 4)
+                          ]
                         : null,
                   ),
                 );
@@ -512,7 +563,8 @@ class _InstagramPostCardState extends State<InstagramPostCard>
                 opacity: opacity.clamp(0.0, 1.0),
                 child: Transform.scale(
                   scale: scale.clamp(0.0, 1.5),
-                  child: const Icon(Icons.favorite, color: Color(0xFFFF00FF), size: 100),
+                  child: const Icon(Icons.favorite,
+                      color: Color(0xFFFF00FF), size: 100),
                 ),
               );
             },
@@ -538,20 +590,21 @@ class _InstagramPostCardState extends State<InstagramPostCard>
           Hero(
             tag: 'post_image_${widget.status.id}',
             child: AspectRatio(
-            aspectRatio: 1.0,
-            child: CachedNetworkImage(
-              imageUrl: widget.status.attach,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => Container(
-                color: CyberpunkTheme.cardDark,
-                child: const Center(child: InstagramLoadingIndicator()),
-              ),
-              errorWidget: (context, url, error) => Container(
-                color: CyberpunkTheme.cardDark,
-                child: const Icon(Icons.broken_image_outlined, color: CyberpunkTheme.textTertiary, size: 32),
+              aspectRatio: 1.0,
+              child: CachedNetworkImage(
+                imageUrl: widget.status.attach,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  color: CyberpunkTheme.cardDark,
+                  child: const Center(child: InstagramLoadingIndicator()),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  color: CyberpunkTheme.cardDark,
+                  child: const Icon(Icons.broken_image_outlined,
+                      color: CyberpunkTheme.textTertiary, size: 32),
+                ),
               ),
             ),
-          ),
           ),
           AnimatedBuilder(
             animation: _likeAnimation,
@@ -599,7 +652,9 @@ class _InstagramPostCardState extends State<InstagramPostCard>
         children: [
           _ActionIcon(
             icon: _isFavorited ? Icons.favorite : Icons.favorite_border_rounded,
-            color: _isFavorited ? CyberpunkTheme.neonPink : CyberpunkTheme.textWhite,
+            color: _isFavorited
+                ? CyberpunkTheme.neonPink
+                : CyberpunkTheme.textWhite,
             onTap: () {
               widget.onLike?.call();
               setState(() {
@@ -625,7 +680,9 @@ class _InstagramPostCardState extends State<InstagramPostCard>
           ),
           const Spacer(),
           _ActionIcon(
-            icon: _isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+            icon: _isBookmarked
+                ? Icons.bookmark_rounded
+                : Icons.bookmark_border_rounded,
             color: _isBookmarked ? CyberpunkTheme.neonCyan : null,
             onTap: () {
               widget.onBookmark?.call();
@@ -661,103 +718,116 @@ class _InstagramPostCardState extends State<InstagramPostCard>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-           Text(
-             widget.status.acct,
-             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: CyberpunkTheme.textWhite),
-           ),
-           // TODO(security): Sanitize HTML content from server before rendering to prevent XSS.
-           // Consider using a sanitizer package like html_sanitize or a whitelist approach.
-           Html(
-             data: widget.status.content,
-             style: {
-               "body": Style(
-                 margin: Margins.zero,
-                 padding: HtmlPaddings.zero,
-                 fontSize: FontSize(14),
-                 color: CyberpunkTheme.textWhite,
-                 lineHeight: LineHeight(1.4),
-               ),
-               "a": Style(
-                 color: CyberpunkTheme.neonCyan,
-                 textDecoration: TextDecoration.none,
-                 fontWeight: FontWeight.w500,
-               ),
-             },
-             onLinkTap: (url, attributes, element) async {
-                if (url == null) return;
-                
-                if (url.contains('/tags/')) {
-                  try {
-                    final uri = Uri.parse(url);
-                    final segments = uri.pathSegments;
-                    final tagIndex = segments.indexOf('tags');
-                    if (tagIndex != -1 && tagIndex + 1 < segments.length) {
-                      final tag = segments[tagIndex + 1];
-                      Navigator.pushNamed(context, '/TagTimeline', arguments: {'tag': tag});
-                      return;
-                    }
-                  } catch (e) {
-                    // ignore
-                  }
-                }
-                
+          Text(
+            widget.status.acct,
+            style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                color: CyberpunkTheme.textWhite),
+          ),
+          // TODO(security): Sanitize HTML content from server before rendering to prevent XSS.
+          // Consider using a sanitizer package like html_sanitize or a whitelist approach.
+          Html(
+            data: widget.status.content,
+            style: {
+              "body": Style(
+                margin: Margins.zero,
+                padding: HtmlPaddings.zero,
+                fontSize: FontSize(14),
+                color: CyberpunkTheme.textWhite,
+                lineHeight: LineHeight(1.4),
+              ),
+              "a": Style(
+                color: CyberpunkTheme.neonCyan,
+                textDecoration: TextDecoration.none,
+                fontWeight: FontWeight.w500,
+              ),
+            },
+            onLinkTap: (url, attributes, element) async {
+              if (url == null) return;
+
+              if (url.contains('/tags/')) {
                 try {
                   final uri = Uri.parse(url);
-                  if ((uri.scheme == 'http' || uri.scheme == 'https') && await canLaunchUrl(uri)) {
-                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  final segments = uri.pathSegments;
+                  final tagIndex = segments.indexOf('tags');
+                  if (tagIndex != -1 && tagIndex + 1 < segments.length) {
+                    final tag = segments[tagIndex + 1];
+                    Navigator.pushNamed(context, '/TagTimeline',
+                        arguments: {'tag': tag});
+                    return;
                   }
                 } catch (e) {
                   // ignore
                 }
-             },
-           ),
-           // Translated content
-           if (_translatedContent != null)
-             Container(
-               margin: const EdgeInsets.only(top: 6),
-               padding: const EdgeInsets.all(10),
-               decoration: BoxDecoration(
-                 color: CyberpunkTheme.neonCyan.withOpacity(0.06),
-                 borderRadius: BorderRadius.circular(8),
-                 border: Border.all(color: CyberpunkTheme.neonCyan.withOpacity(0.15)),
-               ),
-               child: Text(
-                 _translatedContent!,
-                 style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 14, height: 1.4),
-               ),
-             ),
-           // Translate button
-           GestureDetector(
-             onTap: _translateContent,
-             child: Padding(
-               padding: const EdgeInsets.only(top: 4),
-               child: Row(
-                 mainAxisSize: MainAxisSize.min,
-                 children: [
-                   if (_isTranslating)
-                     const SizedBox(
-                       width: 12, height: 12,
-                       child: CircularProgressIndicator(strokeWidth: 1.5, color: CyberpunkTheme.neonCyan),
-                     )
-                   else
-                     Icon(
-                       _translatedContent != null ? Icons.undo_rounded : Icons.translate_rounded,
-                       size: 14,
-                       color: CyberpunkTheme.neonCyan.withOpacity(0.7),
-                     ),
-                   const SizedBox(width: 4),
-                   Text(
-                     _translatedContent != null ? S.of(context).showOriginal : S.of(context).translate,
-                     style: TextStyle(
-                       color: CyberpunkTheme.neonCyan.withOpacity(0.7),
-                       fontSize: 13,
-                       fontWeight: FontWeight.w500,
-                     ),
-                   ),
-                 ],
-               ),
-             ),
-           ),
+              }
+
+              try {
+                final uri = Uri.parse(url);
+                if ((uri.scheme == 'http' || uri.scheme == 'https') &&
+                    await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
+              } catch (e) {
+                // ignore
+              }
+            },
+          ),
+          // Translated content
+          if (_translatedContent != null)
+            Container(
+              margin: const EdgeInsets.only(top: 6),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: CyberpunkTheme.neonCyan.withOpacity(0.06),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                    color: CyberpunkTheme.neonCyan.withOpacity(0.15)),
+              ),
+              child: Text(
+                _translatedContent!,
+                style: const TextStyle(
+                    color: CyberpunkTheme.textWhite, fontSize: 14, height: 1.4),
+              ),
+            ),
+          // Translate button
+          GestureDetector(
+            onTap: _translateContent,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_isTranslating)
+                    const SizedBox(
+                      width: 12,
+                      height: 12,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 1.5, color: CyberpunkTheme.neonCyan),
+                    )
+                  else
+                    Icon(
+                      _translatedContent != null
+                          ? Icons.undo_rounded
+                          : Icons.translate_rounded,
+                      size: 14,
+                      color: CyberpunkTheme.neonCyan.withOpacity(0.7),
+                    ),
+                  const SizedBox(width: 4),
+                  Text(
+                    _translatedContent != null
+                        ? S.of(context).showOriginal
+                        : S.of(context).translate,
+                    style: TextStyle(
+                      color: CyberpunkTheme.neonCyan.withOpacity(0.7),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -770,7 +840,8 @@ class _InstagramPostCardState extends State<InstagramPostCard>
         onTap: widget.onComment,
         child: Text(
           '${S.of(context).viewAllComments} (${widget.status.replies_count})',
-          style: const TextStyle(fontSize: 14, color: CyberpunkTheme.textSecondary),
+          style: const TextStyle(
+              fontSize: 14, color: CyberpunkTheme.textSecondary),
         ),
       ),
     );
@@ -790,7 +861,8 @@ class _InstagramPostCardState extends State<InstagramPostCard>
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
       child: Text(
         timeago.format(createdAt, locale: 'en_short'),
-        style: const TextStyle(fontSize: 12, color: CyberpunkTheme.textTertiary),
+        style:
+            const TextStyle(fontSize: 12, color: CyberpunkTheme.textTertiary),
       ),
     );
   }
@@ -821,7 +893,6 @@ class _ActionIcon extends StatelessWidget {
   }
 }
 
-
 // ── Full-screen image viewer with pinch-to-zoom ──────────────────────────
 class _FullScreenImageView extends StatefulWidget {
   final String imageUrl;
@@ -837,7 +908,8 @@ class _FullScreenImageView extends StatefulWidget {
 }
 
 class _FullScreenImageViewState extends State<_FullScreenImageView> {
-  final TransformationController _transformController = TransformationController();
+  final TransformationController _transformController =
+      TransformationController();
   TapDownDetails? _doubleTapDetails;
 
   @override
@@ -865,7 +937,8 @@ class _FullScreenImageViewState extends State<_FullScreenImageView> {
         onVerticalDragEnd: (details) {
           // Only allow swipe-to-close when not zoomed
           if (_transformController.value == Matrix4.identity() &&
-              details.primaryVelocity != null && details.primaryVelocity! > 300) {
+              details.primaryVelocity != null &&
+              details.primaryVelocity! > 300) {
             Navigator.of(context).pop();
           }
         },
@@ -883,7 +956,8 @@ class _FullScreenImageViewState extends State<_FullScreenImageView> {
                     imageUrl: widget.imageUrl,
                     fit: BoxFit.contain,
                     placeholder: (_, __) => const Center(
-                      child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan),
+                      child: CircularProgressIndicator(
+                          color: CyberpunkTheme.neonCyan),
                     ),
                     errorWidget: (_, __, ___) => const Icon(
                       Icons.broken_image_rounded,
@@ -905,7 +979,8 @@ class _FullScreenImageViewState extends State<_FullScreenImageView> {
                     color: Colors.black.withOpacity(0.5),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.close_rounded, color: Colors.white, size: 24),
+                  child: const Icon(Icons.close_rounded,
+                      color: Colors.white, size: 24),
                 ),
               ),
             ),

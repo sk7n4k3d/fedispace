@@ -25,7 +25,8 @@ class SendPosts extends StatefulWidget {
   final ApiService apiService;
   final PostDraft? draft;
 
-  const SendPosts({Key? key, required this.apiService, this.draft}) : super(key: key);
+  const SendPosts({Key? key, required this.apiService, this.draft})
+      : super(key: key);
 
   @override
   State<SendPosts> createState() => _SendPostsState();
@@ -106,7 +107,8 @@ class _SendPostsState extends State<SendPosts> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: CyberpunkTheme.cardDark,
-        title: const Text('Discard post?', style: TextStyle(color: CyberpunkTheme.textWhite)),
+        title: const Text('Discard post?',
+            style: TextStyle(color: CyberpunkTheme.textWhite)),
         content: const Text(
           'You can save this as a draft to continue later.',
           style: TextStyle(color: CyberpunkTheme.textSecondary),
@@ -114,15 +116,18 @@ class _SendPostsState extends State<SendPosts> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, 'cancel'),
-            child: const Text('Cancel', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+            child: const Text('Cancel',
+                style: TextStyle(color: CyberpunkTheme.textSecondary)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, 'draft'),
-            child: const Text('Save Draft', style: TextStyle(color: CyberpunkTheme.neonCyan)),
+            child: const Text('Save Draft',
+                style: TextStyle(color: CyberpunkTheme.neonCyan)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, 'discard'),
-            child: const Text('Discard', style: TextStyle(color: CyberpunkTheme.errorRed)),
+            child: const Text('Discard',
+                style: TextStyle(color: CyberpunkTheme.errorRed)),
           ),
         ],
       ),
@@ -159,7 +164,8 @@ class _SendPostsState extends State<SendPosts> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 36, height: 4,
+              width: 36,
+              height: 4,
               margin: const EdgeInsets.only(top: 12, bottom: 16),
               decoration: BoxDecoration(
                 color: CyberpunkTheme.borderDark,
@@ -234,15 +240,22 @@ class _SendPostsState extends State<SendPosts> {
   }) {
     return ListTile(
       leading: Container(
-        width: 42, height: 42,
+        width: 42,
+        height: 42,
         decoration: BoxDecoration(
           color: color.withOpacity(0.12),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(icon, color: color, size: 22),
       ),
-      title: Text(label, style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 15, fontWeight: FontWeight.w600)),
-      subtitle: Text(subtitle, style: const TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 12)),
+      title: Text(label,
+          style: const TextStyle(
+              color: CyberpunkTheme.textWhite,
+              fontSize: 15,
+              fontWeight: FontWeight.w600)),
+      subtitle: Text(subtitle,
+          style: const TextStyle(
+              color: CyberpunkTheme.textTertiary, fontSize: 12)),
       onTap: onTap,
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
     );
@@ -283,10 +296,12 @@ class _SendPostsState extends State<SendPosts> {
           bodyLarge: TextStyle(color: CyberpunkTheme.textWhite),
           bodyMedium: TextStyle(color: CyberpunkTheme.textWhite),
           bodySmall: TextStyle(color: CyberpunkTheme.textSecondary),
-          titleLarge: TextStyle(color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700),
+          titleLarge: TextStyle(
+              color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700),
           titleMedium: TextStyle(color: CyberpunkTheme.textWhite),
           titleSmall: TextStyle(color: CyberpunkTheme.textSecondary),
-          labelLarge: TextStyle(color: CyberpunkTheme.neonCyan, fontWeight: FontWeight.w600),
+          labelLarge: TextStyle(
+              color: CyberpunkTheme.neonCyan, fontWeight: FontWeight.w600),
         ),
         buttonTheme: const ButtonThemeData(
           buttonColor: CyberpunkTheme.neonCyan,
@@ -395,7 +410,8 @@ class _SendPostsState extends State<SendPosts> {
         ),
       );
       if (editedImage != null) {
-        final tempFile = File('${Directory.systemTemp.path}/story_edited_${DateTime.now().millisecondsSinceEpoch}.jpg');
+        final tempFile = File(
+            '${Directory.systemTemp.path}/story_edited_${DateTime.now().millisecondsSinceEpoch}.jpg');
         await tempFile.writeAsBytes(editedImage);
         storyPath = tempFile.path;
       }
@@ -406,7 +422,8 @@ class _SendPostsState extends State<SendPosts> {
           context: context,
           builder: (ctx) => AlertDialog(
             backgroundColor: CyberpunkTheme.surfaceDark,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Row(
               children: [
                 Container(
@@ -415,24 +432,34 @@ class _SendPostsState extends State<SendPosts> {
                     color: CyberpunkTheme.neonPink.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(Icons.auto_awesome, color: CyberpunkTheme.neonPink, size: 20),
+                  child: Icon(Icons.auto_awesome,
+                      color: CyberpunkTheme.neonPink, size: 20),
                 ),
                 const SizedBox(width: 10),
-                const Text('AI Edit', style: TextStyle(color: CyberpunkTheme.textWhite, fontSize: 18, fontWeight: FontWeight.w700)),
+                const Text('AI Edit',
+                    style: TextStyle(
+                        color: CyberpunkTheme.textWhite,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700)),
               ],
             ),
             content: const Text(
               'Want to further edit this image with AI?',
-              style: TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 14),
+              style:
+                  TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 14),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Skip', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+                child: const Text('Skip',
+                    style: TextStyle(color: CyberpunkTheme.textSecondary)),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(ctx, true),
-                child: Text('Edit with AI', style: TextStyle(color: CyberpunkTheme.neonPink, fontWeight: FontWeight.w600)),
+                child: Text('Edit with AI',
+                    style: TextStyle(
+                        color: CyberpunkTheme.neonPink,
+                        fontWeight: FontWeight.w600)),
               ),
             ],
           ),
@@ -463,7 +490,8 @@ class _SendPostsState extends State<SendPosts> {
                   children: [
                     CircularProgressIndicator(color: CyberpunkTheme.neonCyan),
                     SizedBox(height: 16),
-                    Text('Publishing story...', style: TextStyle(color: Colors.white)),
+                    Text('Publishing story...',
+                        style: TextStyle(color: Colors.white)),
                   ],
                 ),
               ),
@@ -473,7 +501,7 @@ class _SendPostsState extends State<SendPosts> {
       }
 
       final error = await widget.apiService.createStory(filePath: storyPath);
-      
+
       if (mounted) {
         Navigator.of(context).pop(); // dismiss loading dialog
       }
@@ -527,10 +555,15 @@ class _SendPostsState extends State<SendPosts> {
                 color: CyberpunkTheme.neonPink.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(Icons.auto_awesome, color: CyberpunkTheme.neonPink, size: 20),
+              child: Icon(Icons.auto_awesome,
+                  color: CyberpunkTheme.neonPink, size: 20),
             ),
             const SizedBox(width: 10),
-            const Text('AI Edit', style: TextStyle(color: CyberpunkTheme.textWhite, fontSize: 18, fontWeight: FontWeight.w700)),
+            const Text('AI Edit',
+                style: TextStyle(
+                    color: CyberpunkTheme.textWhite,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700)),
           ],
         ),
         content: Column(
@@ -538,16 +571,19 @@ class _SendPostsState extends State<SendPosts> {
           children: [
             const Text(
               'Describe how you want to modify the image:',
-              style: TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 13),
+              style:
+                  TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 13),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: promptController,
-              style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 14),
+              style: const TextStyle(
+                  color: CyberpunkTheme.textWhite, fontSize: 14),
               maxLines: 3,
               decoration: InputDecoration(
                 hintText: 'e.g. "Make it look like a painting"',
-                hintStyle: const TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 13),
+                hintStyle: const TextStyle(
+                    color: CyberpunkTheme.textTertiary, fontSize: 13),
                 filled: true,
                 fillColor: CyberpunkTheme.cardDark,
                 border: OutlineInputBorder(
@@ -569,14 +605,18 @@ class _SendPostsState extends State<SendPosts> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, null),
-            child: const Text('Cancel', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+            child: const Text('Cancel',
+                style: TextStyle(color: CyberpunkTheme.textSecondary)),
           ),
           TextButton(
             onPressed: () {
               final p = promptController.text.trim();
               if (p.isNotEmpty) Navigator.pop(ctx, p);
             },
-            child: Text('Apply', style: TextStyle(color: CyberpunkTheme.neonPink, fontWeight: FontWeight.w600)),
+            child: Text('Apply',
+                style: TextStyle(
+                    color: CyberpunkTheme.neonPink,
+                    fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -600,7 +640,9 @@ class _SendPostsState extends State<SendPosts> {
             children: [
               CircularProgressIndicator(color: CyberpunkTheme.neonPink),
               SizedBox(height: 16),
-              Text('AI is working...', style: TextStyle(color: CyberpunkTheme.textWhite, fontSize: 14)),
+              Text('AI is working...',
+                  style:
+                      TextStyle(color: CyberpunkTheme.textWhite, fontSize: 14)),
             ],
           ),
         ),
@@ -616,7 +658,10 @@ class _SendPostsState extends State<SendPosts> {
 
       if (apiKey.isEmpty) {
         if (mounted) Navigator.of(context).pop();
-        Fluttertoast.showToast(msg: 'No API key set for $provider', backgroundColor: Colors.red, textColor: Colors.white);
+        Fluttertoast.showToast(
+            msg: 'No API key set for $provider',
+            backgroundColor: Colors.red,
+            textColor: Colors.white);
         return null;
       }
 
@@ -635,7 +680,8 @@ class _SendPostsState extends State<SendPosts> {
 
       if (resultBytes != null) {
         final dir = await Directory.systemTemp.createTemp('story_ai_');
-        final editedFile = File('${dir.path}/ai_edited_${DateTime.now().millisecondsSinceEpoch}.png');
+        final editedFile = File(
+            '${dir.path}/ai_edited_${DateTime.now().millisecondsSinceEpoch}.png');
         await editedFile.writeAsBytes(resultBytes);
         return editedFile.path;
       }
@@ -643,7 +689,10 @@ class _SendPostsState extends State<SendPosts> {
     } catch (e) {
       if (mounted) Navigator.of(context).pop();
       appLogger.error('Story AI edit error', e);
-      Fluttertoast.showToast(msg: 'AI edit failed: $e', backgroundColor: Colors.red, textColor: Colors.white);
+      Fluttertoast.showToast(
+          msg: 'AI edit failed: $e',
+          backgroundColor: Colors.red,
+          textColor: Colors.white);
       return null;
     }
   }
@@ -674,7 +723,7 @@ class _SendPostsState extends State<SendPosts> {
       if (editedImage != null && editedImage is Uint8List) {
         // Write edited image back to the file
         await file.writeAsBytes(editedImage);
-        setState(() {});  // Refresh to show updated image
+        setState(() {}); // Refresh to show updated image
         Fluttertoast.showToast(
           msg: 'Image edited successfully',
           backgroundColor: CyberpunkTheme.neonCyan,
@@ -706,10 +755,15 @@ class _SendPostsState extends State<SendPosts> {
                 color: CyberpunkTheme.neonPink.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.auto_awesome, color: CyberpunkTheme.neonPink, size: 20),
+              child: const Icon(Icons.auto_awesome,
+                  color: CyberpunkTheme.neonPink, size: 20),
             ),
             const SizedBox(width: 10),
-            const Text('AI Edit', style: TextStyle(color: CyberpunkTheme.textWhite, fontSize: 18, fontWeight: FontWeight.w700)),
+            const Text('AI Edit',
+                style: TextStyle(
+                    color: CyberpunkTheme.textWhite,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700)),
           ],
         ),
         content: Column(
@@ -718,25 +772,31 @@ class _SendPostsState extends State<SendPosts> {
           children: [
             const Text(
               'Describe how you want to modify this image:',
-              style: TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 13),
+              style:
+                  TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 13),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: promptController,
               maxLines: 3,
-              style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 14),
+              style: const TextStyle(
+                  color: CyberpunkTheme.textWhite, fontSize: 14),
               decoration: InputDecoration(
                 hintText: 'e.g. Make the sky more dramatic...',
-                hintStyle: TextStyle(color: CyberpunkTheme.textTertiary.withOpacity(0.5), fontSize: 14),
+                hintStyle: TextStyle(
+                    color: CyberpunkTheme.textTertiary.withOpacity(0.5),
+                    fontSize: 14),
                 filled: true,
                 fillColor: CyberpunkTheme.cardDark,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: CyberpunkTheme.borderDark),
+                  borderSide:
+                      const BorderSide(color: CyberpunkTheme.borderDark),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: CyberpunkTheme.borderDark),
+                  borderSide:
+                      const BorderSide(color: CyberpunkTheme.borderDark),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -749,13 +809,15 @@ class _SendPostsState extends State<SendPosts> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+            child: const Text('Cancel',
+                style: TextStyle(color: CyberpunkTheme.textSecondary)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: CyberpunkTheme.neonPink,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
             onPressed: () {
               Navigator.pop(ctx);
@@ -790,7 +852,9 @@ class _SendPostsState extends State<SendPosts> {
               children: [
                 const CircularProgressIndicator(color: CyberpunkTheme.neonPink),
                 const SizedBox(height: 16),
-                const Text('AI is working...', style: TextStyle(color: CyberpunkTheme.textWhite, fontSize: 14)),
+                const Text('AI is working...',
+                    style: TextStyle(
+                        color: CyberpunkTheme.textWhite, fontSize: 14)),
               ],
             ),
           ),
@@ -825,7 +889,8 @@ class _SendPostsState extends State<SendPosts> {
 
       if (resultBytes != null) {
         final dir = file.parent;
-        final editedFile = File('${dir.path}/ai_edited_${DateTime.now().millisecondsSinceEpoch}.png');
+        final editedFile = File(
+            '${dir.path}/ai_edited_${DateTime.now().millisecondsSinceEpoch}.png');
         await editedFile.writeAsBytes(resultBytes);
 
         setState(() {
@@ -851,10 +916,12 @@ class _SendPostsState extends State<SendPosts> {
   }
 
   // ── Stability AI ────────────────────────────────────────────────────
-  Future<Uint8List?> _editWithStability(String apiKey, Uint8List bytes, String prompt) async {
+  Future<Uint8List?> _editWithStability(
+      String apiKey, Uint8List bytes, String prompt) async {
     final request = http.MultipartRequest(
       'POST',
-      Uri.parse('https://api.stability.ai/v2beta/stable-image/edit/search-and-replace'),
+      Uri.parse(
+          'https://api.stability.ai/v2beta/stable-image/edit/search-and-replace'),
     );
     request.headers['authorization'] = 'Bearer $apiKey';
     request.headers['accept'] = 'image/*';
@@ -878,12 +945,14 @@ class _SendPostsState extends State<SendPosts> {
       final errJson = jsonDecode(errBody);
       errMsg = errJson['message'] ?? errJson['errors']?.toString() ?? errMsg;
     } catch (_) {}
-    Fluttertoast.showToast(msg: errMsg, backgroundColor: Colors.red, textColor: Colors.white);
+    Fluttertoast.showToast(
+        msg: errMsg, backgroundColor: Colors.red, textColor: Colors.white);
     return null;
   }
 
   // ── OpenAI / ChatGPT (DALL-E) ──────────────────────────────────────
-  Future<Uint8List?> _editWithOpenAI(String apiKey, Uint8List bytes, String prompt) async {
+  Future<Uint8List?> _editWithOpenAI(
+      String apiKey, Uint8List bytes, String prompt) async {
     final request = http.MultipartRequest(
       'POST',
       Uri.parse('https://api.openai.com/v1/images/edits'),
@@ -917,12 +986,14 @@ class _SendPostsState extends State<SendPosts> {
       errMsg = errJson['error']?['message'] ?? errMsg;
     } catch (_) {}
     appLogger.error('OpenAI error: $errMsg');
-    Fluttertoast.showToast(msg: errMsg, backgroundColor: Colors.red, textColor: Colors.white);
+    Fluttertoast.showToast(
+        msg: errMsg, backgroundColor: Colors.red, textColor: Colors.white);
     return null;
   }
 
   // ── Nano Banano Pro (via kie.ai) ────────────────────────────────
-  Future<Uint8List?> _editWithNanoBanano(String apiKey, Uint8List bytes, String prompt) async {
+  Future<Uint8List?> _editWithNanoBanano(
+      String apiKey, Uint8List bytes, String prompt) async {
     try {
       // Step 1: Upload image as base64
       final b64Data = 'data:image/png;base64,${base64Encode(bytes)}';
@@ -940,8 +1011,12 @@ class _SendPostsState extends State<SendPosts> {
       );
 
       if (uploadResp.statusCode != 200) {
-        appLogger.error('Kie.ai upload failed [${uploadResp.statusCode}]: ${uploadResp.body}');
-        Fluttertoast.showToast(msg: 'Image upload failed (${uploadResp.statusCode})', backgroundColor: Colors.red, textColor: Colors.white);
+        appLogger.error(
+            'Kie.ai upload failed [${uploadResp.statusCode}]: ${uploadResp.body}');
+        Fluttertoast.showToast(
+            msg: 'Image upload failed (${uploadResp.statusCode})',
+            backgroundColor: Colors.red,
+            textColor: Colors.white);
         return null;
       }
 
@@ -952,11 +1027,18 @@ class _SendPostsState extends State<SendPosts> {
       final data = uploadJson['data'];
       String? fileUrl;
       if (data != null) {
-        fileUrl = data['fileUrl'] ?? data['url'] ?? data['file_url'] ?? data['downloadUrl'];
+        fileUrl = data['fileUrl'] ??
+            data['url'] ??
+            data['file_url'] ??
+            data['downloadUrl'];
       }
       if (fileUrl == null || fileUrl.isEmpty) {
-        appLogger.error('Kie.ai upload: no fileUrl in response: ${uploadResp.body}');
-        Fluttertoast.showToast(msg: 'Upload error — check logs', backgroundColor: Colors.red, textColor: Colors.white);
+        appLogger
+            .error('Kie.ai upload: no fileUrl in response: ${uploadResp.body}');
+        Fluttertoast.showToast(
+            msg: 'Upload error — check logs',
+            backgroundColor: Colors.red,
+            textColor: Colors.white);
         return null;
       }
 
@@ -976,8 +1058,12 @@ class _SendPostsState extends State<SendPosts> {
       );
 
       if (createResp.statusCode != 200) {
-        appLogger.error('Kie.ai createTask failed [${createResp.statusCode}]: ${createResp.body}');
-        Fluttertoast.showToast(msg: 'Task creation failed (${createResp.statusCode})', backgroundColor: Colors.red, textColor: Colors.white);
+        appLogger.error(
+            'Kie.ai createTask failed [${createResp.statusCode}]: ${createResp.body}');
+        Fluttertoast.showToast(
+            msg: 'Task creation failed (${createResp.statusCode})',
+            backgroundColor: Colors.red,
+            textColor: Colors.white);
         return null;
       }
 
@@ -986,7 +1072,10 @@ class _SendPostsState extends State<SendPosts> {
       final taskId = createJson['data']?['taskId'] as String?;
       if (taskId == null) {
         appLogger.error('Kie.ai createTask: no taskId in response');
-        Fluttertoast.showToast(msg: 'No task ID returned', backgroundColor: Colors.red, textColor: Colors.white);
+        Fluttertoast.showToast(
+            msg: 'No task ID returned',
+            backgroundColor: Colors.red,
+            textColor: Colors.white);
         return null;
       }
 
@@ -997,7 +1086,8 @@ class _SendPostsState extends State<SendPosts> {
       for (int i = 0; i < 60; i++) {
         await Future.delayed(const Duration(seconds: 2));
         final pollResp = await http.get(
-          Uri.parse('https://api.kie.ai/api/v1/gpt4o-image/record-info?taskId=$taskId'),
+          Uri.parse(
+              'https://api.kie.ai/api/v1/gpt4o-image/record-info?taskId=$taskId'),
           headers: {'Authorization': 'Bearer $apiKey'},
         );
 
@@ -1024,7 +1114,10 @@ class _SendPostsState extends State<SendPosts> {
         } else if (flag == 2) {
           final errMsg = pollJson['data']?['errorMessage'] ?? 'Unknown error';
           appLogger.error('Kie.ai task failed: $errMsg');
-          Fluttertoast.showToast(msg: 'AI edit failed: $errMsg', backgroundColor: Colors.red, textColor: Colors.white);
+          Fluttertoast.showToast(
+              msg: 'AI edit failed: $errMsg',
+              backgroundColor: Colors.red,
+              textColor: Colors.white);
           return null;
         }
         // flag == 0 → still generating, keep polling
@@ -1032,7 +1125,10 @@ class _SendPostsState extends State<SendPosts> {
 
       if (resultUrl == null) {
         appLogger.error('Kie.ai task $taskId timed out after 2 minutes');
-        Fluttertoast.showToast(msg: 'AI edit timed out (2 min)', backgroundColor: Colors.red, textColor: Colors.white);
+        Fluttertoast.showToast(
+            msg: 'AI edit timed out (2 min)',
+            backgroundColor: Colors.red,
+            textColor: Colors.white);
         return null;
       }
 
@@ -1041,11 +1137,17 @@ class _SendPostsState extends State<SendPosts> {
       if (imgResp.statusCode == 200) return imgResp.bodyBytes;
 
       appLogger.error('Kie.ai download failed: ${imgResp.statusCode}');
-      Fluttertoast.showToast(msg: 'Failed to download result', backgroundColor: Colors.red, textColor: Colors.white);
+      Fluttertoast.showToast(
+          msg: 'Failed to download result',
+          backgroundColor: Colors.red,
+          textColor: Colors.white);
       return null;
     } catch (e) {
       appLogger.error('Kie.ai error: $e');
-      Fluttertoast.showToast(msg: 'Nano Banano error: $e', backgroundColor: Colors.red, textColor: Colors.white);
+      Fluttertoast.showToast(
+          msg: 'Nano Banano error: $e',
+          backgroundColor: Colors.red,
+          textColor: Colors.white);
       return null;
     }
   }
@@ -1059,15 +1161,23 @@ class _SendPostsState extends State<SendPosts> {
       context: context,
       backgroundColor: CyberpunkTheme.surfaceDark,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setSheetState) => Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
           child: SizedBox(
             height: 400,
             child: Column(
               children: [
-                Container(width: 40, height: 4, margin: const EdgeInsets.symmetric(vertical: 12), decoration: BoxDecoration(color: CyberpunkTheme.textTertiary, borderRadius: BorderRadius.circular(2))),
+                Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                        color: CyberpunkTheme.textTertiary,
+                        borderRadius: BorderRadius.circular(2))),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
@@ -1076,17 +1186,24 @@ class _SendPostsState extends State<SendPosts> {
                     decoration: InputDecoration(
                       hintText: 'Search locations...',
                       hintStyle: TextStyle(color: CyberpunkTheme.textTertiary),
-                      prefixIcon: const Icon(Icons.search, color: CyberpunkTheme.textTertiary),
+                      prefixIcon: const Icon(Icons.search,
+                          color: CyberpunkTheme.textTertiary),
                       filled: true,
                       fillColor: CyberpunkTheme.cardDark,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none),
                     ),
                     onChanged: (query) async {
                       if (query.length < 2) return;
                       setSheetState(() => searching = true);
                       try {
-                        final locs = await widget.apiService.searchLocation(query);
-                        setSheetState(() { results = locs; searching = false; });
+                        final locs =
+                            await widget.apiService.searchLocation(query);
+                        setSheetState(() {
+                          results = locs;
+                          searching = false;
+                        });
                       } catch (_) {
                         setSheetState(() => searching = false);
                       }
@@ -1095,7 +1212,10 @@ class _SendPostsState extends State<SendPosts> {
                 ),
                 const SizedBox(height: 8),
                 if (searching)
-                  const Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator(strokeWidth: 2, color: CyberpunkTheme.neonCyan))
+                  const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: CyberpunkTheme.neonCyan))
                 else
                   Expanded(
                     child: ListView.builder(
@@ -1103,9 +1223,17 @@ class _SendPostsState extends State<SendPosts> {
                       itemBuilder: (ctx, i) {
                         final loc = results[i];
                         return ListTile(
-                          leading: const Icon(Icons.place, color: CyberpunkTheme.neonCyan),
-                          title: Text(loc['name'] ?? loc['slug'] ?? '', style: const TextStyle(color: CyberpunkTheme.textWhite)),
-                          subtitle: loc['country'] != null ? Text(loc['country'], style: const TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 12)) : null,
+                          leading: const Icon(Icons.place,
+                              color: CyberpunkTheme.neonCyan),
+                          title: Text(loc['name'] ?? loc['slug'] ?? '',
+                              style: const TextStyle(
+                                  color: CyberpunkTheme.textWhite)),
+                          subtitle: loc['country'] != null
+                              ? Text(loc['country'],
+                                  style: const TextStyle(
+                                      color: CyberpunkTheme.textSecondary,
+                                      fontSize: 12))
+                              : null,
                           onTap: () {
                             Navigator.pop(ctx);
                             setState(() => _selectedLocation = loc);
@@ -1129,7 +1257,9 @@ class _SendPostsState extends State<SendPosts> {
       builder: (ctx) => AlertDialog(
         backgroundColor: CyberpunkTheme.surfaceDark,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Alt text', style: TextStyle(color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w600)),
+        title: const Text('Alt text',
+            style: TextStyle(
+                color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w600)),
         content: TextField(
           controller: controller,
           style: const TextStyle(color: CyberpunkTheme.textWhite),
@@ -1138,17 +1268,25 @@ class _SendPostsState extends State<SendPosts> {
             hintText: 'Describe the image for accessibility...',
             hintStyle: TextStyle(color: CyberpunkTheme.textTertiary),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: CyberpunkTheme.neonCyan)),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: CyberpunkTheme.neonCyan)),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel', style: TextStyle(color: CyberpunkTheme.textSecondary))),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel',
+                  style: TextStyle(color: CyberpunkTheme.textSecondary))),
           TextButton(
             onPressed: () {
               setState(() => _altTexts[index] = controller.text.trim());
               Navigator.pop(ctx);
             },
-            child: const Text('Save', style: TextStyle(color: CyberpunkTheme.neonCyan, fontWeight: FontWeight.w600)),
+            child: const Text('Save',
+                style: TextStyle(
+                    color: CyberpunkTheme.neonCyan,
+                    fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -1223,7 +1361,8 @@ class _SendPostsState extends State<SendPosts> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.white.withOpacity(0.08)),
             ),
-            child: const Icon(Icons.close_rounded, color: CyberpunkTheme.textWhite, size: 20),
+            child: const Icon(Icons.close_rounded,
+                color: CyberpunkTheme.textWhite, size: 20),
           ),
         ),
         title: ShaderMask(
@@ -1290,7 +1429,8 @@ class _SendPostsState extends State<SendPosts> {
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  const Icon(Icons.drafts_outlined, color: CyberpunkTheme.textWhite, size: 18),
+                  const Icon(Icons.drafts_outlined,
+                      color: CyberpunkTheme.textWhite, size: 18),
                   if (_draftCount > 0)
                     Positioned(
                       right: -6,
@@ -1320,7 +1460,8 @@ class _SendPostsState extends State<SendPosts> {
             child: GestureDetector(
               onTap: _isUploading ? null : _publish,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                 decoration: BoxDecoration(
                   gradient: _isUploading
                       ? null
@@ -1414,15 +1555,18 @@ class _SendPostsState extends State<SendPosts> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
-                                      color: CyberpunkTheme.neonCyan.withOpacity(0.3),
+                                      color: CyberpunkTheme.neonCyan
+                                          .withOpacity(0.3),
                                       width: 1.5,
                                     ),
                                     gradient: LinearGradient(
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
                                       colors: [
-                                        CyberpunkTheme.neonCyan.withOpacity(0.08),
-                                        CyberpunkTheme.neonCyan.withOpacity(0.02),
+                                        CyberpunkTheme.neonCyan
+                                            .withOpacity(0.08),
+                                        CyberpunkTheme.neonCyan
+                                            .withOpacity(0.02),
                                       ],
                                     ),
                                   ),
@@ -1434,20 +1578,23 @@ class _SendPostsState extends State<SendPosts> {
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
                                           border: Border.all(
-                                            color: CyberpunkTheme.neonCyan.withOpacity(0.4),
+                                            color: CyberpunkTheme.neonCyan
+                                                .withOpacity(0.4),
                                           ),
                                         ),
                                         child: Icon(
                                           Icons.add_rounded,
                                           size: 24,
-                                          color: CyberpunkTheme.neonCyan.withOpacity(0.8),
+                                          color: CyberpunkTheme.neonCyan
+                                              .withOpacity(0.8),
                                         ),
                                       ),
                                       const SizedBox(height: 10),
                                       Text(
                                         'Add More',
                                         style: TextStyle(
-                                          color: CyberpunkTheme.neonCyan.withOpacity(0.8),
+                                          color: CyberpunkTheme.neonCyan
+                                              .withOpacity(0.8),
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -1469,7 +1616,8 @@ class _SendPostsState extends State<SendPosts> {
                                       borderRadius: BorderRadius.circular(16),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: CyberpunkTheme.neonPink.withOpacity(0.08),
+                                          color: CyberpunkTheme.neonPink
+                                              .withOpacity(0.08),
                                           blurRadius: 20,
                                           offset: const Offset(0, 4),
                                         ),
@@ -1497,7 +1645,8 @@ class _SendPostsState extends State<SendPosts> {
                                                   end: Alignment.bottomCenter,
                                                   colors: [
                                                     Colors.transparent,
-                                                    Colors.black.withOpacity(0.7),
+                                                    Colors.black
+                                                        .withOpacity(0.7),
                                                   ],
                                                 ),
                                               ),
@@ -1508,10 +1657,15 @@ class _SendPostsState extends State<SendPosts> {
                                             bottom: 8,
                                             left: 10,
                                             child: Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 3),
                                               decoration: BoxDecoration(
-                                                color: Colors.black.withOpacity(0.5),
-                                                borderRadius: BorderRadius.circular(8),
+                                                color: Colors.black
+                                                    .withOpacity(0.5),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                               ),
                                               child: Text(
                                                 '${index + 1}/${_selectedFiles.length}',
@@ -1538,9 +1692,12 @@ class _SendPostsState extends State<SendPosts> {
                                         decoration: BoxDecoration(
                                           color: Colors.black.withOpacity(0.5),
                                           shape: BoxShape.circle,
-                                          border: Border.all(color: Colors.white.withOpacity(0.15)),
+                                          border: Border.all(
+                                              color: Colors.white
+                                                  .withOpacity(0.15)),
                                         ),
-                                        child: const Icon(Icons.close_rounded, size: 14, color: Colors.white),
+                                        child: const Icon(Icons.close_rounded,
+                                            size: 14, color: Colors.white),
                                       ),
                                     ),
                                   ),
@@ -1551,18 +1708,28 @@ class _SendPostsState extends State<SendPosts> {
                                     child: GestureDetector(
                                       onTap: () => _showAltTextDialog(index),
                                       child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 4),
                                         decoration: BoxDecoration(
-                                          color: _altTexts[index]?.isNotEmpty == true
-                                              ? CyberpunkTheme.neonCyan.withOpacity(0.8)
+                                          color: _altTexts[index]?.isNotEmpty ==
+                                                  true
+                                              ? CyberpunkTheme.neonCyan
+                                                  .withOpacity(0.8)
                                               : Colors.black.withOpacity(0.6),
-                                          borderRadius: BorderRadius.circular(6),
-                                          border: Border.all(color: Colors.white.withOpacity(0.2)),
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                          border: Border.all(
+                                              color: Colors.white
+                                                  .withOpacity(0.2)),
                                         ),
                                         child: Text(
                                           'ALT',
                                           style: TextStyle(
-                                            color: _altTexts[index]?.isNotEmpty == true ? Colors.black : Colors.white70,
+                                            color:
+                                                _altTexts[index]?.isNotEmpty ==
+                                                        true
+                                                    ? Colors.black
+                                                    : Colors.white70,
                                             fontSize: 10,
                                             fontWeight: FontWeight.w800,
                                           ),
@@ -1577,15 +1744,21 @@ class _SendPostsState extends State<SendPosts> {
                                     child: GestureDetector(
                                       onTap: () => _openPhotoEditor(index),
                                       child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 6),
                                         decoration: BoxDecoration(
                                           gradient: const LinearGradient(
-                                            colors: [CyberpunkTheme.neonCyan, Color(0xFF0088FF)],
+                                            colors: [
+                                              CyberpunkTheme.neonCyan,
+                                              Color(0xFF0088FF)
+                                            ],
                                           ),
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: CyberpunkTheme.neonCyan.withOpacity(0.3),
+                                              color: CyberpunkTheme.neonCyan
+                                                  .withOpacity(0.3),
                                               blurRadius: 8,
                                               offset: const Offset(0, 2),
                                             ),
@@ -1594,9 +1767,15 @@ class _SendPostsState extends State<SendPosts> {
                                         child: const Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            Icon(Icons.crop_rotate_rounded, size: 13, color: Colors.white),
+                                            Icon(Icons.crop_rotate_rounded,
+                                                size: 13, color: Colors.white),
                                             SizedBox(width: 4),
-                                            Text('Edit', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                                            Text('Edit',
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 11,
+                                                    fontWeight:
+                                                        FontWeight.w700)),
                                           ],
                                         ),
                                       ),
@@ -1609,15 +1788,21 @@ class _SendPostsState extends State<SendPosts> {
                                     child: GestureDetector(
                                       onTap: () => _showAiEditDialog(index),
                                       child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 6),
                                         decoration: BoxDecoration(
                                           gradient: const LinearGradient(
-                                            colors: [CyberpunkTheme.neonPink, Color(0xFFAA00FF)],
+                                            colors: [
+                                              CyberpunkTheme.neonPink,
+                                              Color(0xFFAA00FF)
+                                            ],
                                           ),
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: CyberpunkTheme.neonPink.withOpacity(0.4),
+                                              color: CyberpunkTheme.neonPink
+                                                  .withOpacity(0.4),
                                               blurRadius: 10,
                                               offset: const Offset(0, 2),
                                             ),
@@ -1626,9 +1811,15 @@ class _SendPostsState extends State<SendPosts> {
                                         child: const Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            Icon(Icons.auto_awesome, size: 13, color: Colors.white),
+                                            Icon(Icons.auto_awesome,
+                                                size: 13, color: Colors.white),
                                             SizedBox(width: 4),
-                                            Text('AI Edit', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                                            Text('AI Edit',
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 11,
+                                                    fontWeight:
+                                                        FontWeight.w700)),
                                           ],
                                         ),
                                       ),
@@ -1672,25 +1863,32 @@ class _SendPostsState extends State<SendPosts> {
                                     ],
                                   ),
                                   border: Border.all(
-                                    color: CyberpunkTheme.neonCyan.withOpacity(0.3),
+                                    color: CyberpunkTheme.neonCyan
+                                        .withOpacity(0.3),
                                     width: 1.5,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: CyberpunkTheme.neonCyan.withOpacity(0.15),
+                                      color: CyberpunkTheme.neonCyan
+                                          .withOpacity(0.15),
                                       blurRadius: 30,
                                       spreadRadius: 2,
                                     ),
                                     BoxShadow(
-                                      color: CyberpunkTheme.neonPink.withOpacity(0.08),
+                                      color: CyberpunkTheme.neonPink
+                                          .withOpacity(0.08),
                                       blurRadius: 30,
                                       spreadRadius: 2,
                                     ),
                                   ],
                                 ),
                                 child: ShaderMask(
-                                  shaderCallback: (bounds) => const LinearGradient(
-                                    colors: [CyberpunkTheme.neonCyan, CyberpunkTheme.neonPink],
+                                  shaderCallback: (bounds) =>
+                                      const LinearGradient(
+                                    colors: [
+                                      CyberpunkTheme.neonCyan,
+                                      CyberpunkTheme.neonPink
+                                    ],
                                   ).createShader(bounds),
                                   child: const Icon(
                                     Icons.add_a_photo_rounded,
@@ -1703,29 +1901,68 @@ class _SendPostsState extends State<SendPosts> {
                               // Compact media source grid
                               const SizedBox(height: 8),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
                                 child: Column(
                                   children: [
-                                    Text('Post', style: TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 1)),
+                                    Text('Post',
+                                        style: TextStyle(
+                                            color: CyberpunkTheme.textTertiary,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            letterSpacing: 1)),
                                     const SizedBox(height: 10),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
                                       children: [
-                                        _compactSourceButton(Icons.photo_library_outlined, 'Gallery', CyberpunkTheme.neonCyan, _pickFromGallery),
-                                        _compactSourceButton(Icons.camera_alt_outlined, 'Camera', CyberpunkTheme.neonPink, () => _pickFromCamera(ImageSource.camera)),
-                                        _compactSourceButton(Icons.videocam_outlined, 'Video', const Color(0xFFFF9800), _pickVideoFromCamera),
+                                        _compactSourceButton(
+                                            Icons.photo_library_outlined,
+                                            'Gallery',
+                                            CyberpunkTheme.neonCyan,
+                                            _pickFromGallery),
+                                        _compactSourceButton(
+                                            Icons.camera_alt_outlined,
+                                            'Camera',
+                                            CyberpunkTheme.neonPink,
+                                            () => _pickFromCamera(
+                                                ImageSource.camera)),
+                                        _compactSourceButton(
+                                            Icons.videocam_outlined,
+                                            'Video',
+                                            const Color(0xFFFF9800),
+                                            _pickVideoFromCamera),
                                       ],
                                     ),
                                     const SizedBox(height: 20),
                                     // Story section label
-                                    Text('Story', style: TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 1)),
+                                    Text('Story',
+                                        style: TextStyle(
+                                            color: CyberpunkTheme.textTertiary,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            letterSpacing: 1)),
                                     const SizedBox(height: 10),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
                                       children: [
-                                        _compactSourceButton(Icons.photo_library_outlined, 'Gallery', const Color(0xFF9C27B0), _createStoryFromGallery),
-                                        _compactSourceButton(Icons.camera_alt_outlined, 'Camera', const Color(0xFF9C27B0), () => _pickFromCamera(ImageSource.camera)),
-                                        _compactSourceButton(Icons.videocam_outlined, 'Video', const Color(0xFF9C27B0), _pickVideoFromCamera),
+                                        _compactSourceButton(
+                                            Icons.photo_library_outlined,
+                                            'Gallery',
+                                            const Color(0xFF9C27B0),
+                                            _createStoryFromGallery),
+                                        _compactSourceButton(
+                                            Icons.camera_alt_outlined,
+                                            'Camera',
+                                            const Color(0xFF9C27B0),
+                                            () => _pickFromCamera(
+                                                ImageSource.camera)),
+                                        _compactSourceButton(
+                                            Icons.videocam_outlined,
+                                            'Video',
+                                            const Color(0xFF9C27B0),
+                                            _pickVideoFromCamera),
                                       ],
                                     ),
                                   ],
@@ -1805,7 +2042,8 @@ class _SendPostsState extends State<SendPosts> {
                 children: [
                   // Location picker
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
                     child: GestureDetector(
                       onTap: _showLocationPicker,
                       child: Row(
@@ -1813,24 +2051,33 @@ class _SendPostsState extends State<SendPosts> {
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: (_selectedLocation != null ? CyberpunkTheme.neonCyan : CyberpunkTheme.textTertiary).withOpacity(0.12),
+                              color: (_selectedLocation != null
+                                      ? CyberpunkTheme.neonCyan
+                                      : CyberpunkTheme.textTertiary)
+                                  .withOpacity(0.12),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
                               Icons.location_on_outlined,
                               size: 18,
-                              color: _selectedLocation != null ? CyberpunkTheme.neonCyan : CyberpunkTheme.textTertiary,
+                              color: _selectedLocation != null
+                                  ? CyberpunkTheme.neonCyan
+                                  : CyberpunkTheme.textTertiary,
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               _selectedLocation != null
-                                  ? (_selectedLocation!['name'] ?? _selectedLocation!['slug'] ?? 'Location set')
+                                  ? (_selectedLocation!['name'] ??
+                                      _selectedLocation!['slug'] ??
+                                      'Location set')
                                   : 'Add location',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: _selectedLocation != null ? CyberpunkTheme.neonCyan : CyberpunkTheme.textWhite,
+                                color: _selectedLocation != null
+                                    ? CyberpunkTheme.neonCyan
+                                    : CyberpunkTheme.textWhite,
                                 fontWeight: FontWeight.w500,
                               ),
                               maxLines: 1,
@@ -1839,8 +2086,10 @@ class _SendPostsState extends State<SendPosts> {
                           ),
                           if (_selectedLocation != null)
                             GestureDetector(
-                              onTap: () => setState(() => _selectedLocation = null),
-                              child: const Icon(Icons.close, size: 16, color: CyberpunkTheme.textTertiary),
+                              onTap: () =>
+                                  setState(() => _selectedLocation = null),
+                              child: const Icon(Icons.close,
+                                  size: 16, color: CyberpunkTheme.textTertiary),
                             ),
                         ],
                       ),
@@ -1854,7 +2103,8 @@ class _SendPostsState extends State<SendPosts> {
 
                   // NSFW Toggle
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -1863,13 +2113,18 @@ class _SendPostsState extends State<SendPosts> {
                             Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                color: (_isSensitive ? CyberpunkTheme.neonAmber : CyberpunkTheme.textTertiary).withOpacity(0.12),
+                                color: (_isSensitive
+                                        ? CyberpunkTheme.neonAmber
+                                        : CyberpunkTheme.textTertiary)
+                                    .withOpacity(0.12),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
                                 Icons.warning_amber_rounded,
                                 size: 18,
-                                color: _isSensitive ? CyberpunkTheme.neonAmber : CyberpunkTheme.textTertiary,
+                                color: _isSensitive
+                                    ? CyberpunkTheme.neonAmber
+                                    : CyberpunkTheme.textTertiary,
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -1917,17 +2172,23 @@ class _SendPostsState extends State<SendPosts> {
                           fillColor: CyberpunkTheme.neonAmber.withOpacity(0.05),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: CyberpunkTheme.neonAmber.withOpacity(0.2)),
+                            borderSide: BorderSide(
+                                color:
+                                    CyberpunkTheme.neonAmber.withOpacity(0.2)),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: CyberpunkTheme.neonAmber.withOpacity(0.2)),
+                            borderSide: BorderSide(
+                                color:
+                                    CyberpunkTheme.neonAmber.withOpacity(0.2)),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: CyberpunkTheme.neonAmber),
+                            borderSide: const BorderSide(
+                                color: CyberpunkTheme.neonAmber),
                           ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 12),
                         ),
                       ),
                     ),
@@ -1946,16 +2207,20 @@ class _SendPostsState extends State<SendPosts> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 6),
                       decoration: BoxDecoration(
                         color: CyberpunkTheme.neonCyan.withOpacity(0.08),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: CyberpunkTheme.neonCyan.withOpacity(0.15)),
+                        border: Border.all(
+                            color: CyberpunkTheme.neonCyan.withOpacity(0.15)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.photo_library_rounded, size: 14, color: CyberpunkTheme.neonCyan.withOpacity(0.8)),
+                          Icon(Icons.photo_library_rounded,
+                              size: 14,
+                              color: CyberpunkTheme.neonCyan.withOpacity(0.8)),
                           const SizedBox(width: 6),
                           Text(
                             '${_selectedFiles.length} ${_selectedFiles.length == 1 ? 'item' : 'items'} selected',
@@ -1979,15 +2244,16 @@ class _SendPostsState extends State<SendPosts> {
     );
   }
 
-
-  Widget _compactSourceButton(IconData icon, String label, Color color, VoidCallback onTap) {
+  Widget _compactSourceButton(
+      IconData icon, String label, Color color, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 64, height: 64,
+            width: 64,
+            height: 64,
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(16),
@@ -1996,18 +2262,27 @@ class _SendPostsState extends State<SendPosts> {
             child: Icon(icon, color: color, size: 30),
           ),
           const SizedBox(height: 6),
-          Text(label, style: TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 13, fontWeight: FontWeight.w500)),
+          Text(label,
+              style: TextStyle(
+                  color: CyberpunkTheme.textSecondary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500)),
         ],
       ),
     );
   }
+
   Widget _mediaBadge(IconData icon, String label) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, size: 14, color: CyberpunkTheme.textTertiary),
         const SizedBox(width: 4),
-        Text(label, style: const TextStyle(fontSize: 12, color: CyberpunkTheme.textTertiary, fontWeight: FontWeight.w500)),
+        Text(label,
+            style: const TextStyle(
+                fontSize: 12,
+                color: CyberpunkTheme.textTertiary,
+                fontWeight: FontWeight.w500)),
       ],
     );
   }

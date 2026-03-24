@@ -56,15 +56,15 @@ class AccountCredential {
   }
 
   Map<String, dynamic> toJson() => {
-    'instanceUrl': instanceUrl,
-    'accessToken': accessToken,
-    'refreshToken': refreshToken,
-    'userId': userId,
-    'username': username,
-    'avatarUrl': avatarUrl,
-    'displayName': displayName,
-    'isActive': isActive,
-  };
+        'instanceUrl': instanceUrl,
+        'accessToken': accessToken,
+        'refreshToken': refreshToken,
+        'userId': userId,
+        'username': username,
+        'avatarUrl': avatarUrl,
+        'displayName': displayName,
+        'isActive': isActive,
+      };
 
   factory AccountCredential.fromJson(Map<String, dynamic> json) {
     return AccountCredential(

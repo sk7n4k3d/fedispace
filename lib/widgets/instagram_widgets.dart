@@ -53,7 +53,8 @@ class InstagramSearchBar extends StatelessWidget {
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           filled: false,
         ),
       ),
@@ -116,11 +117,14 @@ class InstagramFollowButton extends StatelessWidget {
               onPressed: onPressed,
               style: OutlinedButton.styleFrom(
                 foregroundColor: CyberpunkTheme.textWhite,
-                side: const BorderSide(color: CyberpunkTheme.borderDark, width: 1),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                side: const BorderSide(
+                    color: CyberpunkTheme.borderDark, width: 1),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
                 padding: const EdgeInsets.symmetric(horizontal: 18),
               ),
-              child: const Text('Following', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+              child: const Text('Following',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
             )
           : Container(
               decoration: BoxDecoration(
@@ -137,10 +141,13 @@ class InstagramFollowButton extends StatelessWidget {
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,
                   foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                   padding: const EdgeInsets.symmetric(horizontal: 18),
                 ),
-                child: const Text('Follow', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                child: const Text('Follow',
+                    style:
+                        TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
               ),
             ),
     );

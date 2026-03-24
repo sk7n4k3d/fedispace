@@ -72,11 +72,13 @@ class _RegisterPageState extends State<RegisterPage>
 
     setState(() => _checkingUsername = true);
     try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/api/v1.1/auth/invite/admin/uc'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'username': username}),
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .post(
+            Uri.parse('$_baseUrl/api/v1.1/auth/invite/admin/uc'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'username': username}),
+          )
+          .timeout(const Duration(seconds: 10));
 
       if (mounted) {
         setState(() {
@@ -101,11 +103,13 @@ class _RegisterPageState extends State<RegisterPage>
 
     setState(() => _checkingEmail = true);
     try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/api/v1.1/auth/invite/admin/ec'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email}),
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .post(
+            Uri.parse('$_baseUrl/api/v1.1/auth/invite/admin/ec'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email}),
+          )
+          .timeout(const Duration(seconds: 10));
 
       if (mounted) {
         setState(() {
@@ -145,11 +149,13 @@ class _RegisterPageState extends State<RegisterPage>
         body['invite_code'] = inviteCode;
       }
 
-      final response = await http.post(
-        Uri.parse('$_baseUrl/api/v1.1/auth/iar'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(body),
-      ).timeout(const Duration(seconds: 15));
+      final response = await http
+          .post(
+            Uri.parse('$_baseUrl/api/v1.1/auth/iar'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 15));
 
       if (!mounted) return;
 
@@ -162,7 +168,9 @@ class _RegisterPageState extends State<RegisterPage>
         final data = jsonDecode(response.body);
         setState(() {
           _isLoading = false;
-          _errorMessage = data['message'] ?? data['error'] ?? 'Registration failed. Please try again.';
+          _errorMessage = data['message'] ??
+              data['error'] ??
+              'Registration failed. Please try again.';
         });
       }
     } catch (e) {
@@ -181,30 +189,43 @@ class _RegisterPageState extends State<RegisterPage>
     int strength = 0;
     if (password.length >= 8) strength++;
     if (password.length >= 12) strength++;
-    if (RegExp(r'[A-Z]').hasMatch(password) && RegExp(r'[a-z]').hasMatch(password)) strength++;
+    if (RegExp(r'[A-Z]').hasMatch(password) &&
+        RegExp(r'[a-z]').hasMatch(password)) strength++;
     if (RegExp(r'[0-9!@#$%^&*(),.?":{}|<>]').hasMatch(password)) strength++;
     return strength;
   }
 
   Color _strengthColor(int strength) {
     switch (strength) {
-      case 0: return CyberpunkTheme.textTertiary;
-      case 1: return Colors.redAccent;
-      case 2: return Colors.orange;
-      case 3: return CyberpunkTheme.neonYellow;
-      case 4: return const Color(0xFF00E676);
-      default: return CyberpunkTheme.textTertiary;
+      case 0:
+        return CyberpunkTheme.textTertiary;
+      case 1:
+        return Colors.redAccent;
+      case 2:
+        return Colors.orange;
+      case 3:
+        return CyberpunkTheme.neonYellow;
+      case 4:
+        return const Color(0xFF00E676);
+      default:
+        return CyberpunkTheme.textTertiary;
     }
   }
 
   String _strengthLabel(int strength) {
     switch (strength) {
-      case 0: return '';
-      case 1: return 'Weak';
-      case 2: return 'Fair';
-      case 3: return 'Good';
-      case 4: return 'Strong';
-      default: return '';
+      case 0:
+        return '';
+      case 1:
+        return 'Weak';
+      case 2:
+        return 'Fair';
+      case 3:
+        return 'Good';
+      case 4:
+        return 'Strong';
+      default:
+        return '';
     }
   }
 
@@ -268,7 +289,8 @@ class _RegisterPageState extends State<RegisterPage>
 
                       // Back button
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: Colors.white70),
+                        icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                            size: 20, color: Colors.white70),
                         onPressed: () => Navigator.pop(context),
                       ),
 
@@ -277,7 +299,10 @@ class _RegisterPageState extends State<RegisterPage>
                       // Title
                       ShaderMask(
                         shaderCallback: (bounds) => const LinearGradient(
-                          colors: [CyberpunkTheme.neonCyan, CyberpunkTheme.neonPink],
+                          colors: [
+                            CyberpunkTheme.neonCyan,
+                            CyberpunkTheme.neonPink
+                          ],
                         ).createShader(bounds),
                         child: Text(
                           'Create Account',
@@ -306,7 +331,8 @@ class _RegisterPageState extends State<RegisterPage>
                         hint: 'Choose a username',
                         icon: Icons.alternate_email_rounded,
                         validator: (v) {
-                          if (v == null || v.trim().length < 2) return 'Min. 2 characters';
+                          if (v == null || v.trim().length < 2)
+                            return 'Min. 2 characters';
                           if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(v.trim())) {
                             return 'Letters, numbers, underscores only';
                           }
@@ -328,7 +354,9 @@ class _RegisterPageState extends State<RegisterPage>
                         icon: Icons.email_outlined,
                         keyboardType: TextInputType.emailAddress,
                         validator: (v) {
-                          if (v == null || !v.contains('@') || !v.contains('.')) {
+                          if (v == null ||
+                              !v.contains('@') ||
+                              !v.contains('.')) {
                             return 'Enter a valid email';
                           }
                           return null;
@@ -349,16 +377,20 @@ class _RegisterPageState extends State<RegisterPage>
                         icon: Icons.lock_outline_rounded,
                         obscure: !_showPassword,
                         validator: (v) {
-                          if (v == null || v.length < 8) return 'Min. 8 characters';
+                          if (v == null || v.length < 8)
+                            return 'Min. 8 characters';
                           return null;
                         },
                         suffixWidget: IconButton(
                           icon: Icon(
-                            _showPassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                            _showPassword
+                                ? Icons.visibility_off_rounded
+                                : Icons.visibility_rounded,
                             color: CyberpunkTheme.textTertiary,
                             size: 20,
                           ),
-                          onPressed: () => setState(() => _showPassword = !_showPassword),
+                          onPressed: () =>
+                              setState(() => _showPassword = !_showPassword),
                         ),
                       ),
 
@@ -386,16 +418,19 @@ class _RegisterPageState extends State<RegisterPage>
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
                             color: Colors.redAccent.withOpacity(0.1),
-                            border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
+                            border: Border.all(
+                                color: Colors.redAccent.withOpacity(0.3)),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.error_outline, color: Colors.redAccent, size: 18),
+                              const Icon(Icons.error_outline,
+                                  color: Colors.redAccent, size: 18),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Text(
                                   _errorMessage!,
-                                  style: const TextStyle(color: Colors.redAccent, fontSize: 13),
+                                  style: const TextStyle(
+                                      color: Colors.redAccent, fontSize: 13),
                                 ),
                               ),
                             ],
@@ -413,7 +448,10 @@ class _RegisterPageState extends State<RegisterPage>
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
                             gradient: const LinearGradient(
-                              colors: [CyberpunkTheme.neonCyan, Color(0xFF0077CC)],
+                              colors: [
+                                CyberpunkTheme.neonCyan,
+                                Color(0xFF0077CC)
+                              ],
                             ),
                             boxShadow: [
                               BoxShadow(
@@ -520,7 +558,8 @@ class _RegisterPageState extends State<RegisterPage>
             onChanged: (_) => setState(() {}),
             decoration: InputDecoration(
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               hintText: hint,
               hintStyle: TextStyle(
                 color: Colors.white.withOpacity(0.25),
@@ -528,9 +567,11 @@ class _RegisterPageState extends State<RegisterPage>
               ),
               prefixIcon: Padding(
                 padding: const EdgeInsets.only(left: 14, right: 8),
-                child: Icon(icon, color: CyberpunkTheme.neonCyan.withOpacity(0.6), size: 20),
+                child: Icon(icon,
+                    color: CyberpunkTheme.neonCyan.withOpacity(0.6), size: 20),
               ),
-              prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+              prefixIconConstraints:
+                  const BoxConstraints(minWidth: 0, minHeight: 0),
               suffixIcon: suffixWidget,
             ),
           ),
@@ -581,7 +622,8 @@ class _RegisterPageState extends State<RegisterPage>
       child: SizedBox(
         width: 16,
         height: 16,
-        child: CircularProgressIndicator(strokeWidth: 2, color: CyberpunkTheme.neonCyan),
+        child: CircularProgressIndicator(
+            strokeWidth: 2, color: CyberpunkTheme.neonCyan),
       ),
     );
   }
@@ -670,8 +712,10 @@ class _RegisterPageState extends State<RegisterPage>
                     height: 52,
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: CyberpunkTheme.neonCyan.withOpacity(0.4)),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        side: BorderSide(
+                            color: CyberpunkTheme.neonCyan.withOpacity(0.4)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
                       ),
                       onPressed: () => Navigator.pop(context),
                       child: const Text(

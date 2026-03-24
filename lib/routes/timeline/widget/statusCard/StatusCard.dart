@@ -61,7 +61,8 @@ class _StatusCardState extends State<StatusCard> {
     try {
       String audioasset = "assets/sounds/soundtrack1.wav";
       ByteData bytes = await rootBundle.load(audioasset);
-      _cachedSoundBytes = bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+      _cachedSoundBytes =
+          bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
     } catch (e) {
       // Sound loading failed, non-critical
     }
@@ -108,8 +109,6 @@ class _StatusCardState extends State<StatusCard> {
     }
   }
 
-
-
   Future<void> onReblogPress() async {
     Status newStatus;
     int temp = status.reblogs_count;
@@ -132,23 +131,25 @@ class _StatusCardState extends State<StatusCard> {
     }
   }
 
-
   late Uint8List imageDataBytes;
 
   @override
   Widget build(BuildContext context) {
-
     if (status.sensitive != true && status.muted != true) {
       return Container(
         width: MediaQuery.of(context).size.width - 0,
         padding: const EdgeInsets.all(0.0),
         child: Card(
           elevation: 10,
-          color: const Color(0xFF101010).withOpacity(0.8), // Semi-transparent dark
+          color:
+              const Color(0xFF101010).withOpacity(0.8), // Semi-transparent dark
           shape: RoundedRectangleBorder(
-            side: BorderSide(color: const Color(0xFF00F3FF).withOpacity(0.3), width: 1), // Neon border
+            side: BorderSide(
+                color: const Color(0xFF00F3FF).withOpacity(0.3),
+                width: 1), // Neon border
             borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(15), bottomRight: Radius.circular(15)), // Angular corners
+                topLeft: Radius.circular(15),
+                bottomRight: Radius.circular(15)), // Angular corners
           ),
           clipBehavior: Clip.antiAliasWithSaveLayer,
           child: Container(
@@ -163,234 +164,241 @@ class _StatusCardState extends State<StatusCard> {
               ),
             ),
             child: Column(
-            children: [
-              HeaderStatusCard(
-                  postsAccount: status.account,
-                  created_at: status.created_at,
-                  statusId: status.id,
-                  apiService: widget.apiService),
+              children: [
+                HeaderStatusCard(
+                    postsAccount: status.account,
+                    created_at: status.created_at,
+                    statusId: status.id,
+                    apiService: widget.apiService),
 
-              /// IF MEDIA ATTACHEMENT != 1
-              if (status.attachement.length != 1) ...[
-                CarouselSlider.builder(
-                  itemCount: status.attachement.length,
-                  options: CarouselOptions(
-                    height: 300,
-                    autoPlay: true,
-                    aspectRatio: 2.0,
-                    enlargeCenterPage: true,
+                /// IF MEDIA ATTACHEMENT != 1
+                if (status.attachement.length != 1) ...[
+                  CarouselSlider.builder(
+                    itemCount: status.attachement.length,
+                    options: CarouselOptions(
+                      height: 300,
+                      autoPlay: true,
+                      aspectRatio: 2.0,
+                      enlargeCenterPage: true,
+                    ),
+                    itemBuilder: (context, index, realIdx) {
+                      /// IF MEDIA ATTACHAMENT IS [VIDEO] AND LENGTH != 1
+                      if (status.attachement[index]["url"].contains(".mp4")) {
+                        return SimpleVideoPlayer(
+                          url: status.attachement[index]["url"],
+                          width: 490,
+                          height: 290,
+                        );
+                      } else {
+                        /// IF MEDIA ATTACHEMENT IS [IMAGE] AND LENGTH != 1
+                        return FullScreenWidget(
+                            child: Hero(
+                                tag: Random().nextInt(10000).toString(),
+                                child: ClipRRect(
+                                    child: CachedNetworkImage(
+                                        imageUrl: status.attachement[index]
+                                            ["url"],
+                                        placeholder: (context, url) => BlurHash(
+                                            hash: status.attachement[index]
+                                                ["blurhash"]),
+                                        errorWidget: (context, url, error) =>
+                                            const Icon(Icons.error),
+                                        imageBuilder: (context,
+                                                imageProvider) =>
+                                            Container(
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 0,
+                                                        vertical: 5),
+                                                //apply padding horizontal or vertical only
+                                                width: 490,
+                                                height: 290,
+                                                decoration: BoxDecoration(
+                                                  image: DecorationImage(
+                                                    image: imageProvider,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                )))
+                                    //  )
+                                    )));
+                      }
+                    },
                   ),
-                  itemBuilder: (context, index, realIdx) {
-                    /// IF MEDIA ATTACHAMENT IS [VIDEO] AND LENGTH != 1
-                    if (status.attachement[index]["url"].contains(".mp4")) {
-                      return SimpleVideoPlayer(
-                        url: status.attachement[index]["url"],
-                        width: 490,
-                        height: 290,
-                      );
-                    } else {
-                      /// IF MEDIA ATTACHEMENT IS [IMAGE] AND LENGTH != 1
-                      return FullScreenWidget(
-                          child: Hero(
-                              tag: Random().nextInt(10000).toString(),
-                              child: ClipRRect(
-                                  child: CachedNetworkImage(
-                                      imageUrl: status.attachement[index]
-                                          ["url"],
-                                      placeholder: (context, url) => BlurHash(
-                                          hash: status.attachement[index]
-                                              ["blurhash"]),
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(Icons.error),
-                                      imageBuilder: (context, imageProvider) =>
-                                          Container(
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 0,
-                                                      vertical: 5),
-                                              //apply padding horizontal or vertical only
-                                              width: 490,
-                                              height: 290,
-                                              decoration: BoxDecoration(
-                                                image: DecorationImage(
-                                                  image: imageProvider,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              )))
-                                  //  )
-                                  )));
-                    }
-                  },
-                ),
-              ] else ...[
-                /// IF [VIDEO] POSTS AND [LENGTH] == 1
-                if (status.attach.contains(".mp4")) ...[
-                  Container(
-                    width: 490,
-                    height: 290,
-                    child: SimpleVideoPlayer(
-                      url: status.attach,
+                ] else ...[
+                  /// IF [VIDEO] POSTS AND [LENGTH] == 1
+                  if (status.attach.contains(".mp4")) ...[
+                    Container(
                       width: 490,
                       height: 290,
-                    ),
-                  )
-                ] else ...[
-                  /// ELSE [PHOTO] POSTS AND [LENGTH] == 1
-                  FullScreenWidget(
-                      child: Hero(
-                          tag: Random().nextInt(100000).toString(),
-                          child: ClipRRect(
-                              child: ZoomOverlay(
-                                  minScale: 0.5, // Optional
-                                  maxScale: 3.0, // Optional
-                                  twoTouchOnly: true, // Defaults to false
-                                  child: CachedNetworkImage(
-                                      imageUrl: status.attach,
-                                      placeholder: (context, url) => SizedBox(
-                                            width: 490,
-                                            height: 290,
-                                            child:
-                                                BlurHash(hash: status.blurhash),
-                                          ),
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(Icons.error),
-                                      imageBuilder: (context, imageProvider) =>
-                                          Container(
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 0,
-                                                      vertical: 5),
-                                              //apply padding horizontal or vertical only
+                      child: SimpleVideoPlayer(
+                        url: status.attach,
+                        width: 490,
+                        height: 290,
+                      ),
+                    )
+                  ] else ...[
+                    /// ELSE [PHOTO] POSTS AND [LENGTH] == 1
+                    FullScreenWidget(
+                        child: Hero(
+                            tag: Random().nextInt(100000).toString(),
+                            child: ClipRRect(
+                                child: ZoomOverlay(
+                                    minScale: 0.5, // Optional
+                                    maxScale: 3.0, // Optional
+                                    twoTouchOnly: true, // Defaults to false
+                                    child: CachedNetworkImage(
+                                        imageUrl: status.attach,
+                                        placeholder: (context, url) => SizedBox(
                                               width: 490,
                                               height: 290,
-                                              decoration: BoxDecoration(
-                                                image: DecorationImage(
-                                                  image: imageProvider,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              )))))))
+                                              child: BlurHash(
+                                                  hash: status.blurhash),
+                                            ),
+                                        errorWidget: (context, url, error) =>
+                                            const Icon(Icons.error),
+                                        imageBuilder: (context,
+                                                imageProvider) =>
+                                            Container(
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 0,
+                                                        vertical: 5),
+                                                //apply padding horizontal or vertical only
+                                                width: 490,
+                                                height: 290,
+                                                decoration: BoxDecoration(
+                                                  image: DecorationImage(
+                                                    image: imageProvider,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                )))))))
+                  ],
                 ],
-              ],
 
-              Row(
-                children: [
-                  Container(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 5, vertical: 0)),
-                  LikeButton(
-                    circleColor: const CircleColor(
-                        start: Color(0xff00ddff), end: Color(0xff0099cc)),
-                    bubblesColor: const BubblesColor(
-                      dotPrimaryColor: Color(0xff33b5e5),
-                      dotSecondaryColor: Color(0xff0099cc),
-                    ),
-                    isLiked: status.favorited,
-                    likeCount: null,
-                    onTap: onFavoritePress,
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/PostDetail',
-                          arguments: {'post': status});
-                    },
-                    icon: const Icon(FontAwesomeIcons.commentDots),
-                  ),
-                  Expanded(child: Container()),
-                  IconButton(
-                    onPressed: onReblogPress,
-                    tooltip: "Reblog",
-                    icon: status.reblogged == true
-                        ? const Icon(FontAwesomeIcons.repeat)
-                        : const Icon(FontAwesomeIcons.repeat),
-                    color: status.reblogged ? Colors.green : null,
-                  ),
-                  status.replies_count != 0
-                      ? Text(status.reblogs_count.toString())
-                      : Container(),
-                  IconButton(
-                      onPressed: () {
-                        Share.share(status.url);
-                      },
-                      tooltip: "Share",
-                      icon: const Icon(FontAwesomeIcons.shareNodes)),
-                ],
-              ),
-              FutureBuilder<List>(
-                  future: _favourFuture,
-                  builder:
-                      (BuildContext context, AsyncSnapshot<List> snapshot) {
-                    if (snapshot.data != null) {
-                      return likedByStatusCard(
-                          posts: status,
-                          apiService: widget.apiService,
-                          likedby: snapshot.data);
-                    } else if (snapshot.hasError) {}
-                    return Container();
-                  }),
-              const SizedBox(height: 5),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        const SizedBox(width: 5),
-                        Expanded(
-                          child: Html(
-                            data: status.content,
-                            onLinkTap: (url, attributes, element) async {
-                              if (url == null) return;
-                              
-                              if (url.contains('/tags/')) {
-                                // Extract tag
-                                try {
-                                  final uri = Uri.parse(url);
-                                  final segments = uri.pathSegments;
-                                  final tagIndex = segments.indexOf('tags');
-                                  if (tagIndex != -1 && tagIndex + 1 < segments.length) {
-                                    final tag = segments[tagIndex + 1];
-                                    if (context.mounted) {
-                                      Navigator.pushNamed(context, '/TagTimeline', arguments: {'tag': tag});
-                                    }
-                                    return;
-                                  }
-                                } catch (e) {
-                                  debugPrint('Error parsing tag: $e');
-                                }
-                              }
-                              
-                              // Default: Launch URL
-                              try {
-                                final uri = Uri.parse(url);
-                                if (await canLaunchUrl(uri)) {
-                                  await launchUrl(uri, mode: LaunchMode.inAppWebView);
-                                }
-                              } catch (e) {
-                                debugPrint('Error launching URL: $e');
-                              }
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 5),
-                      ],
+                    Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 5, vertical: 0)),
+                    LikeButton(
+                      circleColor: const CircleColor(
+                          start: Color(0xff00ddff), end: Color(0xff0099cc)),
+                      bubblesColor: const BubblesColor(
+                        dotPrimaryColor: Color(0xff33b5e5),
+                        dotSecondaryColor: Color(0xff0099cc),
+                      ),
+                      isLiked: status.favorited,
+                      likeCount: null,
+                      onTap: onFavoritePress,
                     ),
-                    const SizedBox(height: 10),
-                    const SizedBox(height: 10),
-                    Divider(color: const Color(0xFF00F3FF).withOpacity(0.3), thickness: 1), // Neon Divider
-                    //status.replies_count != 0
-                    // ? animatedContainerDemoScreenState("See ${status.replies_count.toString()} comments")
-                    //  : Container(),
-                    Container(),
-                    const SizedBox(height: 15),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/PostDetail',
+                            arguments: {'post': status});
+                      },
+                      icon: const Icon(FontAwesomeIcons.commentDots),
+                    ),
+                    Expanded(child: Container()),
+                    IconButton(
+                      onPressed: onReblogPress,
+                      tooltip: "Reblog",
+                      icon: status.reblogged == true
+                          ? const Icon(FontAwesomeIcons.repeat)
+                          : const Icon(FontAwesomeIcons.repeat),
+                      color: status.reblogged ? Colors.green : null,
+                    ),
+                    status.replies_count != 0
+                        ? Text(status.reblogs_count.toString())
+                        : Container(),
+                    IconButton(
+                        onPressed: () {
+                          Share.share(status.url);
+                        },
+                        tooltip: "Share",
+                        icon: const Icon(FontAwesomeIcons.shareNodes)),
                   ],
                 ),
-              )
+                FutureBuilder<List>(
+                    future: _favourFuture,
+                    builder:
+                        (BuildContext context, AsyncSnapshot<List> snapshot) {
+                      if (snapshot.data != null) {
+                        return likedByStatusCard(
+                            posts: status,
+                            apiService: widget.apiService,
+                            likedby: snapshot.data);
+                      } else if (snapshot.hasError) {}
+                      return Container();
+                    }),
+                const SizedBox(height: 5),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          const SizedBox(width: 5),
+                          Expanded(
+                            child: Html(
+                              data: status.content,
+                              onLinkTap: (url, attributes, element) async {
+                                if (url == null) return;
 
-            ],
-          ),
-        ), // Closing Container
+                                if (url.contains('/tags/')) {
+                                  // Extract tag
+                                  try {
+                                    final uri = Uri.parse(url);
+                                    final segments = uri.pathSegments;
+                                    final tagIndex = segments.indexOf('tags');
+                                    if (tagIndex != -1 &&
+                                        tagIndex + 1 < segments.length) {
+                                      final tag = segments[tagIndex + 1];
+                                      if (context.mounted) {
+                                        Navigator.pushNamed(
+                                            context, '/TagTimeline',
+                                            arguments: {'tag': tag});
+                                      }
+                                      return;
+                                    }
+                                  } catch (e) {
+                                    debugPrint('Error parsing tag: $e');
+                                  }
+                                }
+
+                                // Default: Launch URL
+                                try {
+                                  final uri = Uri.parse(url);
+                                  if (await canLaunchUrl(uri)) {
+                                    await launchUrl(uri,
+                                        mode: LaunchMode.inAppWebView);
+                                  }
+                                } catch (e) {
+                                  debugPrint('Error launching URL: $e');
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      const SizedBox(height: 10),
+                      Divider(
+                          color: const Color(0xFF00F3FF).withOpacity(0.3),
+                          thickness: 1), // Neon Divider
+                      //status.replies_count != 0
+                      // ? animatedContainerDemoScreenState("See ${status.replies_count.toString()} comments")
+                      //  : Container(),
+                      Container(),
+                      const SizedBox(height: 15),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ), // Closing Container
         ),
       );
     } else {

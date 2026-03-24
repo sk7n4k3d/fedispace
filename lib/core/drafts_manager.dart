@@ -35,16 +35,16 @@ class PostDraft {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'caption': caption,
-    'mediaFilePaths': mediaFilePaths,
-    'altTexts': altTexts,
-    'visibility': visibility,
-    'sensitive': sensitive,
-    'spoilerText': spoilerText,
-    'locationName': locationName,
-    'createdAt': createdAt.toIso8601String(),
-  };
+        'id': id,
+        'caption': caption,
+        'mediaFilePaths': mediaFilePaths,
+        'altTexts': altTexts,
+        'visibility': visibility,
+        'sensitive': sensitive,
+        'spoilerText': spoilerText,
+        'locationName': locationName,
+        'createdAt': createdAt.toIso8601String(),
+      };
 
   factory PostDraft.fromJson(Map<String, dynamic> json) {
     return PostDraft(

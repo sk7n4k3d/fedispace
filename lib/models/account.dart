@@ -26,28 +26,28 @@ class Account {
 
   /// URL to the user's set header
   final String headerUrl;
-  final int  followers_count;
-  final int  following_count;
-  final int  statuses_count;
+  final int followers_count;
+  final int following_count;
+  final int statuses_count;
   final String note;
 
   String get display_name => displayName;
   String get avatar => avatarUrl;
   String get header => headerUrl;
-  Account(
-      {required this.id,
-        required this.username,
-        required this.displayName,
-        required this.acct,
-        required this.isLocked,
-        required this.isBot,
-        required this.avatarUrl,
-        required this.headerUrl,
-        required this.followers_count,
-        required this.following_count,
-        required this.statuses_count,
-        required this.note,
-      });
+  Account({
+    required this.id,
+    required this.username,
+    required this.displayName,
+    required this.acct,
+    required this.isLocked,
+    required this.isBot,
+    required this.avatarUrl,
+    required this.headerUrl,
+    required this.followers_count,
+    required this.following_count,
+    required this.statuses_count,
+    required this.note,
+  });
 
   /// Given a Json-like [Map] with information for an account,
   /// build and return the respective [Account] instance.

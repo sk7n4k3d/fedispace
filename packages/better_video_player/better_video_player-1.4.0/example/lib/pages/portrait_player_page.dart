@@ -60,7 +60,8 @@ class _CustomVideoPlayerControls extends StatefulWidget {
   }
 }
 
-class _CustomVideoPlayerControlsState extends State<_CustomVideoPlayerControls> {
+class _CustomVideoPlayerControlsState
+    extends State<_CustomVideoPlayerControls> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<BetterVideoPlayerController>();
@@ -74,7 +75,8 @@ class _CustomVideoPlayerControlsState extends State<_CustomVideoPlayerControls> 
             buildError()
           else if (controller.value.isLoading)
             Center(child: buildLoading())
-          else if (!(controller.value.videoPlayerController?.value.isPlaying ?? false))
+          else if (!(controller.value.videoPlayerController?.value.isPlaying ??
+              false))
             Stack(children: [
               Center(child: buildPlayPause()),
               Align(alignment: Alignment.bottomCenter, child: buildProgress()),
@@ -146,7 +148,8 @@ class _CustomVideoPlayerControlsState extends State<_CustomVideoPlayerControls> 
       if (controller.value.videoPlayerController?.value.isPlaying ?? false) {
         controller.pause();
       } else {
-        if (controller.value.videoPlayerController?.value.isInitialized ?? false) {
+        if (controller.value.videoPlayerController?.value.isInitialized ??
+            false) {
           if (controller.value.isVideoFinish) {
             controller.seekTo(const Duration());
           }

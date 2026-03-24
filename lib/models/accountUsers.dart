@@ -26,9 +26,9 @@ class AccountUsers {
 
   /// URL to the user's set header
   final String headerUrl;
-  final int  followers_count;
-  final int  following_count;
-  final int  statuses_count;
+  final int followers_count;
+  final int following_count;
+  final int statuses_count;
   final String note;
   final bool? following;
 
@@ -37,21 +37,21 @@ class AccountUsers {
   String get header => headerUrl;
   bool get bot => isBot;
   bool get locked => isLocked;
-  AccountUsers(
-      {required this.id,
-        required this.username,
-        required this.displayName,
-        required this.acct,
-        required this.isLocked,
-        required this.isBot,
-        required this.avatarUrl,
-        required this.headerUrl,
-        required this.followers_count,
-        required this.following_count,
-        required this.statuses_count,
-        required this.note,
-        this.following,
-      });
+  AccountUsers({
+    required this.id,
+    required this.username,
+    required this.displayName,
+    required this.acct,
+    required this.isLocked,
+    required this.isBot,
+    required this.avatarUrl,
+    required this.headerUrl,
+    required this.followers_count,
+    required this.following_count,
+    required this.statuses_count,
+    required this.note,
+    this.following,
+  });
 
   /// Given a Json-like [Map] with information for an account,
   /// build and return the respective [AccountUsers] instance.

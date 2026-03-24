@@ -47,8 +47,12 @@ class _ExploreGridState extends State<ExploreGrid>
     });
     try {
       final results = await Future.wait([
-        widget.apiService.discoverPosts(limit: 40).catchError((_) => <Status>[]),
-        widget.apiService.getTrendingPosts(limit: 20).catchError((_) => <Status>[]),
+        widget.apiService
+            .discoverPosts(limit: 40)
+            .catchError((_) => <Status>[]),
+        widget.apiService
+            .getTrendingPosts(limit: 20)
+            .catchError((_) => <Status>[]),
       ]);
 
       final discover = results[0] as List<Status>;
@@ -101,12 +105,14 @@ class _ExploreGridState extends State<ExploreGrid>
             const SizedBox(height: 12),
             Text(
               _hasError ? 'Failed to load' : 'No posts yet',
-              style: const TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 15),
+              style: const TextStyle(
+                  color: CyberpunkTheme.textSecondary, fontSize: 15),
             ),
             if (_hasError)
               TextButton(
                 onPressed: _loadPosts,
-                child: const Text('Retry', style: TextStyle(color: CyberpunkTheme.neonCyan)),
+                child: const Text('Retry',
+                    style: TextStyle(color: CyberpunkTheme.neonCyan)),
               ),
           ],
         ),
@@ -118,7 +124,8 @@ class _ExploreGridState extends State<ExploreGrid>
       backgroundColor: CyberpunkTheme.cardDark,
       onRefresh: _loadPosts,
       child: CustomScrollView(
-        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics()),
         slivers: [
           SliverPadding(
             padding: const EdgeInsets.all(2),
@@ -153,7 +160,8 @@ class _ExploreGridState extends State<ExploreGrid>
         // Row 1: 3 small squares
         if (remaining >= 1) _buildSmallRow(startIndex, min(3, remaining)),
         // Row 2: 1 large (2x2) + 2 small stacked
-        if (remaining > 3) _buildMixedRow(startIndex + 3, min(3, remaining - 3), largeOnLeft),
+        if (remaining > 3)
+          _buildMixedRow(startIndex + 3, min(3, remaining - 3), largeOnLeft),
       ],
     );
   }
@@ -162,7 +170,8 @@ class _ExploreGridState extends State<ExploreGrid>
     return Row(
       children: List.generate(3, (i) {
         if (i < count) {
-          return Expanded(child: _buildGridCell(_posts[startIndex + i], isSmall: true));
+          return Expanded(
+              child: _buildGridCell(_posts[startIndex + i], isSmall: true));
         }
         return const Expanded(child: SizedBox.shrink());
       }),
@@ -187,21 +196,27 @@ class _ExploreGridState extends State<ExploreGrid>
       flex: 1,
       child: Column(
         children: [
-          if (smallPosts.isNotEmpty) _buildGridCell(smallPosts[0], isSmall: true),
-          if (smallPosts.length > 1) _buildGridCell(smallPosts[1], isSmall: true),
-          if (smallPosts.isEmpty) const AspectRatio(aspectRatio: 1, child: SizedBox.shrink()),
-          if (smallPosts.length == 1) const AspectRatio(aspectRatio: 1, child: SizedBox.shrink()),
+          if (smallPosts.isNotEmpty)
+            _buildGridCell(smallPosts[0], isSmall: true),
+          if (smallPosts.length > 1)
+            _buildGridCell(smallPosts[1], isSmall: true),
+          if (smallPosts.isEmpty)
+            const AspectRatio(aspectRatio: 1, child: SizedBox.shrink()),
+          if (smallPosts.length == 1)
+            const AspectRatio(aspectRatio: 1, child: SizedBox.shrink()),
         ],
       ),
     );
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: largeOnLeft ? [largeWidget, smallColumn] : [smallColumn, largeWidget],
+      children:
+          largeOnLeft ? [largeWidget, smallColumn] : [smallColumn, largeWidget],
     );
   }
 
-  Widget _buildGridCell(Status post, {bool isSmall = false, bool isLarge = false}) {
+  Widget _buildGridCell(Status post,
+      {bool isSmall = false, bool isLarge = false}) {
     final mediaUrl = _getPostMediaUrl(post);
     final isTrending = _trendingIds.contains(post.id);
 
@@ -252,13 +267,15 @@ class _ExploreGridState extends State<ExploreGrid>
                     ),
                     errorWidget: (_, __, ___) => Container(
                       color: CyberpunkTheme.cardDark,
-                      child: const Icon(Icons.broken_image, color: CyberpunkTheme.textTertiary),
+                      child: const Icon(Icons.broken_image,
+                          color: CyberpunkTheme.textTertiary),
                     ),
                   )
                 else
                   Container(
                     color: CyberpunkTheme.cardDark,
-                    child: const Icon(Icons.image, color: CyberpunkTheme.textTertiary),
+                    child: const Icon(Icons.image,
+                        color: CyberpunkTheme.textTertiary),
                   ),
 
                 // Multi-image indicator
@@ -286,7 +303,8 @@ class _ExploreGridState extends State<ExploreGrid>
                     bottom: 6,
                     left: 6,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: CyberpunkTheme.neonCyan.withOpacity(0.9),
                         borderRadius: BorderRadius.circular(4),
@@ -294,7 +312,8 @@ class _ExploreGridState extends State<ExploreGrid>
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.trending_up_rounded, color: Colors.black, size: 10),
+                          Icon(Icons.trending_up_rounded,
+                              color: Colors.black, size: 10),
                           SizedBox(width: 2),
                           Text(
                             'Trending',

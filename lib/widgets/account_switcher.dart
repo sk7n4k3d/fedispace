@@ -64,7 +64,8 @@ class _AccountSwitcherSheetState extends State<_AccountSwitcherSheet> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: CyberpunkTheme.cardDark,
-        title: const Text('Remove Account', style: TextStyle(color: CyberpunkTheme.textWhite)),
+        title: const Text('Remove Account',
+            style: TextStyle(color: CyberpunkTheme.textWhite)),
         content: Text(
           'Remove ${account.displayHandle}?',
           style: const TextStyle(color: CyberpunkTheme.textSecondary),
@@ -72,11 +73,13 @@ class _AccountSwitcherSheetState extends State<_AccountSwitcherSheet> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+            child: const Text('Cancel',
+                style: TextStyle(color: CyberpunkTheme.textSecondary)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Remove', style: TextStyle(color: Colors.redAccent)),
+            child:
+                const Text('Remove', style: TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),
@@ -122,7 +125,8 @@ class _AccountSwitcherSheetState extends State<_AccountSwitcherSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
-                const Icon(Icons.switch_account_rounded, color: CyberpunkTheme.neonCyan, size: 22),
+                const Icon(Icons.switch_account_rounded,
+                    color: CyberpunkTheme.neonCyan, size: 22),
                 const SizedBox(width: 10),
                 Text(
                   'Switch Account',
@@ -173,7 +177,8 @@ class _AccountSwitcherSheetState extends State<_AccountSwitcherSheet> {
                 Navigator.pushNamed(context, '/Login');
               },
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 child: Row(
                   children: [
                     Container(
@@ -187,7 +192,8 @@ class _AccountSwitcherSheetState extends State<_AccountSwitcherSheet> {
                         ),
                         color: CyberpunkTheme.neonCyan.withOpacity(0.08),
                       ),
-                      child: const Icon(Icons.add_rounded, color: CyberpunkTheme.neonCyan, size: 24),
+                      child: const Icon(Icons.add_rounded,
+                          color: CyberpunkTheme.neonCyan, size: 24),
                     ),
                     const SizedBox(width: 14),
                     const Text(
@@ -271,16 +277,19 @@ class _AccountTile extends StatelessWidget {
                           fit: BoxFit.cover,
                           placeholder: (_, __) => Container(
                             color: CyberpunkTheme.cardDark,
-                            child: const Icon(Icons.person, color: CyberpunkTheme.textTertiary),
+                            child: const Icon(Icons.person,
+                                color: CyberpunkTheme.textTertiary),
                           ),
                           errorWidget: (_, __, ___) => Container(
                             color: CyberpunkTheme.cardDark,
-                            child: const Icon(Icons.person, color: CyberpunkTheme.textTertiary),
+                            child: const Icon(Icons.person,
+                                color: CyberpunkTheme.textTertiary),
                           ),
                         )
                       : Container(
                           color: CyberpunkTheme.cardDark,
-                          child: const Icon(Icons.person, color: CyberpunkTheme.textTertiary),
+                          child: const Icon(Icons.person,
+                              color: CyberpunkTheme.textTertiary),
                         ),
                 ),
               ),
@@ -294,7 +303,9 @@ class _AccountTile extends StatelessWidget {
                     Text(
                       account.displayName ?? account.username,
                       style: TextStyle(
-                        color: isActive ? CyberpunkTheme.neonCyan : CyberpunkTheme.textWhite,
+                        color: isActive
+                            ? CyberpunkTheme.neonCyan
+                            : CyberpunkTheme.textWhite,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),
@@ -318,7 +329,8 @@ class _AccountTile extends StatelessWidget {
               // Active indicator
               if (isActive)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     color: CyberpunkTheme.neonCyan.withOpacity(0.15),

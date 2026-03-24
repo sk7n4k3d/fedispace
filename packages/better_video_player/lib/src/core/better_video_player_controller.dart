@@ -8,7 +8,8 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-class BetterVideoPlayerController extends ValueNotifier<BetterVideoPlayerValue> {
+class BetterVideoPlayerController
+    extends ValueNotifier<BetterVideoPlayerValue> {
   // normal player controller
   BetterVideoPlayerController()
       : super(BetterVideoPlayerValue(
@@ -17,7 +18,8 @@ class BetterVideoPlayerController extends ValueNotifier<BetterVideoPlayerValue> 
         ));
 
   // full screen player controller
-  BetterVideoPlayerController.copy(BetterVideoPlayerController betterVideoPlayerController)
+  BetterVideoPlayerController.copy(
+      BetterVideoPlayerController betterVideoPlayerController)
       : super(betterVideoPlayerController.value.copyWith(
           isFullScreenMode: true,
         ));
@@ -34,9 +36,11 @@ class BetterVideoPlayerController extends ValueNotifier<BetterVideoPlayerValue> 
   StreamSubscription? _connectivitySubscription;
 
   // emit player event
-  StreamController<BetterVideoPlayerEvent> _playerEventStreamController = StreamController.broadcast();
+  StreamController<BetterVideoPlayerEvent> _playerEventStreamController =
+      StreamController.broadcast();
 
-  Stream<BetterVideoPlayerEvent> get playerEventStream => _playerEventStreamController.stream;
+  Stream<BetterVideoPlayerEvent> get playerEventStream =>
+      _playerEventStreamController.stream;
 
   // video player
   VideoPlayerController? get videoPlayer => value.videoPlayerController;
@@ -53,7 +57,8 @@ class BetterVideoPlayerController extends ValueNotifier<BetterVideoPlayerValue> 
   }
 
   /// 关联播放器
-  void attachVideoPlayerController({VideoPlayerController? videoPlayerController}) {
+  void attachVideoPlayerController(
+      {VideoPlayerController? videoPlayerController}) {
     if (_dispose) {
       return;
     }
@@ -70,7 +75,8 @@ class BetterVideoPlayerController extends ValueNotifier<BetterVideoPlayerValue> 
   }
 
   /// 创建播放器
-  Future<void> createVideoPlayerController({required BetterVideoPlayerDataSource dataSource}) async {
+  Future<void> createVideoPlayerController(
+      {required BetterVideoPlayerDataSource dataSource}) async {
     late VideoPlayerController videoPlayerController;
     switch (dataSource.type) {
       case BetterVideoPlayerDataSourceType.network:
@@ -78,7 +84,8 @@ class BetterVideoPlayerController extends ValueNotifier<BetterVideoPlayerValue> 
         break;
 
       case BetterVideoPlayerDataSourceType.file:
-        videoPlayerController = VideoPlayerController.file(File(dataSource.url));
+        videoPlayerController =
+            VideoPlayerController.file(File(dataSource.url));
         break;
 
       case BetterVideoPlayerDataSourceType.asset:
@@ -91,7 +98,8 @@ class BetterVideoPlayerController extends ValueNotifier<BetterVideoPlayerValue> 
       await videoPlayerController.initialize();
     } catch (e) {
       print(e);
-      videoPlayerController.value = videoPlayerController.value.copyWith(errorDescription: e.toString());
+      videoPlayerController.value =
+          videoPlayerController.value.copyWith(errorDescription: e.toString());
     }
 
     // 绑定播放控制器
@@ -139,7 +147,9 @@ class BetterVideoPlayerController extends ValueNotifier<BetterVideoPlayerValue> 
     _connectivitySubscription?.cancel();
     var connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult.contains(ConnectivityResult.wifi)) {
-      _connectivitySubscription = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
+      _connectivitySubscription = Connectivity()
+          .onConnectivityChanged
+          .listen((List<ConnectivityResult> results) {
         if (value.videoPlayerController?.hasListeners == true) {
           if (!results.contains(ConnectivityResult.wifi)) {
             value = value.copyWith(wifiInterrupted: true);
@@ -160,13 +170,17 @@ class BetterVideoPlayerController extends ValueNotifier<BetterVideoPlayerValue> 
 
     await Future.delayed(Duration.zero);
 
-    value = value.copyWith(isLoading: BetterVideoPlayerUtils.isLoading(videoPlayerValue));
+    value = value.copyWith(
+        isLoading: BetterVideoPlayerUtils.isLoading(videoPlayerValue));
 
     // emit playEnd event
     bool isVideoFinish = value.isVideoFinish;
-    value = value.copyWith(isVideoFinish: BetterVideoPlayerUtils.isVideoFinished(videoPlayerValue));
+    value = value.copyWith(
+        isVideoFinish:
+            BetterVideoPlayerUtils.isVideoFinished(videoPlayerValue));
     if (isVideoFinish == false && value.isVideoFinish == true) {
-      _playerEventStreamController.sink.add(BetterVideoPlayerEvent(value.playerKey, BetterVideoPlayerEventType.onPlayEnd));
+      _playerEventStreamController.sink.add(BetterVideoPlayerEvent(
+          value.playerKey, BetterVideoPlayerEventType.onPlayEnd));
     }
   }
 
@@ -212,7 +226,8 @@ class BetterVideoPlayerController extends ValueNotifier<BetterVideoPlayerValue> 
       }
 
       // 发送开始播放事件
-      _playerEventStreamController.sink.add(BetterVideoPlayerEvent(value.playerKey, BetterVideoPlayerEventType.onPlay));
+      _playerEventStreamController.sink.add(BetterVideoPlayerEvent(
+          value.playerKey, BetterVideoPlayerEventType.onPlay));
 
       if (value.wifiInterrupted) {
         // 去掉 Wifi 中断提醒
@@ -228,8 +243,10 @@ class BetterVideoPlayerController extends ValueNotifier<BetterVideoPlayerValue> 
       return;
     }
 
-    if (value.videoPlayerController != null && value.videoPlayerController!.value.hasError) {
-      _playerEventStreamController.sink.add(BetterVideoPlayerEvent(value.playerKey, BetterVideoPlayerEventType.onRestart));
+    if (value.videoPlayerController != null &&
+        value.videoPlayerController!.value.hasError) {
+      _playerEventStreamController.sink.add(BetterVideoPlayerEvent(
+          value.playerKey, BetterVideoPlayerEventType.onRestart));
 
       // remove error
       value.videoPlayerController!.value = VideoPlayerValue(
@@ -247,12 +264,14 @@ class BetterVideoPlayerController extends ValueNotifier<BetterVideoPlayerValue> 
       );
 
       // auto play
-      value = value.copyWith(configuration: value.configuration.copyWith(autoPlay: true));
+      value = value.copyWith(
+          configuration: value.configuration.copyWith(autoPlay: true));
 
       try {
         await value.videoPlayerController!.initialize();
       } catch (e) {
-        value.videoPlayerController!.value = value.videoPlayerController!.value.copyWith(errorDescription: e.toString());
+        value.videoPlayerController!.value = value.videoPlayerController!.value
+            .copyWith(errorDescription: e.toString());
       }
 
       if (value.videoPlayerController!.value.hasError) {
@@ -282,10 +301,12 @@ class BetterVideoPlayerController extends ValueNotifier<BetterVideoPlayerValue> 
       // 暂停播放
       await value.videoPlayerController?.pause();
 
-      _playerEventStreamController.sink.add(BetterVideoPlayerEvent(value.playerKey, BetterVideoPlayerEventType.onPause));
+      _playerEventStreamController.sink.add(BetterVideoPlayerEvent(
+          value.playerKey, BetterVideoPlayerEventType.onPause));
     } else {
       // 如果在初始化中, 需要关闭自动播放
-      value = value.copyWith(configuration: value.configuration.copyWith(autoPlay: false));
+      value = value.copyWith(
+          configuration: value.configuration.copyWith(autoPlay: false));
     }
   }
 
@@ -361,7 +382,8 @@ class BetterVideoPlayerController extends ValueNotifier<BetterVideoPlayerValue> 
     }
 
     if (videoPlayerValue?.isInitialized == true) {
-      final Duration position = (videoPlayerValue?.duration ?? Duration.zero) * relative;
+      final Duration position =
+          (videoPlayerValue?.duration ?? Duration.zero) * relative;
       await seekTo(position);
     }
   }
@@ -470,9 +492,12 @@ class BetterVideoPlayerValue {
       wifiInterrupted: wifiInterrupted ?? this.wifiInterrupted,
       configuration: configuration ?? this.configuration,
       dataSource: dataSource ?? this.dataSource,
-      videoPlayerController: videoPlayerController ?? this.videoPlayerController,
-      enterFullScreenCallback: enterFullScreenCallback ?? this.enterFullScreenCallback,
-      exitFullScreenCallback: exitFullScreenCallback ?? this.exitFullScreenCallback,
+      videoPlayerController:
+          videoPlayerController ?? this.videoPlayerController,
+      enterFullScreenCallback:
+          enterFullScreenCallback ?? this.enterFullScreenCallback,
+      exitFullScreenCallback:
+          exitFullScreenCallback ?? this.exitFullScreenCallback,
     );
   }
 

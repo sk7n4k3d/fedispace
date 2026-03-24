@@ -47,7 +47,8 @@ class _SettingsPageState extends State<SettingsPage> {
   String _translateTargetLang = 'en';
   bool _autoTranslateEnabled = false;
   String _translateProvider = 'libretranslate'; // 'openai' | 'libretranslate'
-  String _openaiTranslateEndpoint = 'https://api.openai.com/v1/chat/completions';
+  String _openaiTranslateEndpoint =
+      'https://api.openai.com/v1/chat/completions';
   String _openaiTranslateApiKey = '';
 
   static const _languageOptions = {
@@ -139,16 +140,24 @@ class _SettingsPageState extends State<SettingsPage> {
     final notifyFollows = prefs.getBool('notify_follows') ?? true;
     final notifyDMs = prefs.getBool('notify_dms') ?? true;
     final notifyPolls = prefs.getBool('notify_polls') ?? true;
-    final libreTranslateUrl = prefs.getString('libretranslate_url') ?? 'https://libretranslate.com';
-    final translateTargetLang = prefs.getString('translate_target_lang') ?? 'en';
-    final autoTranslateEnabled = prefs.getBool('auto_translate_enabled') ?? false;
-    final translateProvider = prefs.getString('translate_provider') ?? 'libretranslate';
-    final openaiTranslateEndpoint = prefs.getString('openai_translate_endpoint') ?? 'https://api.openai.com/v1/chat/completions';
+    final libreTranslateUrl =
+        prefs.getString('libretranslate_url') ?? 'https://libretranslate.com';
+    final translateTargetLang =
+        prefs.getString('translate_target_lang') ?? 'en';
+    final autoTranslateEnabled =
+        prefs.getBool('auto_translate_enabled') ?? false;
+    final translateProvider =
+        prefs.getString('translate_provider') ?? 'libretranslate';
+    final openaiTranslateEndpoint =
+        prefs.getString('openai_translate_endpoint') ??
+            'https://api.openai.com/v1/chat/completions';
     final defaultAiProvider = prefs.getString('ai_provider') ?? 'stability';
 
     // SECURITY: Load API keys from encrypted secure storage
-    final libreTranslateApiKey = await _secureStorage.read(key: 'libretranslate_api_key') ?? '';
-    final openaiTranslateApiKey = await _secureStorage.read(key: 'openai_translate_api_key') ?? '';
+    final libreTranslateApiKey =
+        await _secureStorage.read(key: 'libretranslate_api_key') ?? '';
+    final openaiTranslateApiKey =
+        await _secureStorage.read(key: 'openai_translate_api_key') ?? '';
     final Map<String, String> aiKeys = {};
     for (final p in _aiKeys.keys) {
       aiKeys[p] = await _secureStorage.read(key: '${p}_api_key') ?? '';
@@ -234,10 +243,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 color: color.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(_providerIcons[provider] ?? Icons.key, color: color, size: 18),
+              child: Icon(_providerIcons[provider] ?? Icons.key,
+                  color: color, size: 18),
             ),
             const SizedBox(width: 10),
-            Text(label, style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 16, fontWeight: FontWeight.w700)),
+            Text(label,
+                style: const TextStyle(
+                    color: CyberpunkTheme.textWhite,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700)),
           ],
         ),
         content: Column(
@@ -246,25 +260,33 @@ class _SettingsPageState extends State<SettingsPage> {
           children: [
             Text(
               'Enter your $label API key:',
-              style: const TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 13),
+              style: const TextStyle(
+                  color: CyberpunkTheme.textSecondary, fontSize: 13),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: controller,
-              style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 14, fontFamily: 'monospace'),
+              style: const TextStyle(
+                  color: CyberpunkTheme.textWhite,
+                  fontSize: 14,
+                  fontFamily: 'monospace'),
               obscureText: true,
               decoration: InputDecoration(
                 hintText: 'sk-xxxxxxxxxxxxxxx',
-                hintStyle: TextStyle(color: CyberpunkTheme.textTertiary.withOpacity(0.4), fontSize: 13),
+                hintStyle: TextStyle(
+                    color: CyberpunkTheme.textTertiary.withOpacity(0.4),
+                    fontSize: 13),
                 filled: true,
                 fillColor: CyberpunkTheme.cardDark,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: CyberpunkTheme.borderDark),
+                  borderSide:
+                      const BorderSide(color: CyberpunkTheme.borderDark),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: CyberpunkTheme.borderDark),
+                  borderSide:
+                      const BorderSide(color: CyberpunkTheme.borderDark),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -272,7 +294,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
             ),
-            if (signupUrl.isNotEmpty) ...[            
+            if (signupUrl.isNotEmpty) ...[
               const SizedBox(height: 12),
               GestureDetector(
                 onTap: () {
@@ -283,7 +305,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 },
                 child: Row(
                   children: [
-                    Icon(Icons.open_in_new, size: 14, color: CyberpunkTheme.neonCyan.withOpacity(0.8)),
+                    Icon(Icons.open_in_new,
+                        size: 14,
+                        color: CyberpunkTheme.neonCyan.withOpacity(0.8)),
                     const SizedBox(width: 6),
                     Flexible(
                       child: Text(
@@ -292,7 +316,8 @@ class _SettingsPageState extends State<SettingsPage> {
                           fontSize: 13,
                           color: CyberpunkTheme.neonCyan.withOpacity(0.8),
                           decoration: TextDecoration.underline,
-                          decorationColor: CyberpunkTheme.neonCyan.withOpacity(0.4),
+                          decorationColor:
+                              CyberpunkTheme.neonCyan.withOpacity(0.4),
                         ),
                       ),
                     ),
@@ -305,13 +330,15 @@ class _SettingsPageState extends State<SettingsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+            child: const Text('Cancel',
+                style: TextStyle(color: CyberpunkTheme.textSecondary)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: color,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
             onPressed: () {
               _saveAiKey(provider, controller.text.trim());
@@ -321,7 +348,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   content: Text('$label key saved'),
                   backgroundColor: CyberpunkTheme.surfaceDark,
                   behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                 ),
               );
             },
@@ -344,7 +372,8 @@ class _SettingsPageState extends State<SettingsPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 36, height: 4,
+              width: 36,
+              height: 4,
               margin: const EdgeInsets.only(top: 12, bottom: 16),
               decoration: BoxDecoration(
                 color: CyberpunkTheme.borderDark,
@@ -355,7 +384,10 @@ class _SettingsPageState extends State<SettingsPage> {
               padding: EdgeInsets.only(bottom: 12),
               child: Text(
                 'Default AI Provider',
-                style: TextStyle(color: CyberpunkTheme.textWhite, fontSize: 17, fontWeight: FontWeight.w700),
+                style: TextStyle(
+                    color: CyberpunkTheme.textWhite,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700),
               ),
             ),
             ..._providerLabels.entries.map((entry) {
@@ -365,19 +397,26 @@ class _SettingsPageState extends State<SettingsPage> {
               final color = _providerColors[id] ?? CyberpunkTheme.neonCyan;
               return ListTile(
                 leading: Container(
-                  width: 42, height: 42,
+                  width: 42,
+                  height: 42,
                   decoration: BoxDecoration(
                     color: color.withOpacity(isSelected ? 0.2 : 0.08),
                     borderRadius: BorderRadius.circular(12),
-                    border: isSelected ? Border.all(color: color.withOpacity(0.4)) : null,
+                    border: isSelected
+                        ? Border.all(color: color.withOpacity(0.4))
+                        : null,
                   ),
                   child: Icon(_providerIcons[id], color: color, size: 22),
                 ),
-                title: Text(label, style: TextStyle(
-                  color: isSelected ? CyberpunkTheme.textWhite : CyberpunkTheme.textSecondary,
-                  fontSize: 15,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                )),
+                title: Text(label,
+                    style: TextStyle(
+                      color: isSelected
+                          ? CyberpunkTheme.textWhite
+                          : CyberpunkTheme.textSecondary,
+                      fontSize: 15,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
+                    )),
                 trailing: isSelected
                     ? Icon(Icons.check_circle_rounded, color: color, size: 22)
                     : null,
@@ -385,7 +424,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   _setDefaultProvider(id);
                   Navigator.pop(ctx);
                 },
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
               );
             }),
             const SizedBox(height: 12),
@@ -406,19 +446,25 @@ class _SettingsPageState extends State<SettingsPage> {
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
         builder: (ctx) => Container(
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6),
+          constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.6),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
                 padding: const EdgeInsets.all(16),
-                child: Text('Followed Tags', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: CyberpunkTheme.textWhite)),
+                child: Text('Followed Tags',
+                    style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: CyberpunkTheme.textWhite)),
               ),
               const Divider(color: CyberpunkTheme.borderDark),
               if (tags.isEmpty)
                 const Padding(
                   padding: EdgeInsets.all(32),
-                  child: Text('No followed tags', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+                  child: Text('No followed tags',
+                      style: TextStyle(color: CyberpunkTheme.textSecondary)),
                 )
               else
                 Flexible(
@@ -429,13 +475,19 @@ class _SettingsPageState extends State<SettingsPage> {
                       final tag = tags[index];
                       final name = tag['name']?.toString() ?? '';
                       return ListTile(
-                        leading: const Icon(Icons.tag, color: CyberpunkTheme.neonCyan),
-                        title: Text('#$name', style: const TextStyle(color: CyberpunkTheme.textWhite)),
+                        leading: const Icon(Icons.tag,
+                            color: CyberpunkTheme.neonCyan),
+                        title: Text('#$name',
+                            style: const TextStyle(
+                                color: CyberpunkTheme.textWhite)),
                         onTap: () {
                           Navigator.pop(ctx);
-                          Navigator.push(context, MaterialPageRoute(
-                            builder: (_) => TagTimeline(apiService: widget.apiService, tag: name),
-                          ));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => TagTimeline(
+                                    apiService: widget.apiService, tag: name),
+                              ));
                         },
                       );
                     },
@@ -448,34 +500,48 @@ class _SettingsPageState extends State<SettingsPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading tags: $e'), backgroundColor: CyberpunkTheme.cardDark),
+          SnackBar(
+              content: Text('Error loading tags: $e'),
+              backgroundColor: CyberpunkTheme.cardDark),
         );
       }
     }
   }
 
   void _showAnnouncementDialog(Map<String, dynamic> announcement) {
-    final text = announcement['content']?.toString().replaceAll(RegExp(r'<[^>]*>'), '') ?? '';
+    final text = announcement['content']
+            ?.toString()
+            .replaceAll(RegExp(r'<[^>]*>'), '') ??
+        '';
     final publishedAt = announcement['published_at'] ?? '';
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: CyberpunkTheme.cardDark,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Announcement', style: TextStyle(color: CyberpunkTheme.neonCyan, fontWeight: FontWeight.w700)),
+        title: const Text('Announcement',
+            style: TextStyle(
+                color: CyberpunkTheme.neonCyan, fontWeight: FontWeight.w700)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(text, style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 14)),
+            Text(text,
+                style: const TextStyle(
+                    color: CyberpunkTheme.textWhite, fontSize: 14)),
             if (publishedAt.isNotEmpty) ...[
               const SizedBox(height: 12),
-              Text(publishedAt, style: const TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 11)),
+              Text(publishedAt,
+                  style: const TextStyle(
+                      color: CyberpunkTheme.textTertiary, fontSize: 11)),
             ],
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(S.of(context).close, style: const TextStyle(color: CyberpunkTheme.neonCyan))),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(S.of(context).close,
+                  style: const TextStyle(color: CyberpunkTheme.neonCyan))),
         ],
       ),
     );
@@ -487,16 +553,23 @@ class _SettingsPageState extends State<SettingsPage> {
       builder: (context) => AlertDialog(
         backgroundColor: CyberpunkTheme.cardDark,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Logout', style: TextStyle(color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w600)),
-        content: const Text('Are you sure you want to logout?', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+        title: const Text('Logout',
+            style: TextStyle(
+                color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w600)),
+        content: const Text('Are you sure you want to logout?',
+            style: TextStyle(color: CyberpunkTheme.textSecondary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+            child: const Text('Cancel',
+                style: TextStyle(color: CyberpunkTheme.textSecondary)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Logout', style: TextStyle(color: CyberpunkTheme.neonPink, fontWeight: FontWeight.w600)),
+            child: const Text('Logout',
+                style: TextStyle(
+                    color: CyberpunkTheme.neonPink,
+                    fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -507,7 +580,8 @@ class _SettingsPageState extends State<SettingsPage> {
         appLogger.info('User logging out');
         await widget.apiService.logOut();
         if (mounted) {
-          Navigator.of(context).pushNamedAndRemoveUntil('/Login', (route) => false);
+          Navigator.of(context)
+              .pushNamedAndRemoveUntil('/Login', (route) => false);
         }
       } catch (error, stackTrace) {
         appLogger.error('Error during logout', error, stackTrace);
@@ -522,11 +596,15 @@ class _SettingsPageState extends State<SettingsPage> {
       builder: (ctx) => AlertDialog(
         backgroundColor: CyberpunkTheme.surfaceDark,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('LibreTranslate Server', style: TextStyle(color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700)),
+        title: const Text('LibreTranslate Server',
+            style: TextStyle(
+                color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Enter the URL of your LibreTranslate instance', style: TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 13)),
+            const Text('Enter the URL of your LibreTranslate instance',
+                style: TextStyle(
+                    color: CyberpunkTheme.textSecondary, fontSize: 13)),
             const SizedBox(height: 12),
             TextField(
               controller: controller,
@@ -536,9 +614,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 hintStyle: TextStyle(color: CyberpunkTheme.textTertiary),
                 filled: true,
                 fillColor: CyberpunkTheme.cardDark,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: CyberpunkTheme.neonCyan, width: 1)),
-                prefixIcon: const Icon(Icons.link_rounded, color: CyberpunkTheme.neonCyan, size: 20),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(
+                        color: CyberpunkTheme.neonCyan, width: 1)),
+                prefixIcon: const Icon(Icons.link_rounded,
+                    color: CyberpunkTheme.neonCyan, size: 20),
               ),
             ),
           ],
@@ -546,7 +630,8 @@ class _SettingsPageState extends State<SettingsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+            child: const Text('Cancel',
+                style: TextStyle(color: CyberpunkTheme.textSecondary)),
           ),
           TextButton(
             onPressed: () async {
@@ -558,7 +643,10 @@ class _SettingsPageState extends State<SettingsPage> {
               }
               Navigator.pop(ctx);
             },
-            child: const Text('Save', style: TextStyle(color: CyberpunkTheme.neonCyan, fontWeight: FontWeight.w600)),
+            child: const Text('Save',
+                style: TextStyle(
+                    color: CyberpunkTheme.neonCyan,
+                    fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -572,11 +660,16 @@ class _SettingsPageState extends State<SettingsPage> {
       builder: (ctx) => AlertDialog(
         backgroundColor: CyberpunkTheme.surfaceDark,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('LibreTranslate API Key', style: TextStyle(color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700)),
+        title: const Text('LibreTranslate API Key',
+            style: TextStyle(
+                color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Enter your LibreTranslate API key (leave empty if not required)', style: TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 13)),
+            const Text(
+                'Enter your LibreTranslate API key (leave empty if not required)',
+                style: TextStyle(
+                    color: CyberpunkTheme.textSecondary, fontSize: 13)),
             const SizedBox(height: 12),
             TextField(
               controller: controller,
@@ -587,9 +680,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 hintStyle: TextStyle(color: CyberpunkTheme.textTertiary),
                 filled: true,
                 fillColor: CyberpunkTheme.cardDark,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: CyberpunkTheme.neonCyan, width: 1)),
-                prefixIcon: const Icon(Icons.vpn_key_rounded, color: CyberpunkTheme.neonCyan, size: 20),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(
+                        color: CyberpunkTheme.neonCyan, width: 1)),
+                prefixIcon: const Icon(Icons.vpn_key_rounded,
+                    color: CyberpunkTheme.neonCyan, size: 20),
               ),
             ),
           ],
@@ -597,17 +696,22 @@ class _SettingsPageState extends State<SettingsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+            child: const Text('Cancel',
+                style: TextStyle(color: CyberpunkTheme.textSecondary)),
           ),
           TextButton(
             onPressed: () async {
               final key = controller.text.trim();
               // SECURITY: Save to encrypted secure storage
-              await _secureStorage.write(key: 'libretranslate_api_key', value: key);
+              await _secureStorage.write(
+                  key: 'libretranslate_api_key', value: key);
               setState(() => _libreTranslateApiKey = key);
               Navigator.pop(ctx);
             },
-            child: const Text('Save', style: TextStyle(color: CyberpunkTheme.neonCyan, fontWeight: FontWeight.w600)),
+            child: const Text('Save',
+                style: TextStyle(
+                    color: CyberpunkTheme.neonCyan,
+                    fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -621,11 +725,15 @@ class _SettingsPageState extends State<SettingsPage> {
       builder: (ctx) => AlertDialog(
         backgroundColor: CyberpunkTheme.surfaceDark,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('OpenAI Endpoint', style: TextStyle(color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700)),
+        title: const Text('OpenAI Endpoint',
+            style: TextStyle(
+                color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Enter the URL of your OpenAI-compatible API endpoint', style: TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 13)),
+            const Text('Enter the URL of your OpenAI-compatible API endpoint',
+                style: TextStyle(
+                    color: CyberpunkTheme.textSecondary, fontSize: 13)),
             const SizedBox(height: 12),
             TextField(
               controller: controller,
@@ -635,9 +743,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 hintStyle: TextStyle(color: CyberpunkTheme.textTertiary),
                 filled: true,
                 fillColor: CyberpunkTheme.cardDark,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF10A37F), width: 1)),
-                prefixIcon: const Icon(Icons.link_rounded, color: Color(0xFF10A37F), size: 20),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide:
+                        const BorderSide(color: Color(0xFF10A37F), width: 1)),
+                prefixIcon: const Icon(Icons.link_rounded,
+                    color: Color(0xFF10A37F), size: 20),
               ),
             ),
           ],
@@ -645,7 +759,8 @@ class _SettingsPageState extends State<SettingsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+            child: const Text('Cancel',
+                style: TextStyle(color: CyberpunkTheme.textSecondary)),
           ),
           TextButton(
             onPressed: () async {
@@ -655,7 +770,9 @@ class _SettingsPageState extends State<SettingsPage> {
               setState(() => _openaiTranslateEndpoint = url);
               Navigator.pop(ctx);
             },
-            child: const Text('Save', style: TextStyle(color: Color(0xFF10A37F), fontWeight: FontWeight.w600)),
+            child: const Text('Save',
+                style: TextStyle(
+                    color: Color(0xFF10A37F), fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -669,11 +786,15 @@ class _SettingsPageState extends State<SettingsPage> {
       builder: (ctx) => AlertDialog(
         backgroundColor: CyberpunkTheme.surfaceDark,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('OpenAI API Key', style: TextStyle(color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700)),
+        title: const Text('OpenAI API Key',
+            style: TextStyle(
+                color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w700)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Enter your OpenAI API key for translation', style: TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 13)),
+            const Text('Enter your OpenAI API key for translation',
+                style: TextStyle(
+                    color: CyberpunkTheme.textSecondary, fontSize: 13)),
             const SizedBox(height: 12),
             TextField(
               controller: controller,
@@ -684,9 +805,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 hintStyle: TextStyle(color: CyberpunkTheme.textTertiary),
                 filled: true,
                 fillColor: CyberpunkTheme.cardDark,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF10A37F), width: 1)),
-                prefixIcon: const Icon(Icons.vpn_key_rounded, color: Color(0xFF10A37F), size: 20),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide:
+                        const BorderSide(color: Color(0xFF10A37F), width: 1)),
+                prefixIcon: const Icon(Icons.vpn_key_rounded,
+                    color: Color(0xFF10A37F), size: 20),
               ),
             ),
           ],
@@ -694,17 +821,21 @@ class _SettingsPageState extends State<SettingsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+            child: const Text('Cancel',
+                style: TextStyle(color: CyberpunkTheme.textSecondary)),
           ),
           TextButton(
             onPressed: () async {
               final key = controller.text.trim();
               // SECURITY: Save to encrypted secure storage
-              await _secureStorage.write(key: 'openai_translate_api_key', value: key);
+              await _secureStorage.write(
+                  key: 'openai_translate_api_key', value: key);
               setState(() => _openaiTranslateApiKey = key);
               Navigator.pop(ctx);
             },
-            child: const Text('Save', style: TextStyle(color: Color(0xFF10A37F), fontWeight: FontWeight.w600)),
+            child: const Text('Save',
+                style: TextStyle(
+                    color: Color(0xFF10A37F), fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -735,14 +866,24 @@ class _SettingsPageState extends State<SettingsPage> {
     showModalBottomSheet(
       context: context,
       backgroundColor: CyberpunkTheme.surfaceDark,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 12),
-          Container(width: 40, height: 4, decoration: BoxDecoration(color: CyberpunkTheme.borderDark, borderRadius: BorderRadius.circular(2))),
+          Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                  color: CyberpunkTheme.borderDark,
+                  borderRadius: BorderRadius.circular(2))),
           const SizedBox(height: 16),
-          const Text('App Language', style: TextStyle(color: CyberpunkTheme.textWhite, fontSize: 17, fontWeight: FontWeight.w700)),
+          const Text('App Language',
+              style: TextStyle(
+                  color: CyberpunkTheme.textWhite,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           Flexible(
             child: ListView(
@@ -751,12 +892,28 @@ class _SettingsPageState extends State<SettingsPage> {
                 final isSelected = _appLocaleCode == entry.key;
                 return ListTile(
                   leading: Icon(
-                    isSelected ? Icons.check_circle_rounded : Icons.circle_outlined,
-                    color: isSelected ? CyberpunkTheme.neonCyan : CyberpunkTheme.textTertiary,
+                    isSelected
+                        ? Icons.check_circle_rounded
+                        : Icons.circle_outlined,
+                    color: isSelected
+                        ? CyberpunkTheme.neonCyan
+                        : CyberpunkTheme.textTertiary,
                     size: 22,
                   ),
-                  title: Text(entry.value, style: TextStyle(color: isSelected ? CyberpunkTheme.neonCyan : CyberpunkTheme.textWhite, fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400)),
-                  trailing: entry.key.isNotEmpty ? Text(entry.key.toUpperCase(), style: const TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 12, letterSpacing: 1)) : null,
+                  title: Text(entry.value,
+                      style: TextStyle(
+                          color: isSelected
+                              ? CyberpunkTheme.neonCyan
+                              : CyberpunkTheme.textWhite,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.w400)),
+                  trailing: entry.key.isNotEmpty
+                      ? Text(entry.key.toUpperCase(),
+                          style: const TextStyle(
+                              color: CyberpunkTheme.textTertiary,
+                              fontSize: 12,
+                              letterSpacing: 1))
+                      : null,
                   onTap: () async {
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.setString('app_locale', entry.key);
@@ -764,7 +921,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     // Update the app locale via MyAppState
                     final state = context.findAncestorStateOfType<MyAppState>();
                     if (entry.key.isEmpty) {
-                      state?.setLocale(WidgetsBinding.instance.platformDispatcher.locale);
+                      state?.setLocale(
+                          WidgetsBinding.instance.platformDispatcher.locale);
                     } else {
                       state?.setLocale(Locale(entry.key));
                     }
@@ -784,25 +942,47 @@ class _SettingsPageState extends State<SettingsPage> {
     showModalBottomSheet(
       context: context,
       backgroundColor: CyberpunkTheme.surfaceDark,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 12),
-          Container(width: 40, height: 4, decoration: BoxDecoration(color: CyberpunkTheme.borderDark, borderRadius: BorderRadius.circular(2))),
+          Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                  color: CyberpunkTheme.borderDark,
+                  borderRadius: BorderRadius.circular(2))),
           const SizedBox(height: 16),
-          const Text('Target Language', style: TextStyle(color: CyberpunkTheme.textWhite, fontSize: 17, fontWeight: FontWeight.w700)),
+          const Text('Target Language',
+              style: TextStyle(
+                  color: CyberpunkTheme.textWhite,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           ..._languageOptions.entries.map((entry) {
             final isSelected = _translateTargetLang == entry.key;
             return ListTile(
               leading: Icon(
                 isSelected ? Icons.check_circle_rounded : Icons.circle_outlined,
-                color: isSelected ? CyberpunkTheme.neonCyan : CyberpunkTheme.textTertiary,
+                color: isSelected
+                    ? CyberpunkTheme.neonCyan
+                    : CyberpunkTheme.textTertiary,
                 size: 22,
               ),
-              title: Text(entry.value, style: TextStyle(color: isSelected ? CyberpunkTheme.neonCyan : CyberpunkTheme.textWhite, fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400)),
-              trailing: Text(entry.key.toUpperCase(), style: TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 12, letterSpacing: 1)),
+              title: Text(entry.value,
+                  style: TextStyle(
+                      color: isSelected
+                          ? CyberpunkTheme.neonCyan
+                          : CyberpunkTheme.textWhite,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.w400)),
+              trailing: Text(entry.key.toUpperCase(),
+                  style: TextStyle(
+                      color: CyberpunkTheme.textTertiary,
+                      fontSize: 12,
+                      letterSpacing: 1)),
               onTap: () async {
                 final prefs = await SharedPreferences.getInstance();
                 await prefs.setString('translate_target_lang', entry.key);
@@ -825,8 +1005,11 @@ class _SettingsPageState extends State<SettingsPage> {
         backgroundColor: CyberpunkTheme.backgroundBlack,
         elevation: 0,
         title: Text(
-           S.of(context).settings,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: CyberpunkTheme.textWhite),
+          S.of(context).settings,
+          style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: CyberpunkTheme.textWhite),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(0.5),
@@ -835,15 +1018,15 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       body: ListView(
         children: [
-           _sectionHeader(S.of(context).editProfile.split(' ').first),
+          _sectionHeader(S.of(context).editProfile.split(' ').first),
           _settingsItem(
             icon: Icons.person_outline_rounded,
-             title: S.of(context).editProfile,
+            title: S.of(context).editProfile,
             onTap: () => Navigator.pushNamed(context, '/EditProfile'),
           ),
           _settingsItem(
             icon: Icons.lock_outline_rounded,
-             title: S.of(context).settings,
+            title: S.of(context).settings,
             trailing: Switch(
               value: _privateAccount,
               onChanged: (value) {
@@ -854,13 +1037,13 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           _settingsItem(
             icon: Icons.block_rounded,
-             title: S.of(context).mutedBlocked,
-             subtitle: S.of(context).mutedBlocked,
+            title: S.of(context).mutedBlocked,
+            subtitle: S.of(context).mutedBlocked,
             onTap: () => Navigator.pushNamed(context, '/MutedBlocked'),
           ),
           _divider(),
 
-           _sectionHeader(S.of(context).notificationSettings),
+          _sectionHeader(S.of(context).notificationSettings),
           _settingsItem(
             icon: Icons.notifications_none_rounded,
             title: 'Push Notifications',
@@ -873,12 +1056,26 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           // Granular notification preferences
-          _notifToggle(Icons.alternate_email_rounded, 'Mentions', _notifyMentions, 'notify_mentions', (v) => setState(() => _notifyMentions = v)),
-          _notifToggle(Icons.favorite_rounded, 'Likes', _notifyLikes, 'notify_likes', (v) => setState(() => _notifyLikes = v)),
-          _notifToggle(Icons.repeat_rounded, 'Boosts / Reblogs', _notifyBoosts, 'notify_boosts', (v) => setState(() => _notifyBoosts = v)),
-          _notifToggle(Icons.person_add_rounded, 'New Followers', _notifyFollows, 'notify_follows', (v) => setState(() => _notifyFollows = v)),
-          _notifToggle(Icons.mail_rounded, 'Direct Messages', _notifyDMs, 'notify_dms', (v) => setState(() => _notifyDMs = v)),
-          _notifToggle(Icons.poll_rounded, 'Polls', _notifyPolls, 'notify_polls', (v) => setState(() => _notifyPolls = v)),
+          _notifToggle(
+              Icons.alternate_email_rounded,
+              'Mentions',
+              _notifyMentions,
+              'notify_mentions',
+              (v) => setState(() => _notifyMentions = v)),
+          _notifToggle(Icons.favorite_rounded, 'Likes', _notifyLikes,
+              'notify_likes', (v) => setState(() => _notifyLikes = v)),
+          _notifToggle(Icons.repeat_rounded, 'Boosts / Reblogs', _notifyBoosts,
+              'notify_boosts', (v) => setState(() => _notifyBoosts = v)),
+          _notifToggle(
+              Icons.person_add_rounded,
+              'New Followers',
+              _notifyFollows,
+              'notify_follows',
+              (v) => setState(() => _notifyFollows = v)),
+          _notifToggle(Icons.mail_rounded, 'Direct Messages', _notifyDMs,
+              'notify_dms', (v) => setState(() => _notifyDMs = v)),
+          _notifToggle(Icons.poll_rounded, 'Polls', _notifyPolls,
+              'notify_polls', (v) => setState(() => _notifyPolls = v)),
           _settingsItem(
             icon: Icons.notification_important_outlined,
             title: 'Test Notification',
@@ -904,7 +1101,9 @@ class _SettingsPageState extends State<SettingsPage> {
               } catch (e) {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error: $e'), backgroundColor: const Color(0xFFFF4757)),
+                    SnackBar(
+                        content: Text('Error: $e'),
+                        backgroundColor: const Color(0xFFFF4757)),
                   );
                 }
               }
@@ -912,7 +1111,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           _divider(),
 
-           _sectionHeader(S.of(context).aiCreativity),
+          _sectionHeader(S.of(context).aiCreativity),
           _settingsItem(
             icon: Icons.swap_horiz_rounded,
             title: 'Default AI Provider',
@@ -926,13 +1125,15 @@ class _SettingsPageState extends State<SettingsPage> {
             return _settingsItem(
               icon: _providerIcons[id] ?? Icons.key,
               title: '${entry.value} Key',
-              subtitle: key.isNotEmpty ? '••••${key.substring(key.length > 4 ? key.length - 4 : 0)}' : 'Not configured',
+              subtitle: key.isNotEmpty
+                  ? '••••${key.substring(key.length > 4 ? key.length - 4 : 0)}'
+                  : 'Not configured',
               onTap: () => _showApiKeyDialog(id),
             );
           }),
           _divider(),
 
-           _sectionHeader(S.of(context).translation),
+          _sectionHeader(S.of(context).translation),
           // Auto-translate toggle
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -940,7 +1141,10 @@ class _SettingsPageState extends State<SettingsPage> {
             decoration: BoxDecoration(
               color: CyberpunkTheme.cardDark,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: _autoTranslateEnabled ? CyberpunkTheme.neonCyan.withOpacity(0.3) : CyberpunkTheme.borderDark),
+              border: Border.all(
+                  color: _autoTranslateEnabled
+                      ? CyberpunkTheme.neonCyan.withOpacity(0.3)
+                      : CyberpunkTheme.borderDark),
             ),
             child: Row(
               children: [
@@ -950,16 +1154,24 @@ class _SettingsPageState extends State<SettingsPage> {
                     color: CyberpunkTheme.neonCyan.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(Icons.translate_rounded, color: CyberpunkTheme.neonCyan, size: 20),
+                  child: Icon(Icons.translate_rounded,
+                      color: CyberpunkTheme.neonCyan, size: 20),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                       Text(S.of(context).autoTranslateAll, style: TextStyle(color: CyberpunkTheme.textWhite, fontSize: 15, fontWeight: FontWeight.w600)),
+                      Text(S.of(context).autoTranslateAll,
+                          style: TextStyle(
+                              color: CyberpunkTheme.textWhite,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600)),
                       SizedBox(height: 2),
-                      Text('Automatically translate every post on display', style: TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 12)),
+                      Text('Automatically translate every post on display',
+                          style: TextStyle(
+                              color: CyberpunkTheme.textSecondary,
+                              fontSize: 12)),
                     ],
                   ),
                 ),
@@ -1033,7 +1245,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         final prefs = await SharedPreferences.getInstance();
-                        await prefs.setString('translate_provider', 'libretranslate');
+                        await prefs.setString(
+                            'translate_provider', 'libretranslate');
                         setState(() => _translateProvider = 'libretranslate');
                       },
                       child: Container(
@@ -1047,7 +1260,9 @@ class _SettingsPageState extends State<SettingsPage> {
                             color: _translateProvider == 'libretranslate'
                                 ? CyberpunkTheme.neonCyan.withOpacity(0.5)
                                 : CyberpunkTheme.borderDark,
-                            width: _translateProvider == 'libretranslate' ? 1.5 : 1,
+                            width: _translateProvider == 'libretranslate'
+                                ? 1.5
+                                : 1,
                           ),
                         ),
                         child: Column(
@@ -1064,9 +1279,10 @@ class _SettingsPageState extends State<SettingsPage> {
                                       ? CyberpunkTheme.neonCyan
                                       : CyberpunkTheme.textSecondary,
                                   fontSize: 13,
-                                  fontWeight: _translateProvider == 'libretranslate'
-                                      ? FontWeight.w700
-                                      : FontWeight.w500,
+                                  fontWeight:
+                                      _translateProvider == 'libretranslate'
+                                          ? FontWeight.w700
+                                          : FontWeight.w500,
                                 )),
                           ],
                         ),
@@ -1088,7 +1304,9 @@ class _SettingsPageState extends State<SettingsPage> {
               _settingsItem(
                 icon: Icons.vpn_key_rounded,
                 title: 'OpenAI API Key',
-                subtitle: _openaiTranslateApiKey.isEmpty ? 'Not set (required)' : '••••••••',
+                subtitle: _openaiTranslateApiKey.isEmpty
+                    ? 'Not set (required)'
+                    : '••••••••',
                 onTap: () => _showOpenaiTranslateKeyDialog(),
               ),
             ],
@@ -1102,42 +1320,52 @@ class _SettingsPageState extends State<SettingsPage> {
               _settingsItem(
                 icon: Icons.vpn_key_rounded,
                 title: 'LibreTranslate API Key',
-                subtitle: _libreTranslateApiKey.isEmpty ? 'Not set' : '••••••••',
+                subtitle:
+                    _libreTranslateApiKey.isEmpty ? 'Not set' : '••••••••',
                 onTap: () => _showTranslateApiKeyDialog(),
               ),
             ],
           ],
           _settingsItem(
             icon: Icons.language_rounded,
-             title: S.of(context).targetLanguage,
-            subtitle: _languageOptions[_translateTargetLang] ?? _translateTargetLang,
+            title: S.of(context).targetLanguage,
+            subtitle:
+                _languageOptions[_translateTargetLang] ?? _translateTargetLang,
             onTap: () => _showLanguagePicker(),
           ),
           _divider(),
 
-           _sectionHeader(S.of(context).bookmarks.split(' ').first),
+          _sectionHeader(S.of(context).bookmarks.split(' ').first),
           _settingsItem(
             icon: Icons.bookmark_outline_rounded,
-             title: S.of(context).bookmarks,
+            title: S.of(context).bookmarks,
             onTap: () => Navigator.pushNamed(context, '/Bookmarks'),
           ),
           _settingsItem(
             icon: Icons.favorite_outline_rounded,
-             title: S.of(context).likedPosts,
+            title: S.of(context).likedPosts,
             onTap: () => Navigator.pushNamed(context, '/LikedPosts'),
           ),
           _settingsItem(
             icon: Icons.history_rounded,
-             title: S.of(context).archivedPosts,
+            title: S.of(context).archivedPosts,
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => ArchivedPostsPage(apiService: widget.apiService)));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) =>
+                          ArchivedPostsPage(apiService: widget.apiService)));
             },
           ),
           _settingsItem(
             icon: Icons.collections_outlined,
-             title: S.of(context).collections,
+            title: S.of(context).collections,
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => CollectionsPage(apiService: widget.apiService)));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) =>
+                          CollectionsPage(apiService: widget.apiService)));
             },
           ),
           _divider(),
@@ -1145,27 +1373,37 @@ class _SettingsPageState extends State<SettingsPage> {
           _sectionHeader('Privacy & Safety'),
           _settingsItem(
             icon: Icons.block_outlined,
-             title: S.of(context).domainBlocks,
-             subtitle: S.of(context).domainBlocks,
+            title: S.of(context).domainBlocks,
+            subtitle: S.of(context).domainBlocks,
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => DomainBlocksPage(apiService: widget.apiService)));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) =>
+                          DomainBlocksPage(apiService: widget.apiService)));
             },
           ),
           _settingsItem(
             icon: Icons.filter_alt_outlined,
-             title: S.of(context).contentFilters,
-             subtitle: S.of(context).contentFilters,
+            title: S.of(context).contentFilters,
+            subtitle: S.of(context).contentFilters,
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => ContentFiltersPage(apiService: widget.apiService)));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) =>
+                          ContentFiltersPage(apiService: widget.apiService)));
             },
           ),
           _divider(),
 
-           _sectionHeader(S.of(context).appLanguage),
+          _sectionHeader(S.of(context).appLanguage),
           _settingsItem(
             icon: Icons.language_rounded,
-             title: S.of(context).appLanguage,
-             subtitle: _appLocaleCode.isEmpty ? S.of(context).systemDefault : (_appLanguageOptions[_appLocaleCode] ?? _appLocaleCode),
+            title: S.of(context).appLanguage,
+            subtitle: _appLocaleCode.isEmpty
+                ? S.of(context).systemDefault
+                : (_appLanguageOptions[_appLocaleCode] ?? _appLocaleCode),
             onTap: _showAppLanguagePicker,
           ),
           _divider(),
@@ -1187,9 +1425,11 @@ class _SettingsPageState extends State<SettingsPage> {
           _settingsItem(
             icon: Icons.campaign_outlined,
             title: 'Server Announcements',
-            subtitle: '${_announcements.length} announcement${_announcements.length != 1 ? "s" : ""}',
+            subtitle:
+                '${_announcements.length} announcement${_announcements.length != 1 ? "s" : ""}',
             onTap: () {
-              if (_announcements.isNotEmpty) _showAnnouncementDialog(_announcements.first);
+              if (_announcements.isNotEmpty)
+                _showAnnouncementDialog(_announcements.first);
             },
           ),
           _divider(),
@@ -1198,11 +1438,14 @@ class _SettingsPageState extends State<SettingsPage> {
           if (_announcements.isNotEmpty) ...[
             _sectionHeader('Announcements'),
             ..._announcements.take(5).map((a) => _settingsItem(
-              icon: Icons.campaign_outlined,
-              title: a['content']?.toString().replaceAll(RegExp(r'<[^>]*>'), '') ?? 'Announcement',
-              subtitle: a['published_at'] ?? '',
-              onTap: () => _showAnnouncementDialog(a),
-            )),
+                  icon: Icons.campaign_outlined,
+                  title: a['content']
+                          ?.toString()
+                          .replaceAll(RegExp(r'<[^>]*>'), '') ??
+                      'Announcement',
+                  subtitle: a['published_at'] ?? '',
+                  onTap: () => _showAnnouncementDialog(a),
+                )),
             _divider(),
           ],
 
@@ -1212,17 +1455,23 @@ class _SettingsPageState extends State<SettingsPage> {
             _settingsItem(
               icon: Icons.language_rounded,
               title: 'Posting language',
-              subtitle: _serverPreferences!['posting:default:language']?.toString() ?? 'Not set',
+              subtitle:
+                  _serverPreferences!['posting:default:language']?.toString() ??
+                      'Not set',
             ),
             _settingsItem(
               icon: Icons.visibility_outlined,
               title: 'Default visibility',
-              subtitle: _serverPreferences!['posting:default:visibility']?.toString() ?? 'public',
+              subtitle: _serverPreferences!['posting:default:visibility']
+                      ?.toString() ??
+                  'public',
             ),
             _settingsItem(
               icon: Icons.warning_outlined,
               title: 'Default sensitive',
-              subtitle: _serverPreferences!['posting:default:sensitive'] == true ? 'Yes' : 'No',
+              subtitle: _serverPreferences!['posting:default:sensitive'] == true
+                  ? 'Yes'
+                  : 'No',
             ),
             _divider(),
           ],
@@ -1247,16 +1496,20 @@ class _SettingsPageState extends State<SettingsPage> {
                             content: const Text('Disconnected from Loops'),
                             backgroundColor: CyberpunkTheme.surfaceDark,
                             behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
                           ),
                         );
                       }
                     },
                     style: TextButton.styleFrom(
                       foregroundColor: CyberpunkTheme.neonPink,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                     ),
-                    child: const Text('Disconnect', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                    child: const Text('Disconnect',
+                        style: TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w600)),
                   ),
                 );
               } else {
@@ -1286,7 +1539,8 @@ class _SettingsPageState extends State<SettingsPage> {
                             content: const Text('Connected to Loops'),
                             backgroundColor: CyberpunkTheme.surfaceDark,
                             behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
                           ),
                         );
                       }
@@ -1298,7 +1552,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           _divider(),
 
-           _sectionHeader(S.of(context).about),
+          _sectionHeader(S.of(context).about),
           _settingsItem(
             icon: Icons.info_outline_rounded,
             title: 'About FediSpace',
@@ -1330,11 +1584,15 @@ class _SettingsPageState extends State<SettingsPage> {
               onPressed: _logout,
               style: OutlinedButton.styleFrom(
                 foregroundColor: CyberpunkTheme.neonPink,
-                side: BorderSide(color: CyberpunkTheme.neonPink.withOpacity(0.3)),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                side:
+                    BorderSide(color: CyberpunkTheme.neonPink.withOpacity(0.3)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-               child: Text(S.of(context).logout, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+              child: Text(S.of(context).logout,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w600, fontSize: 15)),
             ),
           ),
           const SizedBox(height: 40),
@@ -1358,16 +1616,21 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _notifToggle(IconData icon, String title, bool value, String prefKey, ValueChanged<bool> onChanged) {
+  Widget _notifToggle(IconData icon, String title, bool value, String prefKey,
+      ValueChanged<bool> onChanged) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Row(
         children: [
           Icon(icon, size: 20, color: CyberpunkTheme.textSecondary),
           const SizedBox(width: 14),
-          Expanded(child: Text(title, style: const TextStyle(fontSize: 14, color: CyberpunkTheme.textWhite))),
+          Expanded(
+              child: Text(title,
+                  style: const TextStyle(
+                      fontSize: 14, color: CyberpunkTheme.textWhite))),
           SizedBox(
-            height: 28, width: 44,
+            height: 28,
+            width: 44,
             child: FittedBox(
               child: Switch(
                 value: value,
@@ -1405,11 +1668,16 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontSize: 15, color: CyberpunkTheme.textWhite)),
+                  Text(title,
+                      style: const TextStyle(
+                          fontSize: 15, color: CyberpunkTheme.textWhite)),
                   if (subtitle != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
-                      child: Text(subtitle, style: const TextStyle(fontSize: 13, color: CyberpunkTheme.textTertiary)),
+                      child: Text(subtitle,
+                          style: const TextStyle(
+                              fontSize: 13,
+                              color: CyberpunkTheme.textTertiary)),
                     ),
                 ],
               ),
@@ -1417,7 +1685,8 @@ class _SettingsPageState extends State<SettingsPage> {
             if (trailing != null)
               trailing
             else if (onTap != null)
-              const Icon(Icons.chevron_right_rounded, size: 20, color: CyberpunkTheme.textTertiary),
+              const Icon(Icons.chevron_right_rounded,
+                  size: 20, color: CyberpunkTheme.textTertiary),
           ],
         ),
       ),

@@ -11,7 +11,8 @@ class OfflineCache {
   static const int _maxCachedPosts = 50;
 
   bool _isOffline = false;
-  final StreamController<bool> _connectivityController = StreamController<bool>.broadcast();
+  final StreamController<bool> _connectivityController =
+      StreamController<bool>.broadcast();
 
   /// Whether the app is currently offline.
   bool get isOffline => _isOffline;
@@ -32,7 +33,8 @@ class OfflineCache {
       final toCache = posts.take(_maxCachedPosts).toList();
       final jsonList = toCache.map((p) => p.toJson()).toList();
       await prefs.setString(_cacheKey, jsonEncode(jsonList));
-      await prefs.setString(_cacheTimestampKey, DateTime.now().toIso8601String());
+      await prefs.setString(
+          _cacheTimestampKey, DateTime.now().toIso8601String());
     } catch (_) {
       // Silently fail -- cache is best-effort
     }

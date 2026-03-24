@@ -40,7 +40,9 @@ class _VideoProgressBarState extends State<BetterVideoPlayerProgressBar> {
       final box = context.findRenderObject() as RenderBox;
       final Offset tapPos = box.globalToLocal(globalPosition);
       final double relative = tapPos.dx / box.size.width;
-      context.read<BetterVideoPlayerController>().onProgressDragUpdate(relative);
+      context
+          .read<BetterVideoPlayerController>()
+          .onProgressDragUpdate(relative);
     }
 
     return GestureDetector(
@@ -107,11 +109,17 @@ class _ProgressBarPainter extends CustomPainter {
       return;
     }
     final double playedPartPercent =
-        (value?.position ?? Duration.zero).inMilliseconds / (value?.duration ?? Duration.zero).inMilliseconds;
-    final double playedPart = playedPartPercent > 1 ? size.width : playedPartPercent * size.width;
+        (value?.position ?? Duration.zero).inMilliseconds /
+            (value?.duration ?? Duration.zero).inMilliseconds;
+    final double playedPart =
+        playedPartPercent > 1 ? size.width : playedPartPercent * size.width;
     for (final DurationRange range in (value?.buffered ?? [])) {
-      final double start = range.startFraction(value?.duration ?? Duration.zero).clamp(0, 1) * size.width;
-      final double end = range.endFraction(value?.duration ?? Duration.zero).clamp(0, 1) * size.width;
+      final double start =
+          range.startFraction(value?.duration ?? Duration.zero).clamp(0, 1) *
+              size.width;
+      final double end =
+          range.endFraction(value?.duration ?? Duration.zero).clamp(0, 1) *
+              size.width;
       canvas.drawRRect(
         RRect.fromRectAndRadius(
           Rect.fromPoints(

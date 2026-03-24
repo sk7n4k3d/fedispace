@@ -11,7 +11,6 @@ import 'package:fedispace/widgets/skeleton_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart' as html;
 
-
 class Profile extends StatefulWidget {
   final ApiService apiService;
 
@@ -65,11 +64,14 @@ class _Profile extends State<Profile> {
     if (isPageLoading == true || (isPageLoading == false && page == 1)) {
       final responseDic;
       if (arrayOfProducts.length == 0) {
-        responseDic = await widget.apiService.getUserStatus(_userAccount.id, page, "0");
+        responseDic =
+            await widget.apiService.getUserStatus(_userAccount.id, page, "0");
       } else {
-        responseDic = await widget.apiService.getUserStatus(_userAccount.id, page, arrayOfProducts[arrayOfProducts.length - 1]["id"]);
+        responseDic = await widget.apiService.getUserStatus(_userAccount.id,
+            page, arrayOfProducts[arrayOfProducts.length - 1]["id"]);
       }
-      List<Map<String, dynamic>> temArr = List<Map<String, dynamic>>.from(responseDic);
+      List<Map<String, dynamic>> temArr =
+          List<Map<String, dynamic>>.from(responseDic);
       if (page == 1) {
         arrayOfProducts = temArr;
       } else {
@@ -157,18 +159,23 @@ class _Profile extends State<Profile> {
                   backgroundColor: CyberpunkTheme.backgroundBlack,
                   leading: Navigator.canPop(context)
                       ? IconButton(
-                          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                          icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                              size: 20),
                           onPressed: () => Navigator.pop(context),
                         )
                       : null,
                   actions: [
                     IconButton(
-                      icon: const Icon(Icons.notifications_none_rounded, size: 28, color: CyberpunkTheme.textWhite),
-                      onPressed: () => Navigator.pushNamed(context, '/Notification'),
+                      icon: const Icon(Icons.notifications_none_rounded,
+                          size: 28, color: CyberpunkTheme.textWhite),
+                      onPressed: () =>
+                          Navigator.pushNamed(context, '/Notification'),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.settings_outlined, size: 28, color: CyberpunkTheme.textWhite),
-                      onPressed: () => Navigator.pushNamed(context, '/Settings'),
+                      icon: const Icon(Icons.settings_outlined,
+                          size: 28, color: CyberpunkTheme.textWhite),
+                      onPressed: () =>
+                          Navigator.pushNamed(context, '/Settings'),
                     ),
                   ],
                   flexibleSpace: FlexibleSpaceBar(
@@ -202,39 +209,72 @@ class _Profile extends State<Profile> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: CyberpunkTheme.neonCyan.withOpacity(0.5),
+                                  color:
+                                      CyberpunkTheme.neonCyan.withOpacity(0.5),
                                   width: 2,
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: CyberpunkTheme.neonCyan.withOpacity(0.2),
+                                    color: CyberpunkTheme.neonCyan
+                                        .withOpacity(0.2),
                                     blurRadius: 12,
                                     spreadRadius: 0,
                                   ),
                                 ],
                               ),
                               child: GestureDetector(
-                              onTap: () async {
-                                // Try to load own stories and navigate to viewer
-                                try {
-                                  final carousel = await widget.apiService.getStoryCarousel();
-                                  if (carousel.self != null && carousel.self!.items.isNotEmpty && mounted) {
-                                    Navigator.pushNamed(context, '/StoryViewer', arguments: {
-                                      'story': carousel.self,
-                                      'apiService': widget.apiService,
-                                    });
-                                  } else {
-                                    // No stories — show avatar fullscreen
+                                onTap: () async {
+                                  // Try to load own stories and navigate to viewer
+                                  try {
+                                    final carousel = await widget.apiService
+                                        .getStoryCarousel();
+                                    if (carousel.self != null &&
+                                        carousel.self!.items.isNotEmpty &&
+                                        mounted) {
+                                      Navigator.pushNamed(
+                                          context, '/StoryViewer',
+                                          arguments: {
+                                            'story': carousel.self,
+                                            'apiService': widget.apiService,
+                                          });
+                                    } else {
+                                      // No stories — show avatar fullscreen
+                                      if (mounted) {
+                                        showDialog(
+                                          context: context,
+                                          builder: (ctx) => Dialog(
+                                            backgroundColor: Colors.transparent,
+                                            insetPadding:
+                                                const EdgeInsets.all(16),
+                                            child: GestureDetector(
+                                              onTap: () => Navigator.pop(ctx),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                                child: CachedNetworkImage(
+                                                  imageUrl: avatarUrl(),
+                                                  fit: BoxFit.contain,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  } catch (_) {
+                                    // Fallback — show avatar fullscreen
                                     if (mounted) {
                                       showDialog(
                                         context: context,
                                         builder: (ctx) => Dialog(
                                           backgroundColor: Colors.transparent,
-                                          insetPadding: const EdgeInsets.all(16),
+                                          insetPadding:
+                                              const EdgeInsets.all(16),
                                           child: GestureDetector(
                                             onTap: () => Navigator.pop(ctx),
                                             child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(16),
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
                                               child: CachedNetworkImage(
                                                 imageUrl: avatarUrl(),
                                                 fit: BoxFit.contain,
@@ -245,59 +285,48 @@ class _Profile extends State<Profile> {
                                       );
                                     }
                                   }
-                                } catch (_) {
-                                  // Fallback — show avatar fullscreen
-                                  if (mounted) {
-                                    showDialog(
-                                      context: context,
-                                      builder: (ctx) => Dialog(
-                                        backgroundColor: Colors.transparent,
-                                        insetPadding: const EdgeInsets.all(16),
-                                        child: GestureDetector(
-                                          onTap: () => Navigator.pop(ctx),
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(16),
-                                            child: CachedNetworkImage(
-                                              imageUrl: avatarUrl(),
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                }
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(3),
-                                child: CircleAvatar(
-                                  radius: 36,
-                                  backgroundColor: CyberpunkTheme.cardDark,
-                                  backgroundImage: CachedNetworkImageProvider(avatarUrl()),
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(3),
+                                  child: CircleAvatar(
+                                    radius: 36,
+                                    backgroundColor: CyberpunkTheme.cardDark,
+                                    backgroundImage:
+                                        CachedNetworkImageProvider(avatarUrl()),
+                                  ),
                                 ),
                               ),
-                            ),
                             ),
                             const SizedBox(width: 24),
                             // Stats
                             Expanded(
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  _buildStatItem(S.of(context).posts, _userAccount.statuses_count),
+                                  _buildStatItem(S.of(context).posts,
+                                      _userAccount.statuses_count),
                                   GestureDetector(
-                                    onTap: () => Navigator.pushNamed(context, '/FollowersList', arguments: {
-                                      'userId': _userAccount.id,
-                                      'type': 'followers',
-                                    }),
-                                    child: _buildStatItem(S.of(context).followers, _userAccount.followers_count),
+                                    onTap: () => Navigator.pushNamed(
+                                        context, '/FollowersList',
+                                        arguments: {
+                                          'userId': _userAccount.id,
+                                          'type': 'followers',
+                                        }),
+                                    child: _buildStatItem(
+                                        S.of(context).followers,
+                                        _userAccount.followers_count),
                                   ),
                                   GestureDetector(
-                                    onTap: () => Navigator.pushNamed(context, '/FollowersList', arguments: {
-                                      'userId': _userAccount.id,
-                                      'type': 'following',
-                                    }),
-                                    child: _buildStatItem(S.of(context).following, _userAccount.following_count),
+                                    onTap: () => Navigator.pushNamed(
+                                        context, '/FollowersList',
+                                        arguments: {
+                                          'userId': _userAccount.id,
+                                          'type': 'following',
+                                        }),
+                                    child: _buildStatItem(
+                                        S.of(context).following,
+                                        _userAccount.following_count),
                                   ),
                                 ],
                               ),
@@ -329,7 +358,8 @@ class _Profile extends State<Profile> {
                         ),
 
                         // Bio
-                        if (_userAccount?.note != null && _userAccount.note.toString().isNotEmpty)
+                        if (_userAccount?.note != null &&
+                            _userAccount.note.toString().isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(top: 10),
                             child: html.Html(
@@ -339,7 +369,8 @@ class _Profile extends State<Profile> {
                                   margin: html.Margins.zero,
                                   padding: html.HtmlPaddings.zero,
                                   fontSize: html.FontSize(14),
-                                  color: CyberpunkTheme.textWhite.withOpacity(0.9),
+                                  color:
+                                      CyberpunkTheme.textWhite.withOpacity(0.9),
                                   lineHeight: html.LineHeight(1.4),
                                 ),
                                 "a": html.Style(
@@ -357,21 +388,29 @@ class _Profile extends State<Profile> {
                           children: [
                             Expanded(
                               child: OutlinedButton(
-                                onPressed: () => Navigator.pushNamed(context, '/EditProfile'),
+                                onPressed: () => Navigator.pushNamed(
+                                    context, '/EditProfile'),
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: CyberpunkTheme.textWhite,
-                                  side: const BorderSide(color: CyberpunkTheme.borderDark),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                  side: const BorderSide(
+                                      color: CyberpunkTheme.borderDark),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8),
                                 ),
-                                child: Text(S.of(context).editProfile, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                                child: Text(S.of(context).editProfile,
+                                    style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600)),
                               ),
                             ),
                           ],
                         ),
 
                         const SizedBox(height: 16),
-                        Container(height: 0.5, color: CyberpunkTheme.borderDark),
+                        Container(
+                            height: 0.5, color: CyberpunkTheme.borderDark),
                       ],
                     ),
                   ),
@@ -387,7 +426,8 @@ class _Profile extends State<Profile> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           padding: const EdgeInsets.only(top: 2),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3,
                             crossAxisSpacing: 1.5,
                             mainAxisSpacing: 1.5,
@@ -395,17 +435,20 @@ class _Profile extends State<Profile> {
                           ),
                           itemCount: snapshot.data.length,
                           itemBuilder: (BuildContext context, int index) {
-                            final media = snapshot.data[index]["media_attachments"][0];
+                            final media =
+                                snapshot.data[index]["media_attachments"][0];
                             final String url = media["url"];
                             final String type = media["type"] ?? "image";
-                            final bool isVideo = type == "video" || type == "gifv";
+                            final bool isVideo =
+                                type == "video" || type == "gifv";
 
                             return GestureDetector(
                               onTap: () {
-                                Navigator.pushNamed(context, '/statusDetail', arguments: {
-                                  'statusId': snapshot.data[index]["id"],
-                                  'apiService': widget.apiService,
-                                });
+                                Navigator.pushNamed(context, '/statusDetail',
+                                    arguments: {
+                                      'statusId': snapshot.data[index]["id"],
+                                      'apiService': widget.apiService,
+                                    });
                               },
                               child: Stack(
                                 fit: StackFit.expand,
@@ -414,25 +457,43 @@ class _Profile extends State<Profile> {
                                       ? Stack(
                                           fit: StackFit.expand,
                                           children: [
-                                            _ProfileVideoItem(url: url, previewUrl: media["preview_url"]),
+                                            _ProfileVideoItem(
+                                                url: url,
+                                                previewUrl:
+                                                    media["preview_url"]),
                                             const Center(
-                                              child: Icon(Icons.play_circle_outline, color: Colors.white, size: 36),
+                                              child: Icon(
+                                                  Icons.play_circle_outline,
+                                                  color: Colors.white,
+                                                  size: 36),
                                             ),
                                           ],
                                         )
                                       : CachedNetworkImage(
                                           imageUrl: url,
-                                          placeholder: (context, url) => Container(
+                                          placeholder: (context, url) =>
+                                              Container(
                                             color: CyberpunkTheme.cardDark,
-                                            child: const Center(child: InstagramLoadingIndicator(size: 16)),
+                                            child: const Center(
+                                                child:
+                                                    InstagramLoadingIndicator(
+                                                        size: 16)),
                                           ),
-                                          errorWidget: (context, url, error) => Container(
+                                          errorWidget: (context, url, error) =>
+                                              Container(
                                             color: CyberpunkTheme.cardDark,
-                                            child: const Icon(Icons.broken_image_outlined, color: CyberpunkTheme.textTertiary, size: 20),
+                                            child: const Icon(
+                                                Icons.broken_image_outlined,
+                                                color:
+                                                    CyberpunkTheme.textTertiary,
+                                                size: 20),
                                           ),
                                           fit: BoxFit.cover,
                                         ),
-                                  if ((snapshot.data[index]["media_attachments"] as List).length > 1)
+                                  if ((snapshot.data[index]["media_attachments"]
+                                              as List)
+                                          .length >
+                                      1)
                                     Positioned(
                                       top: 6,
                                       right: 6,
@@ -450,14 +511,18 @@ class _Profile extends State<Profile> {
                       } else if (snapshot.hasError) {
                         return Padding(
                           padding: const EdgeInsets.all(32),
-                          child: Center(child: Text(S.of(context).error, style: const TextStyle(color: CyberpunkTheme.textSecondary))),
+                          child: Center(
+                              child: Text(S.of(context).error,
+                                  style: const TextStyle(
+                                      color: CyberpunkTheme.textSecondary))),
                         );
                       }
                       return GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         padding: const EdgeInsets.only(top: 2),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
                           crossAxisSpacing: 1.5,
                           mainAxisSpacing: 1.5,
@@ -480,7 +545,10 @@ class _Profile extends State<Profile> {
         if (snapshot.hasError) {
           return Scaffold(
             backgroundColor: CyberpunkTheme.backgroundBlack,
-            body: Center(child: Text(S.of(context).error, style: const TextStyle(color: CyberpunkTheme.textSecondary))),
+            body: Center(
+                child: Text(S.of(context).error,
+                    style:
+                        const TextStyle(color: CyberpunkTheme.textSecondary))),
           );
         }
         return Scaffold(
@@ -520,7 +588,8 @@ class _Profile extends State<Profile> {
 class _ProfileVideoItem extends StatelessWidget {
   final String url;
   final String? previewUrl;
-  const _ProfileVideoItem({Key? key, required this.url, this.previewUrl}) : super(key: key);
+  const _ProfileVideoItem({Key? key, required this.url, this.previewUrl})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -534,13 +603,15 @@ class _ProfileVideoItem extends StatelessWidget {
         ),
         errorWidget: (context, url, error) => Container(
           color: CyberpunkTheme.cardDark,
-          child: const Icon(Icons.videocam_outlined, color: CyberpunkTheme.textTertiary, size: 24),
+          child: const Icon(Icons.videocam_outlined,
+              color: CyberpunkTheme.textTertiary, size: 24),
         ),
       );
     }
     return Container(
       color: CyberpunkTheme.cardDark,
-      child: const Icon(Icons.videocam_outlined, color: CyberpunkTheme.textTertiary, size: 24),
+      child: const Icon(Icons.videocam_outlined,
+          color: CyberpunkTheme.textTertiary, size: 24),
     );
   }
 }

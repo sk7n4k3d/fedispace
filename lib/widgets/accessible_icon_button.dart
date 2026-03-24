@@ -68,9 +68,8 @@ class AccessibleWidget extends StatelessWidget {
       button: isButton,
       header: isHeader,
       image: isImage,
-      child: onTap != null
-          ? GestureDetector(onTap: onTap, child: child)
-          : child,
+      child:
+          onTap != null ? GestureDetector(onTap: onTap, child: child) : child,
     );
   }
 }

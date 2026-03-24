@@ -18,7 +18,8 @@ class GlitchEffect extends StatefulWidget {
   _GlitchEffectState createState() => _GlitchEffectState();
 }
 
-class _GlitchEffectState extends State<GlitchEffect> with SingleTickerProviderStateMixin {
+class _GlitchEffectState extends State<GlitchEffect>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Timer _timer;
   final Random _random = Random();
@@ -63,10 +64,10 @@ class _GlitchEffectState extends State<GlitchEffect> with SingleTickerProviderSt
 
         final double offset = _random.nextDouble() * 10.0; // Increased from 5.0
         final double distortion = _random.nextDouble() * 0.1;
-        
+
         return Stack(
           children: [
-             // Cyan Channel (Offset Left)
+            // Cyan Channel (Offset Left)
             Transform.translate(
               offset: Offset(-offset, 0),
               child: Opacity(
@@ -77,11 +78,10 @@ class _GlitchEffectState extends State<GlitchEffect> with SingleTickerProviderSt
                     BlendMode.srcIn,
                   ),
                   child: widget.child,
-                
                 ),
               ),
             ),
-             // Magenta Channel (Offset Right)
+            // Magenta Channel (Offset Right)
             Transform.translate(
               offset: Offset(offset, 0),
               child: Opacity(
@@ -97,9 +97,9 @@ class _GlitchEffectState extends State<GlitchEffect> with SingleTickerProviderSt
             ),
             // Main Content (Jittered)
             Transform.translate(
-               offset: Offset(_random.nextDouble() * 2 - 1, _random.nextDouble() * 2 - 1),
-               child: widget.child
-            ),
+                offset: Offset(
+                    _random.nextDouble() * 2 - 1, _random.nextDouble() * 2 - 1),
+                child: widget.child),
           ],
         );
       },

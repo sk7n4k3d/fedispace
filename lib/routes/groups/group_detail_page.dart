@@ -22,7 +22,8 @@ class GroupDetailPage extends StatefulWidget {
   State<GroupDetailPage> createState() => _GroupDetailPageState();
 }
 
-class _GroupDetailPageState extends State<GroupDetailPage> with SingleTickerProviderStateMixin {
+class _GroupDetailPageState extends State<GroupDetailPage>
+    with SingleTickerProviderStateMixin {
   late final GroupsApi _groupsApi;
   late final TabController _tabController;
   bool _isLoading = true;
@@ -121,7 +122,8 @@ class _GroupDetailPageState extends State<GroupDetailPage> with SingleTickerProv
         ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan))
+          ? const Center(
+              child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan))
           : TabBarView(
               controller: _tabController,
               children: [
@@ -141,7 +143,9 @@ class _GroupDetailPageState extends State<GroupDetailPage> with SingleTickerProv
           Container(
             padding: const EdgeInsets.all(12),
             decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: CyberpunkTheme.borderDark, width: 0.5)),
+              border: Border(
+                  bottom:
+                      BorderSide(color: CyberpunkTheme.borderDark, width: 0.5)),
             ),
             child: Row(
               children: [
@@ -159,7 +163,8 @@ class _GroupDetailPageState extends State<GroupDetailPage> with SingleTickerProv
                 ),
                 IconButton(
                   onPressed: _postToGroup,
-                  icon: const Icon(Icons.send_rounded, color: CyberpunkTheme.neonCyan),
+                  icon: const Icon(Icons.send_rounded,
+                      color: CyberpunkTheme.neonCyan),
                 ),
               ],
             ),
@@ -168,8 +173,9 @@ class _GroupDetailPageState extends State<GroupDetailPage> with SingleTickerProv
         // Feed list
         Expanded(
           child: _feed.isEmpty
-              ? const Center(child: Text('No posts yet',
-                  style: TextStyle(color: CyberpunkTheme.textSecondary)))
+              ? const Center(
+                  child: Text('No posts yet',
+                      style: TextStyle(color: CyberpunkTheme.textSecondary)))
               : RefreshIndicator(
                   color: CyberpunkTheme.neonCyan,
                   onRefresh: _loadData,
@@ -188,9 +194,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> with SingleTickerProv
   }
 
   Widget _buildFeedItem(Status status) {
-    final content = status.content
-        .replaceAll(RegExp(r'<[^>]*>'), '')
-        .trim();
+    final content = status.content.replaceAll(RegExp(r'<[^>]*>'), '').trim();
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
@@ -213,24 +217,39 @@ class _GroupDetailPageState extends State<GroupDetailPage> with SingleTickerProv
               ),
               const SizedBox(width: 8),
               Text(status.acct,
-                style: const TextStyle(color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w600, fontSize: 13)),
+                  style: const TextStyle(
+                      color: CyberpunkTheme.textWhite,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13)),
               const Spacer(),
-              Text(status.created_at.length > 10 ? status.created_at.substring(0, 10) : status.created_at,
-                style: const TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 11)),
+              Text(
+                  status.created_at.length > 10
+                      ? status.created_at.substring(0, 10)
+                      : status.created_at,
+                  style: const TextStyle(
+                      color: CyberpunkTheme.textTertiary, fontSize: 11)),
             ],
           ),
           const SizedBox(height: 10),
-          Text(content, style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 14)),
+          Text(content,
+              style: const TextStyle(
+                  color: CyberpunkTheme.textWhite, fontSize: 14)),
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(Icons.favorite_border, size: 16, color: CyberpunkTheme.textTertiary),
+              Icon(Icons.favorite_border,
+                  size: 16, color: CyberpunkTheme.textTertiary),
               const SizedBox(width: 4),
-              Text('${status.favourites_count}', style: const TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 12)),
+              Text('${status.favourites_count}',
+                  style: const TextStyle(
+                      color: CyberpunkTheme.textTertiary, fontSize: 12)),
               const SizedBox(width: 16),
-              Icon(Icons.comment_outlined, size: 16, color: CyberpunkTheme.textTertiary),
+              Icon(Icons.comment_outlined,
+                  size: 16, color: CyberpunkTheme.textTertiary),
               const SizedBox(width: 4),
-              Text('${status.replies_count}', style: const TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 12)),
+              Text('${status.replies_count}',
+                  style: const TextStyle(
+                      color: CyberpunkTheme.textTertiary, fontSize: 12)),
             ],
           ),
         ],
@@ -240,30 +259,38 @@ class _GroupDetailPageState extends State<GroupDetailPage> with SingleTickerProv
 
   Widget _buildMembersTab() {
     if (_members.isEmpty) {
-      return const Center(child: Text('No members data', style: TextStyle(color: CyberpunkTheme.textSecondary)));
+      return const Center(
+          child: Text('No members data',
+              style: TextStyle(color: CyberpunkTheme.textSecondary)));
     }
     return ListView.builder(
       padding: const EdgeInsets.all(12),
       itemCount: _members.length,
       itemBuilder: (context, index) {
         final member = _members[index];
-        final username = member['username']?.toString() ?? member['acct']?.toString() ?? 'Unknown';
+        final username = member['username']?.toString() ??
+            member['acct']?.toString() ??
+            'Unknown';
         final avatar = member['avatar']?.toString() ?? '';
         final displayName = member['display_name']?.toString() ?? username;
         return ListTile(
           leading: CircleAvatar(
-            backgroundImage: avatar.isNotEmpty ? CachedNetworkImageProvider(avatar) : null,
+            backgroundImage:
+                avatar.isNotEmpty ? CachedNetworkImageProvider(avatar) : null,
             backgroundColor: CyberpunkTheme.surfaceDark,
           ),
           title: Text(displayName, style: const TextStyle(fontSize: 14)),
-          subtitle: Text('@$username', style: const TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 12)),
+          subtitle: Text('@$username',
+              style: const TextStyle(
+                  color: CyberpunkTheme.textTertiary, fontSize: 12)),
         );
       },
     );
   }
 
   Widget _buildInfoTab() {
-    final description = _groupInfo?['description']?.toString() ?? 'No description';
+    final description =
+        _groupInfo?['description']?.toString() ?? 'No description';
     final category = _groupInfo?['category']?.toString() ?? '';
     final privacy = _groupInfo?['privacy']?.toString() ?? 'public';
     final memberCount = _groupInfo?['member_count'] ?? _members.length;
@@ -282,16 +309,27 @@ class _GroupDetailPageState extends State<GroupDetailPage> with SingleTickerProv
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('About', style: TextStyle(
-                color: CyberpunkTheme.neonCyan, fontSize: 16, fontWeight: FontWeight.w600)),
+              const Text('About',
+                  style: TextStyle(
+                      color: CyberpunkTheme.neonCyan,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600)),
               const SizedBox(height: 12),
-              Text(description, style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 14)),
+              Text(description,
+                  style: const TextStyle(
+                      color: CyberpunkTheme.textWhite, fontSize: 14)),
               const SizedBox(height: 16),
               _infoRow(Icons.people_outline, 'Members', '$memberCount'),
               _infoRow(Icons.lock_outline, 'Privacy', privacy),
-              if (category.isNotEmpty) _infoRow(Icons.category_outlined, 'Category', category),
-              if (createdAt.isNotEmpty) _infoRow(Icons.calendar_today_outlined, 'Created',
-                createdAt.length > 10 ? createdAt.substring(0, 10) : createdAt),
+              if (category.isNotEmpty)
+                _infoRow(Icons.category_outlined, 'Category', category),
+              if (createdAt.isNotEmpty)
+                _infoRow(
+                    Icons.calendar_today_outlined,
+                    'Created',
+                    createdAt.length > 10
+                        ? createdAt.substring(0, 10)
+                        : createdAt),
             ],
           ),
         ),
@@ -306,8 +344,14 @@ class _GroupDetailPageState extends State<GroupDetailPage> with SingleTickerProv
         children: [
           Icon(icon, size: 18, color: CyberpunkTheme.textSecondary),
           const SizedBox(width: 10),
-          Text('$label: ', style: const TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 13)),
-          Text(value, style: const TextStyle(color: CyberpunkTheme.textWhite, fontSize: 13, fontWeight: FontWeight.w500)),
+          Text('$label: ',
+              style: const TextStyle(
+                  color: CyberpunkTheme.textSecondary, fontSize: 13)),
+          Text(value,
+              style: const TextStyle(
+                  color: CyberpunkTheme.textWhite,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500)),
         ],
       ),
     );

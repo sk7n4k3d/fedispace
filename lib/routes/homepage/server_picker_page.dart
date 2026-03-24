@@ -295,8 +295,7 @@ class _ServerPickerPageState extends State<ServerPickerPage>
                           ? IconButton(
                               icon: Icon(Icons.close_rounded,
                                   size: 18,
-                                  color:
-                                      Colors.white.withValues(alpha: 0.4)),
+                                  color: Colors.white.withValues(alpha: 0.4)),
                               onPressed: () => setState(() {
                                 _searchController.clear();
                                 _searchQuery = '';
@@ -319,8 +318,8 @@ class _ServerPickerPageState extends State<ServerPickerPage>
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   children: [
-                    _buildFilterChip(l.serverPickerFilterAll,
-                        _ServerFilter.all, accentColor),
+                    _buildFilterChip(l.serverPickerFilterAll, _ServerFilter.all,
+                        accentColor),
                     const SizedBox(width: 8),
                     _buildFilterChip(l.serverPickerFilterPopular,
                         _ServerFilter.popular, accentColor),
@@ -337,7 +336,8 @@ class _ServerPickerPageState extends State<ServerPickerPage>
             // ── Server list (filtered) ──
             Builder(builder: (context) {
               final filtered = _filteredServers;
-              if (filtered.isEmpty && _servers.every((s) => s.loaded || s.error)) {
+              if (filtered.isEmpty &&
+                  _servers.every((s) => s.loaded || s.error)) {
                 return SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
@@ -414,9 +414,7 @@ class _ServerPickerPageState extends State<ServerPickerPage>
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: isActive
-                ? accentColor
-                : Colors.white.withValues(alpha: 0.5),
+            color: isActive ? accentColor : Colors.white.withValues(alpha: 0.5),
           ),
         ),
       ),
@@ -495,9 +493,8 @@ class _ServerCardState extends State<_ServerCard>
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(20),
-            onTap: server.loaded && server.registrationsOpen
-                ? widget.onTap
-                : null,
+            onTap:
+                server.loaded && server.registrationsOpen ? widget.onTap : null,
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),

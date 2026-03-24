@@ -26,7 +26,8 @@ class BetterVideoPlayerProgressWidget extends StatefulWidget {
   }
 }
 
-class BetterVideoPlayerProgressWidgetState extends State<BetterVideoPlayerProgressWidget> {
+class BetterVideoPlayerProgressWidgetState
+    extends State<BetterVideoPlayerProgressWidget> {
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -40,7 +41,8 @@ class BetterVideoPlayerProgressWidgetState extends State<BetterVideoPlayerProgre
 
   Widget buildPosition() {
     final controller = context.watch<BetterVideoPlayerController>();
-    final position = controller.value.videoPlayerController?.value.position ?? Duration.zero;
+    final position =
+        controller.value.videoPlayerController?.value.position ?? Duration.zero;
     return Text(
       '${BetterVideoPlayerUtils.formatDuration(position)}',
       style: TextStyle(
@@ -53,7 +55,8 @@ class BetterVideoPlayerProgressWidgetState extends State<BetterVideoPlayerProgre
 
   Widget buildDuration() {
     final controller = context.watch<BetterVideoPlayerController>();
-    final duration = controller.value.videoPlayerController?.value.duration ?? Duration.zero;
+    final duration =
+        controller.value.videoPlayerController?.value.duration ?? Duration.zero;
     return Text(
       '${BetterVideoPlayerUtils.formatDuration(duration)}',
       style: TextStyle(

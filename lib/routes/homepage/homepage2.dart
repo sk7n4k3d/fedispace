@@ -252,8 +252,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                 Expanded(
                   child: _SecondaryButton(
                     label: S.of(context).loginWhatIsPixelfed,
-                    onTap: () =>
-                        Navigator.pushNamed(context, '/presentation'),
+                    onTap: () => Navigator.pushNamed(context, '/presentation'),
                   ),
                 ),
                 const SizedBox(width: 12),

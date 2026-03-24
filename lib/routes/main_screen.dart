@@ -54,8 +54,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   void _initNotifications() {
-     NotificationPollingService().init(widget.apiService);
-     NotificationPollingService().startPolling();
+    NotificationPollingService().init(widget.apiService);
+    NotificationPollingService().startPolling();
   }
 
   Future<void> _initUnifiedPush() async {

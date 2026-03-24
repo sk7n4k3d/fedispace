@@ -8,13 +8,15 @@ import 'package:fedispace/themes/cyberpunk_theme.dart';
 class MutedBlockedPage extends StatefulWidget {
   final ApiService apiService;
 
-  const MutedBlockedPage({Key? key, required this.apiService}) : super(key: key);
+  const MutedBlockedPage({Key? key, required this.apiService})
+      : super(key: key);
 
   @override
   State<MutedBlockedPage> createState() => _MutedBlockedPageState();
 }
 
-class _MutedBlockedPageState extends State<MutedBlockedPage> with SingleTickerProviderStateMixin {
+class _MutedBlockedPageState extends State<MutedBlockedPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   List<Map<String, dynamic>> _mutedUsers = [];
   List<Map<String, dynamic>> _blockedUsers = [];
@@ -55,7 +57,9 @@ class _MutedBlockedPageState extends State<MutedBlockedPage> with SingleTickerPr
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to unmute: $e'), backgroundColor: Colors.red.shade800),
+          SnackBar(
+              content: Text('Failed to unmute: $e'),
+              backgroundColor: Colors.red.shade800),
         );
       }
     }
@@ -68,7 +72,9 @@ class _MutedBlockedPageState extends State<MutedBlockedPage> with SingleTickerPr
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to unblock: $e'), backgroundColor: Colors.red.shade800),
+          SnackBar(
+              content: Text('Failed to unblock: $e'),
+              backgroundColor: Colors.red.shade800),
         );
       }
     }
@@ -83,7 +89,10 @@ class _MutedBlockedPageState extends State<MutedBlockedPage> with SingleTickerPr
         elevation: 0,
         title: const Text(
           'Muted & Blocked',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: CyberpunkTheme.textWhite),
+          style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: CyberpunkTheme.textWhite),
         ),
         bottom: TabBar(
           controller: _tabController,
@@ -91,7 +100,8 @@ class _MutedBlockedPageState extends State<MutedBlockedPage> with SingleTickerPr
           indicatorWeight: 2,
           labelColor: CyberpunkTheme.neonCyan,
           unselectedLabelColor: CyberpunkTheme.textSecondary,
-          labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          labelStyle:
+              const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
           tabs: [
             Tab(text: 'Muted (${_mutedUsers.length})'),
             Tab(text: 'Blocked (${_blockedUsers.length})'),
@@ -99,7 +109,8 @@ class _MutedBlockedPageState extends State<MutedBlockedPage> with SingleTickerPr
         ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan))
+          ? const Center(
+              child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan))
           : TabBarView(
               controller: _tabController,
               children: [
@@ -110,7 +121,8 @@ class _MutedBlockedPageState extends State<MutedBlockedPage> with SingleTickerPr
     );
   }
 
-  Widget _buildUserList(List<Map<String, dynamic>> users, {required bool isMuted}) {
+  Widget _buildUserList(List<Map<String, dynamic>> users,
+      {required bool isMuted}) {
     if (users.isEmpty) {
       return Center(
         child: Column(
@@ -123,8 +135,11 @@ class _MutedBlockedPageState extends State<MutedBlockedPage> with SingleTickerPr
             ),
             const SizedBox(height: 12),
             Text(
-              isMuted ? S.of(context).noMutedUsers : S.of(context).noBlockedUsers,
-              style: const TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 15),
+              isMuted
+                  ? S.of(context).noMutedUsers
+                  : S.of(context).noBlockedUsers,
+              style: const TextStyle(
+                  color: CyberpunkTheme.textSecondary, fontSize: 15),
             ),
           ],
         ),
@@ -153,24 +168,32 @@ class _MutedBlockedPageState extends State<MutedBlockedPage> with SingleTickerPr
               border: Border.all(color: CyberpunkTheme.borderDark),
             ),
             child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               leading: CircleAvatar(
                 radius: 22,
                 backgroundColor: CyberpunkTheme.cardDark,
-                backgroundImage: avatarUrl.isNotEmpty ? CachedNetworkImageProvider(avatarUrl) : null,
+                backgroundImage: avatarUrl.isNotEmpty
+                    ? CachedNetworkImageProvider(avatarUrl)
+                    : null,
                 child: avatarUrl.isEmpty
-                    ? const Icon(Icons.person, color: CyberpunkTheme.textTertiary, size: 22)
+                    ? const Icon(Icons.person,
+                        color: CyberpunkTheme.textTertiary, size: 22)
                     : null,
               ),
               title: Text(
                 displayName,
-                style: const TextStyle(color: CyberpunkTheme.textWhite, fontWeight: FontWeight.w600, fontSize: 14),
+                style: const TextStyle(
+                    color: CyberpunkTheme.textWhite,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               subtitle: Text(
                 '@$username',
-                style: const TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 13),
+                style: const TextStyle(
+                    color: CyberpunkTheme.textSecondary, fontSize: 13),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -183,18 +206,25 @@ class _MutedBlockedPageState extends State<MutedBlockedPage> with SingleTickerPr
                   }
                 },
                 style: TextButton.styleFrom(
-                  foregroundColor: isMuted ? CyberpunkTheme.neonCyan : CyberpunkTheme.neonPink,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  foregroundColor: isMuted
+                      ? CyberpunkTheme.neonCyan
+                      : CyberpunkTheme.neonPink,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                     side: BorderSide(
-                      color: (isMuted ? CyberpunkTheme.neonCyan : CyberpunkTheme.neonPink).withOpacity(0.3),
+                      color: (isMuted
+                              ? CyberpunkTheme.neonCyan
+                              : CyberpunkTheme.neonPink)
+                          .withOpacity(0.3),
                     ),
                   ),
                 ),
                 child: Text(
                   isMuted ? 'Unmute' : 'Unblock',
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.w600),
                 ),
               ),
             ),

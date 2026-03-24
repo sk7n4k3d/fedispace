@@ -37,11 +37,13 @@ class HeaderStatusCard extends StatelessWidget {
       if (currentAccount.id == id) {
         Navigator.of(context).pushNamed('/Profile');
       } else {
-        Navigator.of(context).pushNamed('/UserProfile', arguments: {'userId': id});
+        Navigator.of(context)
+            .pushNamed('/UserProfile', arguments: {'userId': id});
       }
     } catch (e) {
       // Fallback if fetch fails
-      Navigator.of(context).pushNamed('/UserProfile', arguments: {'userId': id});
+      Navigator.of(context)
+          .pushNamed('/UserProfile', arguments: {'userId': id});
     }
   }
 
@@ -123,7 +125,8 @@ class HeaderStatusCard extends StatelessWidget {
                             // However, let's try to just trigger the onTap logic which handles it.
                             onTap(context, postsAccount.id);
                           } catch (e) {
-                             Navigator.of(context).pushNamed('/UserProfile', arguments: {'userId': postsAccount.id});
+                            Navigator.of(context).pushNamed('/UserProfile',
+                                arguments: {'userId': postsAccount.id});
                           }
                         } else if (index == 3) {
                           // Mute User

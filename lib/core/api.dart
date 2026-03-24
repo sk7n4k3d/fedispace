@@ -31,7 +31,6 @@ import 'package:http/http.dart' as http;
 import 'package:oauth2_client/access_token_response.dart';
 import 'package:oauth2_client/oauth2_helper.dart';
 
-
 /// Simple in-memory cache with TTL for frequently accessed API responses
 class _CacheEntry {
   final dynamic data;
@@ -108,10 +107,10 @@ class ApiService {
   }
 
   /// Create a new post/status on Pixelfed
-  /// 
+  ///
   /// SECURITY: Fixed JSON injection vulnerability by using proper Map serialization
-  Future<int> createPosts({
-      required String content,
+  Future<int> createPosts(
+      {required String content,
       String? inReplyToId,
       List<String> mediaIds = const [],
       bool sensitive = false,
@@ -184,10 +183,12 @@ class ApiService {
   }
 
   /// Upload media files to Pixelfed and create a post
-  /// 
+  ///
   /// SECURITY: Fixed hardcoded values and improved error handling
   Future<int?> apiPostMedia(String description, List<String> filenames,
-      {bool sensitive = false, String visibility = 'public', Map<int, String>? altTexts}) async {
+      {bool sensitive = false,
+      String visibility = 'public',
+      Map<int, String>? altTexts}) async {
     try {
       List<String> mediaIds = [];
       final uri = Uri.parse('${instanceUrl!}/api/v2/media');
@@ -249,13 +250,13 @@ class ApiService {
         final response = await request.send();
         final responseBody = await http.Response.fromStream(response);
 
-        appLogger.apiResponse(
-            '/api/v2/media', responseBody.statusCode, body: responseBody.body);
+        appLogger.apiResponse('/api/v2/media', responseBody.statusCode,
+            body: responseBody.body);
 
         // Accept 200 OK, 201 Created, and 202 Accepted (async processing)
         // Per Mastodon API: 202 is returned for large files (video/audio) being processed asynchronously
-        if (responseBody.statusCode != 200 && 
-            responseBody.statusCode != 201 && 
+        if (responseBody.statusCode != 200 &&
+            responseBody.statusCode != 201 &&
             responseBody.statusCode != 202) {
           // Dismiss progress notification
           AwesomeNotifications().dismiss(999);
@@ -266,13 +267,14 @@ class ApiService {
 
         final responseData = ErrorHandler.parseJson(responseBody.body);
         final mediaId = responseData['id']?.toString();
-        
+
         if (mediaId != null) {
           mediaIds.add(mediaId);
-          
+
           // Log async processing status
           if (responseBody.statusCode == 202) {
-            appLogger.info('Media $mediaId uploaded, processing asynchronously (preview available)');
+            appLogger.info(
+                'Media $mediaId uploaded, processing asynchronously (preview available)');
           } else {
             appLogger.info('Media $mediaId uploaded and processed');
           }
@@ -310,9 +312,9 @@ class ApiService {
         originalError: e,
       );
     }
-    
+
     appLogger.apiResponse('/api/v1/notifications', resp.statusCode);
-    
+
     if (resp.statusCode == 200) {
       return resp.body;
     }
@@ -403,21 +405,24 @@ class ApiService {
     try {
       String apiUrl;
       appLogger.debug('Checking Pixelfed instance: $domain');
-      
+
       if (domain.toString().contains('://')) {
         apiUrl = '$domain/api/v1/instance';
       } else {
         apiUrl = 'https://${domain.toString()}/api/v1/instance';
       }
-      
+
       appLogger.apiCall('GET', apiUrl);
       http.Response resp = await http.get(Uri.parse(apiUrl));
       appLogger.apiResponse(apiUrl, resp.statusCode);
-      
+
       if (resp.statusCode == 200) {
         final jsonBody = jsonDecode(resp.body);
-        if (jsonBody['metadata'] != null && jsonBody['metadata']['nodeName'] == 'Pixelfed' &&
-            jsonBody['config'] != null && jsonBody['config']['features'] != null && jsonBody['config']['features']['mobile_apis'] == true) {
+        if (jsonBody['metadata'] != null &&
+            jsonBody['metadata']['nodeName'] == 'Pixelfed' &&
+            jsonBody['config'] != null &&
+            jsonBody['config']['features'] != null &&
+            jsonBody['config']['features']['mobile_apis'] == true) {
           appLogger.info('Valid Pixelfed instance detected: $domain');
           return true;
         }
@@ -444,24 +449,26 @@ class ApiService {
   }
 
   /// Get list of statuses from timeline
-  Future<List<Status>> getStatusList(String? maxId, int limit, String timeLine) async {
+  Future<List<Status>> getStatusList(
+      String? maxId, int limit, String timeLine) async {
     String apiUrl;
     if (timeLine == 'home') {
       apiUrl = '${instanceUrl!}/api/v1/timelines/home?limit=$limit';
     } else if (timeLine == 'local') {
-      apiUrl = '${instanceUrl!}/api/v1/timelines/public?local=true&limit=$limit';
+      apiUrl =
+          '${instanceUrl!}/api/v1/timelines/public?local=true&limit=$limit';
     } else {
       apiUrl = '${instanceUrl!}/api/v1/timelines/public?limit=$limit';
     }
-    
+
     if (maxId != null) {
       apiUrl += '&max_id=$maxId';
     }
-    
+
     appLogger.apiCall('GET', apiUrl);
     http.Response resp = await _apiGet(apiUrl);
     appLogger.apiResponse(apiUrl, resp.statusCode);
-    
+
     if (resp.statusCode == 200) {
       // The response is a list of json objects
       List<dynamic> jsonDataList = jsonDecode(resp.body);
@@ -478,17 +485,18 @@ class ApiService {
   }
 
   /// Get list of statuses for a specific tag
-  Future<List<Status>> getTimelineTag(String tag, String? maxId, int limit) async {
+  Future<List<Status>> getTimelineTag(
+      String tag, String? maxId, int limit) async {
     String apiUrl = '${instanceUrl!}/api/v1/timelines/tag/$tag?limit=$limit';
-    
+
     if (maxId != null) {
       apiUrl += '&max_id=$maxId';
     }
-    
+
     appLogger.apiCall('GET', apiUrl);
     http.Response resp = await _apiGet(apiUrl);
     appLogger.apiResponse(apiUrl, resp.statusCode);
-    
+
     if (resp.statusCode == 200) {
       List<dynamic> jsonDataList = jsonDecode(resp.body);
       return jsonDataList
@@ -519,17 +527,17 @@ class ApiService {
   Future<Account> getAccount() async {
     final apiUrl = '${instanceUrl!}/api/v1/accounts/verify_credentials';
     appLogger.apiCall('GET', '/api/v1/accounts/verify_credentials');
-    
+
     http.Response resp = await _apiGet(apiUrl);
     appLogger.apiResponse(apiUrl, resp.statusCode);
-    
+
     if (resp.statusCode == 200) {
       Map<String, dynamic> jsonData = jsonDecode(resp.body);
       currentAccount = Account.fromJson(jsonData);
       appLogger.info('Account retrieved: ${currentAccount!.username}');
       return currentAccount!;
     }
-    
+
     throw ApiException(
       'Unexpected status code ${resp.statusCode} on getAccount',
       statusCode: resp.statusCode,
@@ -543,22 +551,23 @@ class ApiService {
   /// Get account information for a specific user
   Future<AccountUsers> getUserAccount(String id) async {
     final cacheKey = 'user_account_$id';
-    final cached = _cache.get<AccountUsers>(cacheKey, const Duration(minutes: 5));
+    final cached =
+        _cache.get<AccountUsers>(cacheKey, const Duration(minutes: 5));
     if (cached != null) return cached;
 
     final apiUrl = '${instanceUrl!}/api/v1/accounts/$id';
     appLogger.apiCall('GET', '/api/v1/accounts/$id');
-    
+
     http.Response resp = await _apiGet(apiUrl);
     appLogger.apiResponse(apiUrl, resp.statusCode);
-    
+
     if (resp.statusCode == 200) {
       Map<String, dynamic> jsonData = jsonDecode(resp.body);
       currentAccountOfUsers = AccountUsers.fromJson(jsonData);
       _cache.set(cacheKey, currentAccountOfUsers!);
       return currentAccountOfUsers!;
     }
-    
+
     throw ApiException(
       'Unexpected status code ${resp.statusCode} on getUserAccount',
       statusCode: resp.statusCode,
@@ -569,10 +578,10 @@ class ApiService {
   Future<Status> statusByID(String statusId) async {
     appLogger.debug('Fetching status: $statusId');
     final apiUrl = '${instanceUrl!}/api/v1/statuses/$statusId';
-    
+
     http.Response resp = await _apiGet(apiUrl);
     appLogger.apiResponse(apiUrl, resp.statusCode);
-    
+
     if (resp.statusCode == 200) {
       Map<String, dynamic> jsonData = jsonDecode(resp.body);
       return Status.fromJson(jsonData);
@@ -764,46 +773,47 @@ class ApiService {
     );
   }
 
-  Future<bool> reportUser(String accountId, {String? comment, List<String>? statusIds}) async {
+  Future<bool> reportUser(String accountId,
+      {String? comment, List<String>? statusIds}) async {
     final apiUrl = "${instanceUrl!}/api/v1/reports";
-    
+
     final Map<String, dynamic> body = {
       'account_id': accountId,
     };
-    
+
     if (comment != null && comment.isNotEmpty) {
       body['comment'] = comment;
     }
-    
+
     if (statusIds != null && statusIds.isNotEmpty) {
       body['status_ids'] = statusIds;
     }
 
     // Using helper.post directly to handle body encoding if needed, similar to createPosts
-    // But _apiPost uses helper.post with httpClient. 
-    // Let's use helper.post directly to control headers and body encoding strictly if needed, 
-    // or we can try to use _apiPost if it supports body. 
+    // But _apiPost uses helper.post with httpClient.
+    // Let's use helper.post directly to control headers and body encoding strictly if needed,
+    // or we can try to use _apiPost if it supports body.
     // _apiPost implementation: Future<http.Response> _apiPost(String url) async { return await helper!.post(url, httpClient: httpClient); }
     // It doesn't seem to take a body. I should check _apiPost again.
     // Wait, _apiPost at line 53 takes one arg. It seems limited.
     // I will use helper!.post directly like createPosts does.
 
     appLogger.apiCall('POST', '/api/v1/reports', params: body);
-    
+
     final response = await helper!.post(
       apiUrl,
-      body: body, 
+      body: body,
       // oauth2_client helper automatically sets Content-Type to application/x-www-form-urlencoded if body is map
       // or application/json if we encode it. Mastodon API usually accepts form-data.
       httpClient: httpClient,
     );
-    
+
     appLogger.apiResponse('/api/v1/reports', response.statusCode);
 
     if (response.statusCode == 200) {
       return true;
     }
-    
+
     ErrorHandler.handleResponse(response.statusCode, response.body);
     return false;
   }
@@ -822,7 +832,7 @@ class ApiService {
     appLogger.apiCall('GET', apiUrl);
     http.Response resp = await _apiGet(apiUrl);
     appLogger.apiResponse(apiUrl, resp.statusCode);
-    
+
     if (resp.statusCode == 200) {
       return jsonDecode(resp.body);
     }
@@ -851,7 +861,9 @@ class ApiService {
         resp = await _apiGet(apiUrl);
       }
 
-      appLogger.apiResponse('stories/carousel', resp.statusCode, body: resp.body.length > 500 ? resp.body.substring(0, 500) : resp.body);
+      appLogger.apiResponse('stories/carousel', resp.statusCode,
+          body:
+              resp.body.length > 500 ? resp.body.substring(0, 500) : resp.body);
 
       if (resp.statusCode != 200) {
         appLogger.warning('Story carousel returned ${resp.statusCode}');
@@ -878,14 +890,14 @@ class ApiService {
           .where((s) => s.items.isNotEmpty)
           .toList();
 
-      appLogger.info('Story carousel: self=${selfStory != null ? selfStory.items.length : 0} items, ${others.length} friends');
+      appLogger.info(
+          'Story carousel: self=${selfStory != null ? selfStory.items.length : 0} items, ${others.length} friends');
       return StoryCarouselResult(self: selfStory, others: others);
     } catch (e, s) {
       appLogger.error('Error fetching story carousel', e, s);
       return StoryCarouselResult(self: null, others: []);
     }
   }
-
 
   /// Create and publish a story in one step
   /// Uses the same endpoint as the official Pixelfed app:
@@ -908,27 +920,35 @@ class ApiService {
       const int targetW = 1080;
       const int targetH = 1920;
 
-      appLogger.info('Story image original: ${original.width}x${original.height}, target: ${targetW}x$targetH');
+      appLogger.info(
+          'Story image original: ${original.width}x${original.height}, target: ${targetW}x$targetH');
 
       // Scale to cover: pick the larger scale factor so the image fills the target area
-      final double scale = math.max(targetW / original.width, targetH / original.height);
+      final double scale =
+          math.max(targetW / original.width, targetH / original.height);
       final int scaledW = (original.width * scale).round();
       final int scaledH = (original.height * scale).round();
 
       // Resize to cover dimensions
-      final scaled = img.copyResize(original, width: scaledW, height: scaledH, interpolation: img.Interpolation.linear);
+      final scaled = img.copyResize(original,
+          width: scaledW,
+          height: scaledH,
+          interpolation: img.Interpolation.linear);
 
       // Center-crop to exactly 1080x1920
       final int cropX = ((scaledW - targetW) / 2).round();
       final int cropY = ((scaledH - targetH) / 2).round();
-      final cropped = img.copyCrop(scaled, x: cropX, y: cropY, width: targetW, height: targetH);
+      final cropped = img.copyCrop(scaled,
+          x: cropX, y: cropY, width: targetW, height: targetH);
 
       final dir = await getTemporaryDirectory();
-      final outPath = '${dir.path}/story_resized_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final outPath =
+          '${dir.path}/story_resized_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final jpegBytes = img.encodeJpg(cropped, quality: 85);
       await File(outPath).writeAsBytes(jpegBytes);
 
-      appLogger.info('Story image resized to ${targetW}x$targetH, saved to $outPath (${jpegBytes.length} bytes)');
+      appLogger.info(
+          'Story image resized to ${targetW}x$targetH, saved to $outPath (${jpegBytes.length} bytes)');
       return outPath;
     } catch (e, stackTrace) {
       appLogger.error('Error resizing story image', e, stackTrace);
@@ -936,7 +956,8 @@ class ApiService {
     }
   }
 
-  Future<String?> createStory({required String filePath, int duration = 10}) async {
+  Future<String?> createStory(
+      {required String filePath, int duration = 10}) async {
     try {
       // Resize image to fit Pixelfed story dimension limits
       final resizedPath = await _resizeImageForStory(filePath);
@@ -954,7 +975,7 @@ class ApiService {
         'Accept': 'application/json',
         'X-PIXELFED-APP': '1',
       });
-      
+
       final file = File(uploadPath);
       if (!await file.exists()) return 'File not found: $uploadPath';
 
@@ -962,21 +983,26 @@ class ApiService {
       request.fields['duration'] = duration.toString();
       request.fields['can_reply'] = 'true';
       request.fields['can_react'] = 'true';
-      
+
       appLogger.apiCall('POST', '/api/v1.2/stories/publish');
       final response = await request.send();
       final responseBody = await http.Response.fromStream(response);
-      appLogger.apiResponse('/api/v1.2/stories/publish', responseBody.statusCode, body: responseBody.body);
+      appLogger.apiResponse(
+          '/api/v1.2/stories/publish', responseBody.statusCode,
+          body: responseBody.body);
 
       // Clean up temporary resized file
       if (resizedPath != null) {
-        try { await File(resizedPath).delete(); } catch (_) {}
+        try {
+          await File(resizedPath).delete();
+        } catch (_) {}
       }
 
       if (responseBody.statusCode == 200 || responseBody.statusCode == 201) {
         return null; // success
       }
-      appLogger.error('Story publish failed: ${responseBody.statusCode} ${responseBody.body}');
+      appLogger.error(
+          'Story publish failed: ${responseBody.statusCode} ${responseBody.body}');
       return 'Upload failed (${responseBody.statusCode}): ${responseBody.body}';
     } catch (e, stackTrace) {
       appLogger.error('Error creating story', e, stackTrace);
@@ -997,7 +1023,8 @@ class ApiService {
     bool? discoverable,
   }) async {
     try {
-      final uri = Uri.parse('${instanceUrl!}/api/v1/accounts/update_credentials');
+      final uri =
+          Uri.parse('${instanceUrl!}/api/v1/accounts/update_credentials');
       final tokenResponse = await helper!.getTokenFromStorage();
       final token = tokenResponse?.accessToken;
 
@@ -1014,20 +1041,24 @@ class ApiService {
       if (displayName != null) request.fields['display_name'] = displayName;
       if (note != null) request.fields['note'] = note;
       if (locked != null) request.fields['locked'] = locked.toString();
-      if (discoverable != null) request.fields['discoverable'] = discoverable.toString();
+      if (discoverable != null)
+        request.fields['discoverable'] = discoverable.toString();
 
       // Add image files
       if (avatar != null && await avatar.exists()) {
-        request.files.add(await http.MultipartFile.fromPath('avatar', avatar.path));
+        request.files
+            .add(await http.MultipartFile.fromPath('avatar', avatar.path));
       }
       if (header != null && await header.exists()) {
-        request.files.add(await http.MultipartFile.fromPath('header', header.path));
+        request.files
+            .add(await http.MultipartFile.fromPath('header', header.path));
       }
 
       appLogger.apiCall('PATCH', '/api/v1/accounts/update_credentials');
       final response = await request.send();
       final responseBody = await http.Response.fromStream(response);
-      appLogger.apiResponse('/api/v1/accounts/update_credentials', responseBody.statusCode);
+      appLogger.apiResponse(
+          '/api/v1/accounts/update_credentials', responseBody.statusCode);
 
       if (responseBody.statusCode == 200) {
         final jsonData = ErrorHandler.parseJson(responseBody.body);
@@ -1036,7 +1067,8 @@ class ApiService {
       }
 
       ErrorHandler.handleResponse(responseBody.statusCode, responseBody.body);
-      throw ApiException('Failed to update credentials', statusCode: responseBody.statusCode);
+      throw ApiException('Failed to update credentials',
+          statusCode: responseBody.statusCode);
     } catch (err, stackTrace) {
       appLogger.error('Error updating credentials', err, stackTrace);
       rethrow;
@@ -1045,7 +1077,8 @@ class ApiService {
 
   /// Search for accounts
   /// GET /api/v1/accounts/search
-  Future<List<AccountUsers>> searchAccounts(String query, {int limit = 20}) async {
+  Future<List<AccountUsers>> searchAccounts(String query,
+      {int limit = 20}) async {
     try {
       final params = {
         'q': query,
@@ -1061,7 +1094,8 @@ class ApiService {
       if (resp.statusCode == 200) {
         final List<dynamic> jsonData = jsonDecode(resp.body);
         return jsonData
-            .map((account) => AccountUsers.fromJson(account as Map<String, dynamic>))
+            .map((account) =>
+                AccountUsers.fromJson(account as Map<String, dynamic>))
             .toList();
       }
 
@@ -1075,9 +1109,11 @@ class ApiService {
 
   /// Get account followers
   /// GET /api/v1/accounts/:id/followers
-  Future<List<AccountUsers>> getFollowers(String accountId, {String? maxId, int limit = 40}) async {
+  Future<List<AccountUsers>> getFollowers(String accountId,
+      {String? maxId, int limit = 40}) async {
     try {
-      var apiUrl = '${instanceUrl!}/api/v1/accounts/$accountId/followers?limit=$limit';
+      var apiUrl =
+          '${instanceUrl!}/api/v1/accounts/$accountId/followers?limit=$limit';
       if (maxId != null) {
         apiUrl += '&max_id=$maxId';
       }
@@ -1089,12 +1125,14 @@ class ApiService {
       if (resp.statusCode == 200) {
         final List<dynamic> jsonData = jsonDecode(resp.body);
         return jsonData
-            .map((account) => AccountUsers.fromJson(account as Map<String, dynamic>))
+            .map((account) =>
+                AccountUsers.fromJson(account as Map<String, dynamic>))
             .toList();
       }
 
       ErrorHandler.handleResponse(resp.statusCode, resp.body);
-      throw ApiException('Failed to get followers', statusCode: resp.statusCode);
+      throw ApiException('Failed to get followers',
+          statusCode: resp.statusCode);
     } catch (err, stackTrace) {
       appLogger.error('Error getting followers', err, stackTrace);
       rethrow;
@@ -1108,31 +1146,32 @@ class ApiService {
   }
 
   Future<void> followStatus(String userId) async {
-      // Assuming this is checking relationship? Or following?
-      // Based on usage context 'await widget.apiService.followStatus(widget.userId);'
-      // It might be 'followUser'.
-      await followUser(userId);
+    // Assuming this is checking relationship? Or following?
+    // Based on usage context 'await widget.apiService.followStatus(widget.userId);'
+    // It might be 'followUser'.
+    await followUser(userId);
   }
-  
+
   Future<List<Status>> getFav(String? maxId) async {
     // Get Favourites
     // GET /api/v1/favourites
     String apiUrl = '${instanceUrl!}/api/v1/favourites?limit=20';
     if (maxId != null) {
-       apiUrl += '&max_id=$maxId';
+      apiUrl += '&max_id=$maxId';
     }
-    
+
     appLogger.apiCall('GET', apiUrl);
     http.Response resp = await _apiGet(apiUrl);
     appLogger.apiResponse(apiUrl, resp.statusCode);
-    
+
     if (resp.statusCode == 200) {
-       List<dynamic> jsonDataList = jsonDecode(resp.body);
-       return jsonDataList
-          .map((statusData) => Status.fromJson(statusData as Map<String, dynamic>))
+      List<dynamic> jsonDataList = jsonDecode(resp.body);
+      return jsonDataList
+          .map((statusData) =>
+              Status.fromJson(statusData as Map<String, dynamic>))
           .toList();
     }
-     throw ApiException(
+    throw ApiException(
       'Unexpected status code ${resp.statusCode} on getFav',
       statusCode: resp.statusCode,
     );
@@ -1142,9 +1181,9 @@ class ApiService {
     final apiUrl = '${instanceUrl!}/api/v1/statuses/$statusId/context';
     appLogger.apiCall('GET', apiUrl);
     http.Response resp = await _apiGet(apiUrl);
-    
+
     if (resp.statusCode == 200) {
-       return jsonDecode(resp.body);
+      return jsonDecode(resp.body);
     }
     throw ApiException('Failed to get context', statusCode: resp.statusCode);
   }
@@ -1155,9 +1194,11 @@ class ApiService {
 
   /// Get accounts being followed
   /// GET /api/v1/accounts/:id/following
-  Future<List<AccountUsers>> getFollowing(String accountId, {String? maxId, int limit = 40}) async {
+  Future<List<AccountUsers>> getFollowing(String accountId,
+      {String? maxId, int limit = 40}) async {
     try {
-      var apiUrl = '${instanceUrl!}/api/v1/accounts/$accountId/following?limit=$limit';
+      var apiUrl =
+          '${instanceUrl!}/api/v1/accounts/$accountId/following?limit=$limit';
       if (maxId != null) {
         apiUrl += '&max_id=$maxId';
       }
@@ -1169,12 +1210,14 @@ class ApiService {
       if (resp.statusCode == 200) {
         final List<dynamic> jsonData = jsonDecode(resp.body);
         return jsonData
-            .map((account) => AccountUsers.fromJson(account as Map<String, dynamic>))
+            .map((account) =>
+                AccountUsers.fromJson(account as Map<String, dynamic>))
             .toList();
       }
 
       ErrorHandler.handleResponse(resp.statusCode, resp.body);
-      throw ApiException('Failed to get following', statusCode: resp.statusCode);
+      throw ApiException('Failed to get following',
+          statusCode: resp.statusCode);
     } catch (err, stackTrace) {
       appLogger.error('Error getting following', err, stackTrace);
       rethrow;
@@ -1202,7 +1245,8 @@ class ApiService {
       }
 
       ErrorHandler.handleResponse(resp.statusCode, resp.body);
-      throw ApiException('Failed to get bookmarks', statusCode: resp.statusCode);
+      throw ApiException('Failed to get bookmarks',
+          statusCode: resp.statusCode);
     } catch (err, stackTrace) {
       appLogger.error('Error getting bookmarks', err, stackTrace);
       rethrow;
@@ -1271,8 +1315,10 @@ class ApiService {
   /// POST /api/v1/notifications/:id/dismiss
   Future<bool> dismissNotification(String notificationId) async {
     try {
-      final apiUrl = '${instanceUrl!}/api/v1/notifications/$notificationId/dismiss';
-      appLogger.apiCall('POST', '/api/v1/notifications/$notificationId/dismiss');
+      final apiUrl =
+          '${instanceUrl!}/api/v1/notifications/$notificationId/dismiss';
+      appLogger.apiCall(
+          'POST', '/api/v1/notifications/$notificationId/dismiss');
 
       final resp = await _apiPost(apiUrl);
       appLogger.apiResponse(apiUrl, resp.statusCode);
@@ -1291,12 +1337,18 @@ class ApiService {
 
   /// Get direct message conversations
   /// Mastodon API: GET /api/v1/conversations
-  Future<List<dynamic>> getConversations({int limit = 20, String? maxId, String? minId}) async {
-    return getConversationsByScope(scope: 'inbox', limit: limit, maxId: maxId, minId: minId);
+  Future<List<dynamic>> getConversations(
+      {int limit = 20, String? maxId, String? minId}) async {
+    return getConversationsByScope(
+        scope: 'inbox', limit: limit, maxId: maxId, minId: minId);
   }
 
   /// Get conversations by scope: inbox, sent, or requests
-  Future<List<dynamic>> getConversationsByScope({required String scope, int limit = 40, String? maxId, String? minId}) async {
+  Future<List<dynamic>> getConversationsByScope(
+      {required String scope,
+      int limit = 40,
+      String? maxId,
+      String? minId}) async {
     try {
       final tokenResponse = await helper!.getTokenFromStorage();
       final token = tokenResponse?.accessToken;
@@ -1311,7 +1363,8 @@ class ApiService {
         if (minId != null) 'min_id': minId,
       };
 
-      final uri = Uri.parse('$_baseUrl/api/v1/conversations').replace(queryParameters: queryParams);
+      final uri = Uri.parse('$_baseUrl/api/v1/conversations')
+          .replace(queryParameters: queryParams);
       final response = await http.get(
         uri,
         headers: {
@@ -1320,7 +1373,8 @@ class ApiService {
         },
       );
 
-      appLogger.apiResponse('/api/v1/conversations?scope=$scope', response.statusCode);
+      appLogger.apiResponse(
+          '/api/v1/conversations?scope=$scope', response.statusCode);
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
@@ -1333,14 +1387,16 @@ class ApiService {
         return [];
       }
     } catch (err, stackTrace) {
-      appLogger.error('Error getting conversations (scope=$scope)', err, stackTrace);
+      appLogger.error(
+          'Error getting conversations (scope=$scope)', err, stackTrace);
       return [];
     }
   }
 
   /// Get all messages for a specific conversation partner
   /// Merges inbox + sent conversations to reconstruct full DM history
-  Future<List<Map<String, dynamic>>> getAllConversationMessages(String partnerId) async {
+  Future<List<Map<String, dynamic>>> getAllConversationMessages(
+      String partnerId) async {
     try {
       // Fetch both inbox and sent
       final inbox = await getConversationsByScope(scope: 'inbox', limit: 40);
@@ -1353,9 +1409,10 @@ class ApiService {
         if (conv is! Map) continue;
         final accounts = conv['accounts'] as List?;
         if (accounts == null || accounts.isEmpty) continue;
-        
+
         // Check if this conversation involves our partner
-        bool matchesPartner = accounts.any((a) => a['id']?.toString() == partnerId);
+        bool matchesPartner =
+            accounts.any((a) => a['id']?.toString() == partnerId);
         if (!matchesPartner) continue;
 
         final lastStatus = conv['last_status'];
@@ -1372,8 +1429,9 @@ class ApiService {
         if (conv is! Map) continue;
         final accounts = conv['accounts'] as List?;
         if (accounts == null || accounts.isEmpty) continue;
-        
-        bool matchesPartner = accounts.any((a) => a['id']?.toString() == partnerId);
+
+        bool matchesPartner =
+            accounts.any((a) => a['id']?.toString() == partnerId);
         if (!matchesPartner) continue;
 
         final lastStatus = conv['last_status'];
@@ -1387,8 +1445,10 @@ class ApiService {
 
       // Sort by created_at descending (newest first for reverse ListView)
       allMessages.sort((a, b) {
-        final aTime = DateTime.tryParse(a['created_at'] ?? '') ?? DateTime(2000);
-        final bTime = DateTime.tryParse(b['created_at'] ?? '') ?? DateTime(2000);
+        final aTime =
+            DateTime.tryParse(a['created_at'] ?? '') ?? DateTime(2000);
+        final bTime =
+            DateTime.tryParse(b['created_at'] ?? '') ?? DateTime(2000);
         return bTime.compareTo(aTime);
       });
 
@@ -1408,84 +1468,86 @@ class ApiService {
     }
   }
 
-
-
   Future<dynamic> sendChatDirectMessage({
-      required String recipientId,
-      required String content,
-      List<String>? mediaIds,
+    required String recipientId,
+    required String content,
+    List<String>? mediaIds,
   }) async {
     try {
-        // Correct path confirmed from source: /api/v1.1/direct/thread/send
-        final uri = '$_baseUrl/api/v1.1/direct/thread/send';
-        debugPrint('[DM-SEND] sendChatDirectMessage() called');
-        debugPrint('[DM-SEND] recipientId: $recipientId, content length: ${content.length}, mediaIds: $mediaIds');
-        
-        final Map<String, String> bodyMap = {
-           'to_id': recipientId,  // Changed from recipient_id
-           'message': content,    // Changed from body/text fallback
-           'type': 'text',        // Required by validation (in:text,emoji)
-        };
-        
-        if (mediaIds != null && mediaIds.isNotEmpty) {
-            // ... media handling if needed, usually media_id or media_ids[]
-             for (int i = 0; i < mediaIds.length; i++) {
-                bodyMap['media_ids[$i]'] = mediaIds[i];
-             }
+      // Correct path confirmed from source: /api/v1.1/direct/thread/send
+      final uri = '$_baseUrl/api/v1.1/direct/thread/send';
+      debugPrint('[DM-SEND] sendChatDirectMessage() called');
+      debugPrint(
+          '[DM-SEND] recipientId: $recipientId, content length: ${content.length}, mediaIds: $mediaIds');
+
+      final Map<String, String> bodyMap = {
+        'to_id': recipientId, // Changed from recipient_id
+        'message': content, // Changed from body/text fallback
+        'type': 'text', // Required by validation (in:text,emoji)
+      };
+
+      if (mediaIds != null && mediaIds.isNotEmpty) {
+        // ... media handling if needed, usually media_id or media_ids[]
+        for (int i = 0; i < mediaIds.length; i++) {
+          bodyMap['media_ids[$i]'] = mediaIds[i];
         }
-        
-        appLogger.apiCall('POST', '/api/v1.1/direct/thread/send');
-        
-        final response = await helper!.post(
-            uri,
-            body: bodyMap,
-            headers: {
-              'Accept': 'application/json',
-            },
-        );
-        
-        appLogger.apiResponse('/api/v1.1/direct/thread/send', response.statusCode);
-        debugPrint('[DM-SEND] Response status: ${response.statusCode}');
-        debugPrint('[DM-SEND] Response body: ${response.body}');
-        
-        if (response.statusCode == 200 || response.statusCode == 201) {
-             // Success
-             debugPrint('[DM-SEND] SUCCESS');
-             return jsonDecode(response.body); // Return map
-        } else {
-             // Log
-             debugPrint('[DM-SEND] FAILED: ${response.statusCode} - ${response.body}');
-             appLogger.error('Chat DM Failed with status ${response.statusCode}');
-             return {'error': 'Chat API ${response.statusCode}: ${response.body}'};
-        }
+      }
+
+      appLogger.apiCall('POST', '/api/v1.1/direct/thread/send');
+
+      final response = await helper!.post(
+        uri,
+        body: bodyMap,
+        headers: {
+          'Accept': 'application/json',
+        },
+      );
+
+      appLogger.apiResponse(
+          '/api/v1.1/direct/thread/send', response.statusCode);
+      debugPrint('[DM-SEND] Response status: ${response.statusCode}');
+      debugPrint('[DM-SEND] Response body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Success
+        debugPrint('[DM-SEND] SUCCESS');
+        return jsonDecode(response.body); // Return map
+      } else {
+        // Log
+        debugPrint(
+            '[DM-SEND] FAILED: ${response.statusCode} - ${response.body}');
+        appLogger.error('Chat DM Failed with status ${response.statusCode}');
+        return {'error': 'Chat API ${response.statusCode}: ${response.body}'};
+      }
     } catch (e, stack) {
-        debugPrint('[DM-SEND] EXCEPTION: $e');
-        debugPrint('[DM-SEND] Stack: $stack');
-        appLogger.error('Chat DM Error', e, stack);
-        return {'error': 'Exception: $e'};
+      debugPrint('[DM-SEND] EXCEPTION: $e');
+      debugPrint('[DM-SEND] Stack: $stack');
+      appLogger.error('Chat DM Error', e, stack);
+      return {'error': 'Exception: $e'};
     }
   }
 
   /// Get chat messages for a thread
   /// GET /api/v1.1/direct/thread/:id/messages
-  Future<List<dynamic>> getChatMessages(String threadId, {String? maxId}) async {
+  Future<List<dynamic>> getChatMessages(String threadId,
+      {String? maxId}) async {
     try {
-        var uri = '$_baseUrl/api/v1.1/direct/thread/$threadId/messages';
-        if (maxId != null) {
-          uri += '?max_id=$maxId';
-        }
+      var uri = '$_baseUrl/api/v1.1/direct/thread/$threadId/messages';
+      if (maxId != null) {
+        uri += '?max_id=$maxId';
+      }
 
-        appLogger.apiCall('GET', '/api/v1.1/direct/thread/$threadId/messages');
-        final response = await _apiGet(uri);
-        appLogger.apiResponse(uri, response.statusCode);
+      appLogger.apiCall('GET', '/api/v1.1/direct/thread/$threadId/messages');
+      final response = await _apiGet(uri);
+      appLogger.apiResponse(uri, response.statusCode);
 
-        if (response.statusCode == 200) {
-            return jsonDecode(response.body);
-        }
-        return [];
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+      return [];
     } catch (e, stack) {
-        appLogger.error('Error getting chat messages', e, stack);
-        return [];
+      appLogger.error('Error getting chat messages', e, stack);
+      return [];
     }
   }
 
@@ -1493,48 +1555,45 @@ class ApiService {
   /// GET /api/v1.1/direct/thread?pid={partnerId}
   Future<List<dynamic>> getDirectThread(String partnerId) async {
     try {
-        final tokenResponse = await helper!.getTokenFromStorage();
-        final token = tokenResponse?.accessToken;
-        
-        final uri = Uri.parse('$_baseUrl/api/v1.1/direct/thread').replace(
-          queryParameters: {'pid': partnerId},
-        );
-        
-        appLogger.apiCall('GET', '/api/v1.1/direct/thread?pid=$partnerId');
-        
-        final response = await http.get(
-          uri,
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Accept': 'application/json',
-          },
-        );
-        
-        appLogger.apiResponse('/api/v1.1/direct/thread?pid=$partnerId', response.statusCode);
-        
-        if (response.statusCode == 200) {
-            final decoded = jsonDecode(response.body);
-            if (decoded is List) {
-              return decoded;
-            } else if (decoded is Map && decoded.containsKey('messages')) {
-              // Some Pixelfed versions wrap messages in a map
-              return decoded['messages'] is List ? decoded['messages'] : [];
-            }
-            return [decoded]; // Single object, wrap in list
+      final tokenResponse = await helper!.getTokenFromStorage();
+      final token = tokenResponse?.accessToken;
+
+      final uri = Uri.parse('$_baseUrl/api/v1.1/direct/thread').replace(
+        queryParameters: {'pid': partnerId},
+      );
+
+      appLogger.apiCall('GET', '/api/v1.1/direct/thread?pid=$partnerId');
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
+      appLogger.apiResponse(
+          '/api/v1.1/direct/thread?pid=$partnerId', response.statusCode);
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        if (decoded is List) {
+          return decoded;
+        } else if (decoded is Map && decoded.containsKey('messages')) {
+          // Some Pixelfed versions wrap messages in a map
+          return decoded['messages'] is List ? decoded['messages'] : [];
         }
-        return [];
+        return [decoded]; // Single object, wrap in list
+      }
+      return [];
     } catch (e, stack) {
-        appLogger.error('Error getting direct thread', e, stack);
-        return [];
+      appLogger.error('Error getting direct thread', e, stack);
+      return [];
     }
   }
 
-
-
   /// Sanitize instance URL to remove trailing slash
   String get _baseUrl => instanceUrl?.replaceAll(RegExp(r'/$'), '') ?? '';
-
-
 
   // ══════════════════════════════════════════════════════════════════
   // HIGH-PRIORITY ENDPOINTS (batch added)
@@ -1542,11 +1601,14 @@ class ApiService {
 
   /// Get relationships between the current user and given accounts
   /// GET /api/v1/accounts/relationships?id[]=...
-  Future<List<Map<String, dynamic>>> getRelationships(List<String> accountIds) async {
+  Future<List<Map<String, dynamic>>> getRelationships(
+      List<String> accountIds) async {
     try {
       final params = accountIds.map((id) => 'id[]=$id').join('&');
-      final resp = await _apiGet('${instanceUrl!}/api/v1/accounts/relationships?$params');
-      appLogger.apiCall('GET', '/api/v1/accounts/relationships', params: {'ids': accountIds.toString()});
+      final resp = await _apiGet(
+          '${instanceUrl!}/api/v1/accounts/relationships?$params');
+      appLogger.apiCall('GET', '/api/v1/accounts/relationships',
+          params: {'ids': accountIds.toString()});
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
         return data.cast<Map<String, dynamic>>();
@@ -1560,9 +1622,11 @@ class ApiService {
 
   /// Get accounts that favourited a status
   /// GET /api/v1/statuses/:id/favourited_by
-  Future<List<Account>> getFavouritedBy(String statusId, {int limit = 40}) async {
+  Future<List<Account>> getFavouritedBy(String statusId,
+      {int limit = 40}) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1/statuses/$statusId/favourited_by?limit=$limit');
+      final resp = await _apiGet(
+          '${instanceUrl!}/api/v1/statuses/$statusId/favourited_by?limit=$limit');
       appLogger.apiCall('GET', '/api/v1/statuses/$statusId/favourited_by');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -1577,9 +1641,11 @@ class ApiService {
 
   /// Get accounts that reblogged a status
   /// GET /api/v1/statuses/:id/reblogged_by
-  Future<List<Account>> getRebloggedBy(String statusId, {int limit = 40}) async {
+  Future<List<Account>> getRebloggedBy(String statusId,
+      {int limit = 40}) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1/statuses/$statusId/reblogged_by?limit=$limit');
+      final resp = await _apiGet(
+          '${instanceUrl!}/api/v1/statuses/$statusId/reblogged_by?limit=$limit');
       appLogger.apiCall('GET', '/api/v1/statuses/$statusId/reblogged_by');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -1597,10 +1663,12 @@ class ApiService {
   Future<List<Status>> discoverPosts({int limit = 40}) async {
     try {
       final cacheKey = 'discover_posts_$limit';
-      final cached = _cache.get<List<Status>>(cacheKey, const Duration(minutes: 5));
+      final cached =
+          _cache.get<List<Status>>(cacheKey, const Duration(minutes: 5));
       if (cached != null) return cached;
 
-      final resp = await _apiGet('${instanceUrl!}/api/v1/discover/posts?limit=$limit');
+      final resp =
+          await _apiGet('${instanceUrl!}/api/v1/discover/posts?limit=$limit');
       appLogger.apiCall('GET', '/api/v1/discover/posts');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -1619,7 +1687,8 @@ class ApiService {
   /// GET /api/v1.1/discover/accounts/popular  (also /api/v1/discover/accounts/popular)
   Future<List<Account>> discoverPopularAccounts({int limit = 20}) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1/discover/accounts/popular?limit=$limit');
+      final resp = await _apiGet(
+          '${instanceUrl!}/api/v1/discover/accounts/popular?limit=$limit');
       appLogger.apiCall('GET', '/api/v1/discover/accounts/popular');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -1637,15 +1706,18 @@ class ApiService {
   Future<List<Status>> getTrendingPosts({int limit = 40}) async {
     try {
       final cacheKey = 'trending_posts_$limit';
-      final cached = _cache.get<List<Status>>(cacheKey, const Duration(minutes: 5));
+      final cached =
+          _cache.get<List<Status>>(cacheKey, const Duration(minutes: 5));
       if (cached != null) return cached;
 
-      final resp = await _apiGet('${instanceUrl!}/api/v1.1/discover/posts/trending?limit=$limit');
+      final resp = await _apiGet(
+          '${instanceUrl!}/api/v1.1/discover/posts/trending?limit=$limit');
       appLogger.apiCall('GET', '/api/v1.1/discover/posts/trending');
       if (resp.statusCode == 200) {
         final decoded = json.decode(resp.body);
         // Pixelfed may return {data: [...]} or [...]
-        final List<dynamic> data = decoded is List ? decoded : (decoded['data'] ?? decoded);
+        final List<dynamic> data =
+            decoded is List ? decoded : (decoded['data'] ?? decoded);
         final result = data.map((s) => Status.fromJson(s)).toList();
         _cache.set(cacheKey, result);
         return result;
@@ -1660,7 +1732,11 @@ class ApiService {
   /// Full search (accounts, statuses, hashtags)
   /// GET /api/v2/search?q=...&type=...&limit=...
   /// type can be: accounts, statuses, hashtags (or omitted for all)
-  Future<Map<String, dynamic>> searchV2(String query, {String? type, int limit = 20, int offset = 0, bool resolve = false}) async {
+  Future<Map<String, dynamic>> searchV2(String query,
+      {String? type,
+      int limit = 20,
+      int offset = 0,
+      bool resolve = false}) async {
     try {
       final params = <String, String>{
         'q': query,
@@ -1669,9 +1745,12 @@ class ApiService {
         'resolve': resolve.toString(),
       };
       if (type != null) params['type'] = type;
-      final queryString = params.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value)}').join('&');
+      final queryString = params.entries
+          .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
+          .join('&');
       final resp = await _apiGet('${instanceUrl!}/api/v2/search?$queryString');
-      appLogger.apiCall('GET', '/api/v2/search', params: {'q': query, 'type': type ?? 'all'});
+      appLogger.apiCall('GET', '/api/v2/search',
+          params: {'q': query, 'type': type ?? 'all'});
       if (resp.statusCode == 200) {
         return json.decode(resp.body);
       }
@@ -1686,7 +1765,8 @@ class ApiService {
   /// GET /api/v1/follow_requests
   Future<List<Account>> getFollowRequests({int limit = 40}) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1/follow_requests?limit=$limit');
+      final resp =
+          await _apiGet('${instanceUrl!}/api/v1/follow_requests?limit=$limit');
       appLogger.apiCall('GET', '/api/v1/follow_requests');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -1703,7 +1783,8 @@ class ApiService {
   /// POST /api/v1/follow_requests/{id}/authorize
   Future<bool> acceptFollowRequest(String accountId) async {
     try {
-      final resp = await _apiPost('${instanceUrl!}/api/v1/follow_requests/$accountId/authorize');
+      final resp = await _apiPost(
+          '${instanceUrl!}/api/v1/follow_requests/$accountId/authorize');
       appLogger.apiCall('POST', '/api/v1/follow_requests/$accountId/authorize');
       return resp.statusCode == 200;
     } catch (e, s) {
@@ -1716,7 +1797,8 @@ class ApiService {
   /// POST /api/v1/follow_requests/{id}/reject
   Future<bool> rejectFollowRequest(String accountId) async {
     try {
-      final resp = await _apiPost('${instanceUrl!}/api/v1/follow_requests/$accountId/reject');
+      final resp = await _apiPost(
+          '${instanceUrl!}/api/v1/follow_requests/$accountId/reject');
       appLogger.apiCall('POST', '/api/v1/follow_requests/$accountId/reject');
       return resp.statusCode == 200;
     } catch (e, s) {
@@ -1742,7 +1824,8 @@ class ApiService {
         },
         body: json.encode({'id': messageId}),
       );
-      appLogger.apiCall('DELETE', '/api/v1.1/direct/thread/message', params: {'id': messageId});
+      appLogger.apiCall('DELETE', '/api/v1.1/direct/thread/message',
+          params: {'id': messageId});
       appLogger.apiResponse(apiUrl, resp.statusCode);
       return resp.statusCode == 200 || resp.statusCode == 204;
     } catch (e, s) {
@@ -1753,7 +1836,8 @@ class ApiService {
 
   /// Upload media in a direct message thread
   /// POST /api/v1.1/direct/thread/media
-  Future<String?> uploadDirectMessageMedia(String filePath, String recipientId) async {
+  Future<String?> uploadDirectMessageMedia(
+      String filePath, String recipientId) async {
     try {
       debugPrint('[DM-UPLOAD] uploadDirectMessageMedia() called');
       debugPrint('[DM-UPLOAD] filePath: $filePath');
@@ -1776,7 +1860,8 @@ class ApiService {
       appLogger.apiCall('POST', '/api/v1.1/direct/thread/media');
       final response = await request.send();
       final responseBody = await http.Response.fromStream(response);
-      appLogger.apiResponse('/api/v1.1/direct/thread/media', responseBody.statusCode);
+      appLogger.apiResponse(
+          '/api/v1.1/direct/thread/media', responseBody.statusCode);
       debugPrint('[DM-UPLOAD] Response status: ${responseBody.statusCode}');
       debugPrint('[DM-UPLOAD] Response body: ${responseBody.body}');
 
@@ -1808,13 +1893,15 @@ class ApiService {
       final prefs = await SharedPreferences.getInstance();
       final enabled = prefs.getBool('auto_translate_enabled') ?? false;
       if (!enabled) return null;
-      
-      final endpoint = prefs.getString('openai_translate_endpoint') ?? 'https://api.openai.com/v1/chat/completions';
-      final apiKey = await secureStorage.read(key: 'openai_translate_api_key') ?? '';
+
+      final endpoint = prefs.getString('openai_translate_endpoint') ??
+          'https://api.openai.com/v1/chat/completions';
+      final apiKey =
+          await secureStorage.read(key: 'openai_translate_api_key') ?? '';
       if (apiKey.isEmpty) return null;
-      
+
       final langName = targetLang;
-      
+
       final response = await http.post(
         Uri.parse(endpoint),
         headers: {
@@ -1826,7 +1913,8 @@ class ApiService {
           'messages': [
             {
               'role': 'system',
-              'content': 'You are a translator. Translate the following text to $langName. Return ONLY the translated text, nothing else.',
+              'content':
+                  'You are a translator. Translate the following text to $langName. Return ONLY the translated text, nothing else.',
             },
             {
               'role': 'user',
@@ -1837,13 +1925,15 @@ class ApiService {
           'temperature': 0.3,
         }),
       );
-      
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final translated = data['choices']?[0]?['message']?['content']?.toString().trim();
+        final translated =
+            data['choices']?[0]?['message']?['content']?.toString().trim();
         return translated;
       }
-      appLogger.error('Translation API error: ${response.statusCode} ${response.body}');
+      appLogger.error(
+          'Translation API error: ${response.statusCode} ${response.body}');
       return null;
     } catch (e) {
       appLogger.error('Translation error', e);
@@ -1867,7 +1957,8 @@ class ApiService {
         },
         body: json.encode({'id': storyId}),
       );
-      appLogger.apiCall('POST', '/api/v1.1/stories/seen', params: {'id': storyId});
+      appLogger
+          .apiCall('POST', '/api/v1.1/stories/seen', params: {'id': storyId});
       return resp.statusCode == 200;
     } catch (e, s) {
       appLogger.error('Error marking story viewed', e, s);
@@ -1883,9 +1974,12 @@ class ApiService {
   /// GET /api/v1/accounts/lookup?acct=...
   Future<Account?> lookupAccount(String username) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1/accounts/lookup?acct=${Uri.encodeComponent(username)}');
-      appLogger.apiCall('GET', '/api/v1/accounts/lookup', params: {'acct': username});
-      if (resp.statusCode == 200) return Account.fromJson(json.decode(resp.body));
+      final resp = await _apiGet(
+          '${instanceUrl!}/api/v1/accounts/lookup?acct=${Uri.encodeComponent(username)}');
+      appLogger.apiCall('GET', '/api/v1/accounts/lookup',
+          params: {'acct': username});
+      if (resp.statusCode == 200)
+        return Account.fromJson(json.decode(resp.body));
       return null;
     } catch (e, s) {
       appLogger.error('Error looking up account', e, s);
@@ -1897,8 +1991,10 @@ class ApiService {
   /// POST /api/v1/accounts/{id}/remove_from_followers
   Future<bool> removeFromFollowers(String accountId) async {
     try {
-      final resp = await _apiPost('${instanceUrl!}/api/v1/accounts/$accountId/remove_from_followers');
-      appLogger.apiCall('POST', '/api/v1/accounts/$accountId/remove_from_followers');
+      final resp = await _apiPost(
+          '${instanceUrl!}/api/v1/accounts/$accountId/remove_from_followers');
+      appLogger.apiCall(
+          'POST', '/api/v1/accounts/$accountId/remove_from_followers');
       return resp.statusCode == 200;
     } catch (e, s) {
       appLogger.error('Error removing follower', e, s);
@@ -1910,7 +2006,8 @@ class ApiService {
   /// POST /api/v1/accounts/{id}/pin
   Future<bool> pinAccount(String accountId) async {
     try {
-      final resp = await _apiPost('${instanceUrl!}/api/v1/accounts/$accountId/pin');
+      final resp =
+          await _apiPost('${instanceUrl!}/api/v1/accounts/$accountId/pin');
       appLogger.apiCall('POST', '/api/v1/accounts/$accountId/pin');
       return resp.statusCode == 200;
     } catch (e, s) {
@@ -1923,7 +2020,8 @@ class ApiService {
   /// POST /api/v1/accounts/{id}/unpin
   Future<bool> unpinAccount(String accountId) async {
     try {
-      final resp = await _apiPost('${instanceUrl!}/api/v1/accounts/$accountId/unpin');
+      final resp =
+          await _apiPost('${instanceUrl!}/api/v1/accounts/$accountId/unpin');
       appLogger.apiCall('POST', '/api/v1/accounts/$accountId/unpin');
       return resp.statusCode == 200;
     } catch (e, s) {
@@ -1936,7 +2034,8 @@ class ApiService {
   /// GET /api/v1/accounts/{id}/lists
   Future<List<Map<String, dynamic>>> getAccountLists(String accountId) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1/accounts/$accountId/lists');
+      final resp =
+          await _apiGet('${instanceUrl!}/api/v1/accounts/$accountId/lists');
       appLogger.apiCall('GET', '/api/v1/accounts/$accountId/lists');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -1957,7 +2056,8 @@ class ApiService {
   /// GET /api/v1/statuses/{id}/card
   Future<Map<String, dynamic>?> getStatusCard(String statusId) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1/statuses/$statusId/card');
+      final resp =
+          await _apiGet('${instanceUrl!}/api/v1/statuses/$statusId/card');
       appLogger.apiCall('GET', '/api/v1/statuses/$statusId/card');
       if (resp.statusCode == 200) return json.decode(resp.body);
       return null;
@@ -1971,7 +2071,8 @@ class ApiService {
   /// POST /api/v1/statuses/{id}/pin
   Future<bool> pinStatus(String statusId) async {
     try {
-      final resp = await _apiPost('${instanceUrl!}/api/v1/statuses/$statusId/pin');
+      final resp =
+          await _apiPost('${instanceUrl!}/api/v1/statuses/$statusId/pin');
       appLogger.apiCall('POST', '/api/v1/statuses/$statusId/pin');
       return resp.statusCode == 200;
     } catch (e, s) {
@@ -1984,7 +2085,8 @@ class ApiService {
   /// POST /api/v1/statuses/{id}/unpin
   Future<bool> unpinStatus(String statusId) async {
     try {
-      final resp = await _apiPost('${instanceUrl!}/api/v1/statuses/$statusId/unpin');
+      final resp =
+          await _apiPost('${instanceUrl!}/api/v1/statuses/$statusId/unpin');
       appLogger.apiCall('POST', '/api/v1/statuses/$statusId/unpin');
       return resp.statusCode == 200;
     } catch (e, s) {
@@ -1997,7 +2099,8 @@ class ApiService {
   /// GET /api/v1/statuses/{id}/history
   Future<List<Map<String, dynamic>>> getStatusHistory(String statusId) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1/statuses/$statusId/history');
+      final resp =
+          await _apiGet('${instanceUrl!}/api/v1/statuses/$statusId/history');
       appLogger.apiCall('GET', '/api/v1/statuses/$statusId/history');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -2012,7 +2115,11 @@ class ApiService {
 
   /// Edit an existing status
   /// PUT /api/v1/statuses/{id}
-  Future<bool> editStatus(String statusId, {required String content, List<String>? mediaIds, bool? sensitive, String? spoilerText}) async {
+  Future<bool> editStatus(String statusId,
+      {required String content,
+      List<String>? mediaIds,
+      bool? sensitive,
+      String? spoilerText}) async {
     try {
       final tokenResponse = await helper!.getTokenFromStorage();
       final token = tokenResponse?.accessToken;
@@ -2025,7 +2132,10 @@ class ApiService {
 
       final resp = await httpClient.put(
         Uri.parse('${instanceUrl!}/api/v1/statuses/$statusId'),
-        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
+        },
         body: json.encode(body),
       );
       appLogger.apiCall('PUT', '/api/v1/statuses/$statusId');
@@ -2042,14 +2152,17 @@ class ApiService {
 
   /// Trending hashtags
   /// GET /api/v1.1/discover/posts/hashtags
-  Future<List<Map<String, dynamic>>> discoverTrendingHashtags({int limit = 20}) async {
+  Future<List<Map<String, dynamic>>> discoverTrendingHashtags(
+      {int limit = 20}) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1.1/discover/posts/hashtags?limit=$limit');
+      final resp = await _apiGet(
+          '${instanceUrl!}/api/v1.1/discover/posts/hashtags?limit=$limit');
       appLogger.apiCall('GET', '/api/v1.1/discover/posts/hashtags');
       if (resp.statusCode == 200) {
         final decoded = json.decode(resp.body);
         if (decoded is List) return decoded.cast<Map<String, dynamic>>();
-        if (decoded is Map && decoded['tags'] != null) return (decoded['tags'] as List).cast<Map<String, dynamic>>();
+        if (decoded is Map && decoded['tags'] != null)
+          return (decoded['tags'] as List).cast<Map<String, dynamic>>();
       }
       return [];
     } catch (e, s) {
@@ -2062,11 +2175,13 @@ class ApiService {
   /// GET /api/v1.1/discover/posts/network/trending
   Future<List<Status>> discoverNetworkTrending({int limit = 40}) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1.1/discover/posts/network/trending?limit=$limit');
+      final resp = await _apiGet(
+          '${instanceUrl!}/api/v1.1/discover/posts/network/trending?limit=$limit');
       appLogger.apiCall('GET', '/api/v1.1/discover/posts/network/trending');
       if (resp.statusCode == 200) {
         final decoded = json.decode(resp.body);
-        final List<dynamic> data = decoded is List ? decoded : (decoded['data'] ?? []);
+        final List<dynamic> data =
+            decoded is List ? decoded : (decoded['data'] ?? []);
         return data.map((s) => Status.fromJson(s)).toList();
       }
       return [];
@@ -2084,7 +2199,8 @@ class ApiService {
   /// GET /api/v1/suggestions
   Future<List<Account>> getSuggestions({int limit = 20}) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1/suggestions?limit=$limit');
+      final resp =
+          await _apiGet('${instanceUrl!}/api/v1/suggestions?limit=$limit');
       appLogger.apiCall('GET', '/api/v1/suggestions');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -2134,7 +2250,10 @@ class ApiService {
 
       final resp = await httpClient.put(
         Uri.parse('${instanceUrl!}/api/v1/media/$mediaId'),
-        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
+        },
         body: json.encode(body),
       );
       appLogger.apiCall('PUT', '/api/v1/media/$mediaId');
@@ -2159,7 +2278,10 @@ class ApiService {
 
       final resp = await httpClient.post(
         Uri.parse('${instanceUrl!}/api/v1.1/direct/thread/mute'),
-        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
+        },
         body: json.encode({'id': threadId}),
       );
       appLogger.apiCall('POST', '/api/v1.1/direct/thread/mute');
@@ -2180,7 +2302,10 @@ class ApiService {
 
       final resp = await httpClient.post(
         Uri.parse('${instanceUrl!}/api/v1.1/direct/thread/unmute'),
-        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
+        },
         body: json.encode({'id': threadId}),
       );
       appLogger.apiCall('POST', '/api/v1.1/direct/thread/unmute');
@@ -2201,7 +2326,10 @@ class ApiService {
 
       final resp = await httpClient.post(
         Uri.parse('${instanceUrl!}/api/v1.1/direct/thread/read'),
-        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
+        },
         body: json.encode({'id': threadId}),
       );
       appLogger.apiCall('POST', '/api/v1.1/direct/thread/read');
@@ -2222,7 +2350,10 @@ class ApiService {
 
       final resp = await httpClient.post(
         Uri.parse('${instanceUrl!}/api/v1.1/direct/lookup'),
-        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
+        },
         body: json.encode({'q': query}),
       );
       appLogger.apiCall('POST', '/api/v1.1/direct/lookup');
@@ -2241,7 +2372,8 @@ class ApiService {
   /// GET /api/v1.1/direct/compose/mutuals
   Future<List<Account>> getDmMutuals() async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1.1/direct/compose/mutuals');
+      final resp =
+          await _apiGet('${instanceUrl!}/api/v1.1/direct/compose/mutuals');
       appLogger.apiCall('GET', '/api/v1.1/direct/compose/mutuals');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -2262,7 +2394,8 @@ class ApiService {
   /// POST /api/v1.1/stories/self-expire/{id}
   Future<bool> deleteStory(String storyId) async {
     try {
-      final resp = await _apiPost('${instanceUrl!}/api/v1.1/stories/self-expire/$storyId');
+      final resp = await _apiPost(
+          '${instanceUrl!}/api/v1.1/stories/self-expire/$storyId');
       appLogger.apiCall('POST', '/api/v1.1/stories/self-expire/$storyId');
       return resp.statusCode == 200;
     } catch (e, s) {
@@ -2281,7 +2414,10 @@ class ApiService {
 
       final resp = await httpClient.post(
         Uri.parse('${instanceUrl!}/api/v1.1/stories/comment'),
-        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
+        },
         body: json.encode({'sid': storyId, 'comment': comment}),
       );
       appLogger.apiCall('POST', '/api/v1.1/stories/comment');
@@ -2296,7 +2432,8 @@ class ApiService {
   /// GET /api/v1.2/stories/viewers
   Future<List<Account>> getStoryViewers(String storyId) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1.2/stories/viewers?sid=$storyId');
+      final resp = await _apiGet(
+          '${instanceUrl!}/api/v1.2/stories/viewers?sid=$storyId');
       appLogger.apiCall('GET', '/api/v1.2/stories/viewers');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -2317,9 +2454,11 @@ class ApiService {
 
   /// Get collections for a user
   /// GET /api/v1.1/collections/accounts/{id}
-  Future<List<Map<String, dynamic>>> getUserCollections(String accountId) async {
+  Future<List<Map<String, dynamic>>> getUserCollections(
+      String accountId) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1.1/collections/accounts/$accountId');
+      final resp = await _apiGet(
+          '${instanceUrl!}/api/v1.1/collections/accounts/$accountId');
       appLogger.apiCall('GET', '/api/v1.1/collections/accounts/$accountId');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -2336,7 +2475,8 @@ class ApiService {
   /// GET /api/v1.1/collections/items/{id}
   Future<List<Status>> getCollectionItems(String collectionId) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1.1/collections/items/$collectionId');
+      final resp = await _apiGet(
+          '${instanceUrl!}/api/v1.1/collections/items/$collectionId');
       appLogger.apiCall('GET', '/api/v1.1/collections/items/$collectionId');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -2353,7 +2493,8 @@ class ApiService {
   /// GET /api/v1.1/collections/view/{id}
   Future<Map<String, dynamic>?> viewCollection(String collectionId) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1.1/collections/view/$collectionId');
+      final resp = await _apiGet(
+          '${instanceUrl!}/api/v1.1/collections/view/$collectionId');
       appLogger.apiCall('GET', '/api/v1.1/collections/view/$collectionId');
       if (resp.statusCode == 200) return json.decode(resp.body);
       return null;
@@ -2373,7 +2514,10 @@ class ApiService {
 
       final resp = await httpClient.post(
         Uri.parse('${instanceUrl!}/api/v1.1/collections/add'),
-        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
+        },
         body: json.encode({'collection_id': collectionId, 'post_id': statusId}),
       );
       appLogger.apiCall('POST', '/api/v1.1/collections/add');
@@ -2403,7 +2547,8 @@ class ApiService {
 
   /// Update a collection
   /// POST /api/v1.1/collections/update/{id}
-  Future<bool> updateCollection(String collectionId, {String? title, String? description}) async {
+  Future<bool> updateCollection(String collectionId,
+      {String? title, String? description}) async {
     try {
       final tokenResponse = await helper!.getTokenFromStorage();
       final token = tokenResponse?.accessToken;
@@ -2415,7 +2560,10 @@ class ApiService {
 
       final resp = await httpClient.post(
         Uri.parse('${instanceUrl!}/api/v1.1/collections/update/$collectionId'),
-        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
+        },
         body: json.encode(body),
       );
       appLogger.apiCall('POST', '/api/v1.1/collections/update/$collectionId');
@@ -2454,7 +2602,8 @@ class ApiService {
   /// GET /api/v1/domain_blocks
   Future<List<String>> getDomainBlocks({int limit = 40}) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1/domain_blocks?limit=$limit');
+      final resp =
+          await _apiGet('${instanceUrl!}/api/v1/domain_blocks?limit=$limit');
       appLogger.apiCall('GET', '/api/v1/domain_blocks');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -2477,7 +2626,10 @@ class ApiService {
 
       final resp = await httpClient.post(
         Uri.parse('${instanceUrl!}/api/v1/domain_blocks'),
-        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
+        },
         body: json.encode({'domain': domain}),
       );
       appLogger.apiCall('POST', '/api/v1/domain_blocks');
@@ -2498,7 +2650,10 @@ class ApiService {
 
       final resp = await httpClient.delete(
         Uri.parse('${instanceUrl!}/api/v1/domain_blocks'),
-        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
+        },
         body: json.encode({'domain': domain}),
       );
       appLogger.apiCall('DELETE', '/api/v1/domain_blocks');
@@ -2550,7 +2705,10 @@ class ApiService {
 
       final resp = await httpClient.post(
         Uri.parse('${instanceUrl!}/api/v2/filters'),
-        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
+        },
         body: json.encode(body),
       );
       appLogger.apiCall('POST', '/api/v2/filters');
@@ -2564,7 +2722,8 @@ class ApiService {
 
   /// Update a content filter
   /// PUT /api/v2/filters/{id}
-  Future<bool> updateFilter(String filterId, {String? title, List<String>? context, String? filterAction}) async {
+  Future<bool> updateFilter(String filterId,
+      {String? title, List<String>? context, String? filterAction}) async {
     try {
       final tokenResponse = await helper!.getTokenFromStorage();
       final token = tokenResponse?.accessToken;
@@ -2577,7 +2736,10 @@ class ApiService {
 
       final resp = await httpClient.put(
         Uri.parse('${instanceUrl!}/api/v2/filters/$filterId'),
-        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
+        },
         body: json.encode(body),
       );
       appLogger.apiCall('PUT', '/api/v2/filters/$filterId');
@@ -2616,7 +2778,8 @@ class ApiService {
   /// POST /api/v1.1/archive/add/{id}
   Future<bool> archivePost(String statusId) async {
     try {
-      final resp = await _apiPost('${instanceUrl!}/api/v1.1/archive/add/$statusId');
+      final resp =
+          await _apiPost('${instanceUrl!}/api/v1.1/archive/add/$statusId');
       appLogger.apiCall('POST', '/api/v1.1/archive/add/$statusId');
       return resp.statusCode == 200;
     } catch (e, s) {
@@ -2629,7 +2792,8 @@ class ApiService {
   /// POST /api/v1.1/archive/remove/{id}
   Future<bool> unarchivePost(String statusId) async {
     try {
-      final resp = await _apiPost('${instanceUrl!}/api/v1.1/archive/remove/$statusId');
+      final resp =
+          await _apiPost('${instanceUrl!}/api/v1.1/archive/remove/$statusId');
       appLogger.apiCall('POST', '/api/v1.1/archive/remove/$statusId');
       return resp.statusCode == 200;
     } catch (e, s) {
@@ -2642,7 +2806,8 @@ class ApiService {
   /// GET /api/v1.1/archive/list
   Future<List<Status>> getArchivedPosts({int limit = 20}) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1.1/archive/list?limit=$limit');
+      final resp =
+          await _apiGet('${instanceUrl!}/api/v1.1/archive/list?limit=$limit');
       appLogger.apiCall('GET', '/api/v1.1/archive/list');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -2721,7 +2886,8 @@ class ApiService {
   /// GET /api/v1/followed_tags
   Future<List<Map<String, dynamic>>> getFollowedTags({int limit = 40}) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1/followed_tags?limit=$limit');
+      final resp =
+          await _apiGet('${instanceUrl!}/api/v1/followed_tags?limit=$limit');
       appLogger.apiCall('GET', '/api/v1/followed_tags');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -2738,7 +2904,8 @@ class ApiService {
   /// POST /api/v1/tags/{name}/follow
   Future<bool> followTag(String tagName) async {
     try {
-      final resp = await _apiPost('${instanceUrl!}/api/v1/tags/${Uri.encodeComponent(tagName)}/follow');
+      final resp = await _apiPost(
+          '${instanceUrl!}/api/v1/tags/${Uri.encodeComponent(tagName)}/follow');
       appLogger.apiCall('POST', '/api/v1/tags/$tagName/follow');
       return resp.statusCode == 200;
     } catch (e, s) {
@@ -2751,7 +2918,8 @@ class ApiService {
   /// POST /api/v1/tags/{name}/unfollow
   Future<bool> unfollowTag(String tagName) async {
     try {
-      final resp = await _apiPost('${instanceUrl!}/api/v1/tags/${Uri.encodeComponent(tagName)}/unfollow');
+      final resp = await _apiPost(
+          '${instanceUrl!}/api/v1/tags/${Uri.encodeComponent(tagName)}/unfollow');
       appLogger.apiCall('POST', '/api/v1/tags/$tagName/unfollow');
       return resp.statusCode == 200;
     } catch (e, s) {
@@ -2764,7 +2932,8 @@ class ApiService {
   /// GET /api/v1/tags/{name}/related
   Future<List<Map<String, dynamic>>> getRelatedTags(String tagName) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1/tags/${Uri.encodeComponent(tagName)}/related');
+      final resp = await _apiGet(
+          '${instanceUrl!}/api/v1/tags/${Uri.encodeComponent(tagName)}/related');
       appLogger.apiCall('GET', '/api/v1/tags/$tagName/related');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -2781,8 +2950,10 @@ class ApiService {
   /// GET /api/v1.1/compose/search/location?q=...
   Future<List<Map<String, dynamic>>> searchLocation(String query) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1.1/compose/search/location?q=${Uri.encodeComponent(query)}');
-      appLogger.apiCall('GET', '/api/v1.1/compose/search/location', params: {'q': query});
+      final resp = await _apiGet(
+          '${instanceUrl!}/api/v1.1/compose/search/location?q=${Uri.encodeComponent(query)}');
+      appLogger.apiCall('GET', '/api/v1.1/compose/search/location',
+          params: {'q': query});
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
         return data.cast<Map<String, dynamic>>();
@@ -2815,7 +2986,8 @@ class ApiService {
   /// GET /api/v1/lists/{id}/accounts
   Future<List<Account>> getListAccounts(String listId, {int limit = 40}) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1/lists/$listId/accounts?limit=$limit');
+      final resp = await _apiGet(
+          '${instanceUrl!}/api/v1/lists/$listId/accounts?limit=$limit');
       appLogger.apiCall('GET', '/api/v1/lists/$listId/accounts');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -2832,7 +3004,8 @@ class ApiService {
   /// GET /api/v1/endorsements
   Future<List<Account>> getEndorsements({int limit = 40}) async {
     try {
-      final resp = await _apiGet('${instanceUrl!}/api/v1/endorsements?limit=$limit');
+      final resp =
+          await _apiGet('${instanceUrl!}/api/v1/endorsements?limit=$limit');
       appLogger.apiCall('GET', '/api/v1/endorsements');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
@@ -2844,7 +3017,6 @@ class ApiService {
       return [];
     }
   }
-
 
   /// Subscribe to push notifications via Web Push API
   /// POST /api/v1/push/subscription
@@ -2881,7 +3053,8 @@ class ApiService {
       if (response.statusCode == 200) {
         return json.decode(response.body) as Map<String, dynamic>;
       }
-      appLogger.error('Push subscription failed with status ${response.statusCode}');
+      appLogger
+          .error('Push subscription failed with status ${response.statusCode}');
       return null;
     } catch (e, stackTrace) {
       appLogger.error('Error subscribing to push notifications', e, stackTrace);
@@ -2911,11 +3084,13 @@ class ApiService {
   /// Returns true if available, false otherwise.
   Future<bool> checkUsernameAvailable(String username) async {
     try {
-      final response = await http.post(
-        Uri.parse('${instanceUrl!}/api/v1.1/auth/invite/admin/uc'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'username': username}),
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .post(
+            Uri.parse('${instanceUrl!}/api/v1.1/auth/invite/admin/uc'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'username': username}),
+          )
+          .timeout(const Duration(seconds: 10));
       return response.statusCode == 200;
     } catch (_) {
       return false;
@@ -2926,11 +3101,13 @@ class ApiService {
   /// Returns true if available, false otherwise.
   Future<bool> checkEmailAvailable(String email) async {
     try {
-      final response = await http.post(
-        Uri.parse('${instanceUrl!}/api/v1.1/auth/invite/admin/ec'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email}),
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .post(
+            Uri.parse('${instanceUrl!}/api/v1.1/auth/invite/admin/ec'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email}),
+          )
+          .timeout(const Duration(seconds: 10));
       return response.statusCode == 200;
     } catch (_) {
       return false;
@@ -2955,11 +3132,13 @@ class ApiService {
       body['invite_code'] = inviteCode;
     }
 
-    final response = await http.post(
-      Uri.parse('${instanceUrl!}/api/v1.1/auth/iar'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(body),
-    ).timeout(const Duration(seconds: 15));
+    final response = await http
+        .post(
+          Uri.parse('${instanceUrl!}/api/v1.1/auth/iar'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(body),
+        )
+        .timeout(const Duration(seconds: 15));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       return jsonDecode(response.body) as Map<String, dynamic>;
@@ -2973,11 +3152,13 @@ class ApiService {
   /// Confirm registration with email token.
   Future<bool> confirmRegistration(String token) async {
     try {
-      final response = await http.post(
-        Uri.parse('${instanceUrl!}/api/v1.1/auth/confirm'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'token': token}),
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .post(
+            Uri.parse('${instanceUrl!}/api/v1.1/auth/confirm'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'token': token}),
+          )
+          .timeout(const Duration(seconds: 10));
       return response.statusCode == 200;
     } catch (_) {
       return false;

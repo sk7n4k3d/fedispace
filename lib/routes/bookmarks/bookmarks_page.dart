@@ -138,7 +138,8 @@ class _BookmarksPageState extends State<BookmarksPage> {
       return CyberpunkEmptyState(
         icon: Icons.bookmark_border_rounded,
         title: S.of(context).bookmarks,
-        subtitle: 'Save photos and videos that you want to see again. No one is notified, and only you can see what you\'ve saved.',
+        subtitle:
+            'Save photos and videos that you want to see again. No one is notified, and only you can see what you\'ve saved.',
         accentColor: CyberpunkTheme.neonCyan,
       );
     }

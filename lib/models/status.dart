@@ -42,8 +42,7 @@ class Status {
   final int reblogs_count;
   final List<dynamic> attachement;
 
-  bool get hasMediaAttachments =>
-      attachement.isNotEmpty;
+  bool get hasMediaAttachments => attachement.isNotEmpty;
 
   /// Safely get the first media attachment if available
   Map<String, dynamic>? getFirstMedia() {
@@ -53,9 +52,7 @@ class Status {
 
   /// Get all media attachments
   List<Map<String, dynamic>> getAllMedia() {
-    return attachement
-        .map((e) => e as Map<String, dynamic>)
-        .toList();
+    return attachement.map((e) => e as Map<String, dynamic>).toList();
   }
 
   const Status({
@@ -86,18 +83,48 @@ class Status {
   });
 
   factory Status.empty() => Status(
-    id: '', content: '', account: Account(id: '', username: '', displayName: '', acct: '', isLocked: false, isBot: false, avatarUrl: '', headerUrl: '', followers_count: 0, following_count: 0, statuses_count: 0, note: ''),
-    favorited: false, reblogged: false, visibility: '', uri: '', url: '',
-    in_reply_to_id: '', in_reply_to_account_id: '', muted: false, sensitive: false,
-    spoiler_text: '', language: '', avatar: '', acct: '', attach: '', preview_url: '',
-    created_at: '', favourites_count: 0, replies_count: 0, reblogs_count: 0,
-    attachement: [], blurhash: '',
-  );
+        id: '',
+        content: '',
+        account: Account(
+            id: '',
+            username: '',
+            displayName: '',
+            acct: '',
+            isLocked: false,
+            isBot: false,
+            avatarUrl: '',
+            headerUrl: '',
+            followers_count: 0,
+            following_count: 0,
+            statuses_count: 0,
+            note: ''),
+        favorited: false,
+        reblogged: false,
+        visibility: '',
+        uri: '',
+        url: '',
+        in_reply_to_id: '',
+        in_reply_to_account_id: '',
+        muted: false,
+        sensitive: false,
+        spoiler_text: '',
+        language: '',
+        avatar: '',
+        acct: '',
+        attach: '',
+        preview_url: '',
+        created_at: '',
+        favourites_count: 0,
+        replies_count: 0,
+        reblogs_count: 0,
+        attachement: [],
+        blurhash: '',
+      );
 
   factory Status.fromJson(Map<String, dynamic> data) {
     final mediaAttachments = data['media_attachments'] as List<dynamic>? ?? [];
-    final firstMedia = mediaAttachments.isNotEmpty 
-        ? mediaAttachments[0] as Map<String, dynamic>? 
+    final firstMedia = mediaAttachments.isNotEmpty
+        ? mediaAttachments[0] as Map<String, dynamic>?
         : null;
 
     return Status(
@@ -119,7 +146,8 @@ class Status {
       acct: data['account']?['acct'] ?? '',
       // SECURITY FIX: Safe array access with null checking
       attach: firstMedia?['url'] ?? '',
-      preview_url: firstMedia?['preview_url'] ?? firstMedia?['preview_remote_url'] ?? '',
+      preview_url:
+          firstMedia?['preview_url'] ?? firstMedia?['preview_remote_url'] ?? '',
       created_at: data['created_at'] ?? '',
       favourites_count: data['favourites_count'] ?? 0,
       replies_count: data['replies_count'] ?? 0,

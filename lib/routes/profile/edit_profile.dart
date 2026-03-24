@@ -25,7 +25,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final _displayNameController = TextEditingController();
   final _bioController = TextEditingController();
-  
+
   Account? _account;
   bool _isLoading = true;
   bool _isSaving = false;
@@ -128,7 +128,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
         backgroundColor: CyberpunkTheme.backgroundBlack,
         appBar: AppBar(
           backgroundColor: CyberpunkTheme.backgroundBlack,
-          title: Text(S.of(context).editProfile, style: GoogleFonts.inter(color: CyberpunkTheme.textWhite, fontSize: 20, fontWeight: FontWeight.w700)),
+          title: Text(S.of(context).editProfile,
+              style: GoogleFonts.inter(
+                  color: CyberpunkTheme.textWhite,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700)),
         ),
         body: const SingleChildScrollView(child: ProfileSkeleton()),
       );
@@ -202,9 +206,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               : (_account?.avatar.isNotEmpty ?? false)
                                   ? CachedNetworkImageProvider(_account!.avatar)
                                   : null,
-                          child: (_newAvatarFile == null && 
+                          child: (_newAvatarFile == null &&
                                   (_account?.avatar.isEmpty ?? true))
-                              ? const Icon(Icons.person, size: 50, color: CyberpunkTheme.textTertiary)
+                              ? const Icon(Icons.person,
+                                  size: 50, color: CyberpunkTheme.textTertiary)
                               : null,
                         ),
                       ),
@@ -264,7 +269,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
               const InstagramDivider(),
               const SizedBox(height: CyberpunkTheme.spacingL),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: CyberpunkTheme.spacingL),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: CyberpunkTheme.spacingL),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -282,12 +288,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       child: Container(
                         height: 120,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(CyberpunkTheme.radiusS),
+                          borderRadius:
+                              BorderRadius.circular(CyberpunkTheme.radiusS),
                           border: Border.all(color: CyberpunkTheme.borderDark),
                         ),
                         child: _newHeaderFile != null
                             ? ClipRRect(
-                                borderRadius: BorderRadius.circular(CyberpunkTheme.radiusS),
+                                borderRadius: BorderRadius.circular(
+                                    CyberpunkTheme.radiusS),
                                 child: Image.file(
                                   _newHeaderFile!,
                                   fit: BoxFit.cover,
@@ -296,7 +304,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               )
                             : (_account?.header.isNotEmpty ?? false)
                                 ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(CyberpunkTheme.radiusS),
+                                    borderRadius: BorderRadius.circular(
+                                        CyberpunkTheme.radiusS),
                                     child: CachedNetworkImage(
                                       imageUrl: _account!.header,
                                       fit: BoxFit.cover,
@@ -305,14 +314,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   )
                                 : Center(
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         const Icon(
                                           Icons.add_photo_alternate_outlined,
                                           size: 40,
                                           color: CyberpunkTheme.textTertiary,
                                         ),
-                                        const SizedBox(height: CyberpunkTheme.spacingS),
+                                        const SizedBox(
+                                            height: CyberpunkTheme.spacingS),
                                         Text(
                                           'Add Header Image',
                                           style: GoogleFonts.inter(
@@ -343,7 +354,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     bool enabled = true,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: CyberpunkTheme.spacingL, vertical: CyberpunkTheme.spacingM),
+      padding: const EdgeInsets.symmetric(
+          horizontal: CyberpunkTheme.spacingL,
+          vertical: CyberpunkTheme.spacingM),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -365,7 +378,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
               enabled: enabled,
               maxLength: maxLength,
               maxLines: maxLines,
-              style: GoogleFonts.inter(fontSize: 16, color: CyberpunkTheme.textWhite),
+              style: GoogleFonts.inter(
+                  fontSize: 16, color: CyberpunkTheme.textWhite),
               decoration: InputDecoration(
                 border: InputBorder.none,
                 counterText: '',
