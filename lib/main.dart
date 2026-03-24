@@ -61,7 +61,7 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  late StreamSubscription _intentSub;
+  StreamSubscription? _intentSub;
   final title = 'Fedi Space';
 
   void _setupNotificationListeners() {
@@ -106,7 +106,7 @@ class MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
-    _intentSub.cancel();
+    _intentSub?.cancel();
     super.dispose();
   }
 

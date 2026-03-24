@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -81,12 +80,6 @@ class UnifiedPushService {
   }
 
   /// Generate random bytes for VAPID keys
-  String _generateRandomBase64(int length) {
-    final random = Random.secure();
-    final bytes = List<int>.generate(length, (_) => random.nextInt(256));
-    return base64Url.encode(bytes).replaceAll('=', '');
-  }
-
   /// Register push endpoint with Pixelfed server
   Future<void> _registerEndpointWithServer(String endpointUrl) async {
     try {
@@ -94,8 +87,9 @@ class UnifiedPushService {
       
       // Generate VAPID keys for the push subscription
       // These are placeholder keys - the server needs them for Web Push protocol
-      final p256dhKey = _generateRandomBase64(65);
-      final authKey = _generateRandomBase64(16);
+      // Send empty keys - Pixelfed doesn't encrypt push payloads
+      final p256dhKey = '';
+      final authKey = '';
       
       final result = await _apiService!.subscribePushNotifications(
         endpoint: endpointUrl,
@@ -144,7 +138,7 @@ class UnifiedPushService {
     if (inst != instance) return;
     
     final decoded = String.fromCharCodes(message);
-    appLogger.info('UnifiedPush message received: $decoded');
+    appLogger.info('UnifiedPush message received (length: ${message.length} bytes)');
     
     // Try to parse as JSON (Mastodon/Pixelfed notification format)
     try {

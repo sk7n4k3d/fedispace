@@ -1,5 +1,4 @@
 // ignore_for_file: non_constant_identifier_names, avoid_print
-import 'dart:io';
 
 import 'package:fedispace/core/api.dart';
 import 'package:fedispace/models/account.dart';
@@ -15,7 +14,7 @@ import '/widgets/bottomWidget.dart';
 class TimelineLegacy extends StatefulWidget implements PreferredSizeWidget {
   final ApiService apiService;
 
-  String typeTimeLine;
+  final String typeTimeLine;
 
   /// Main instance of the API service to use in the widget.
   TimelineLegacy({Key? key, required this.apiService, required this.typeTimeLine})
@@ -70,7 +69,7 @@ class _TimelineTabsState extends State<TimelineLegacy> with TickerProviderStateM
                   child: const Text('No'),
                 ),
                 TextButton(
-                  onPressed: () => exit(0), // <-- SEE HERE
+                  onPressed: () => SystemNavigator.pop(),
                   child: const Text('Yes'),
                 ),
               ],
@@ -183,12 +182,13 @@ class _TimelineTabsState extends State<TimelineLegacy> with TickerProviderStateM
 
                 //Init Floating Action Bubble
                 bottomNavigationBar: widget.typeTimeLine == 'home'
-                    ? bottomWidget(apiService: widget.apiService, page: 0)
-                    : bottomWidget(apiService: widget.apiService, page: 1))));
+                    ? BottomWidget(apiService: widget.apiService, page: 0)
+                    : BottomWidget(apiService: widget.apiService, page: 1))));
   }
 
   @override
   void dispose() {
+    _animationController.dispose();
     _pagingController.dispose();
     super.dispose();
   }

@@ -263,7 +263,12 @@ class _SettingsPageState extends State<SettingsPage> {
             if (signupUrl.isNotEmpty) ...[            
               const SizedBox(height: 12),
               GestureDetector(
-                onTap: () => launchUrl(Uri.parse(signupUrl), mode: LaunchMode.externalApplication),
+                onTap: () {
+                  final uri = Uri.parse(signupUrl);
+                  if (uri.scheme == 'http' || uri.scheme == 'https') {
+                    launchUrl(uri, mode: LaunchMode.externalApplication);
+                  }
+                },
                 child: Row(
                   children: [
                     Icon(Icons.open_in_new, size: 14, color: CyberpunkTheme.neonCyan.withOpacity(0.8)),
@@ -429,7 +434,7 @@ class _SettingsPageState extends State<SettingsPage> {
     if (confirm == true) {
       try {
         appLogger.info('User logging out');
-        await widget.apiService.resetApiServiceState();
+        await widget.apiService.logOut();
         if (mounted) {
           Navigator.of(context).pushNamedAndRemoveUntil('/Login', (route) => false);
         }

@@ -1,5 +1,4 @@
 // Modern Instagram-style timeline with 3-tab Fediverse support
-import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:fedispace/core/api.dart';
@@ -94,7 +93,7 @@ class _TimelineState extends State<Timeline> with TickerProviderStateMixin {
                   child: const Text('Cancel', style: TextStyle(color: CyberpunkTheme.textSecondary)),
                 ),
                 TextButton(
-                  onPressed: () => exit(0),
+                  onPressed: () => SystemNavigator.pop(),
                   child: const Text('Exit', style: TextStyle(color: CyberpunkTheme.neonPink)),
                 ),
               ],
@@ -334,12 +333,26 @@ class _TimelineFeedState extends State<_TimelineFeed> with AutomaticKeepAliveCli
   void _handleLike(dynamic post) async {
     appLogger.debug('Like tapped');
     try {
+      model.Status updatedStatus;
       if (post.favourited == true) {
-        await widget.apiService.undoFavoriteStatus(post.id);
+        updatedStatus = await widget.apiService.undoFavoriteStatus(post.id);
       } else {
-        await widget.apiService.favoriteStatus(post.id);
+        updatedStatus = await widget.apiService.favoriteStatus(post.id);
       }
-      _pagingController.refresh();
+      // Update in-place instead of refreshing entire timeline
+      final items = _pagingController.value.pages;
+      if (items != null) {
+        for (final page in items) {
+          for (int i = 0; i < page.length; i++) {
+            if (page[i].id == post.id) {
+              page[i] = updatedStatus;
+              // Trigger rebuild
+              _pagingController.notifyListeners();
+              return;
+            }
+          }
+        }
+      }
     } catch (e) {
       appLogger.error('Failed to toggle like', e);
     }
@@ -359,12 +372,25 @@ class _TimelineFeedState extends State<_TimelineFeed> with AutomaticKeepAliveCli
 
   void _handleBookmark(dynamic post) async {
     try {
+      model.Status updatedStatus;
       if (post.bookmarked == true) {
-        await widget.apiService.undoBookmarkStatus(post.id);
+        updatedStatus = await widget.apiService.undoBookmarkStatus(post.id);
       } else {
-        await widget.apiService.bookmarkStatus(post.id);
+        updatedStatus = await widget.apiService.bookmarkStatus(post.id);
       }
-      _pagingController.refresh();
+      // Update in-place instead of refreshing entire timeline
+      final items = _pagingController.value.pages;
+      if (items != null) {
+        for (final page in items) {
+          for (int i = 0; i < page.length; i++) {
+            if (page[i].id == post.id) {
+              page[i] = updatedStatus;
+              _pagingController.notifyListeners();
+              return;
+            }
+          }
+        }
+      }
     } catch (e) {
       appLogger.error('Failed to toggle bookmark', e);
     }

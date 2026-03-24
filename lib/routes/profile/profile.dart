@@ -9,7 +9,6 @@ import 'package:fedispace/themes/cyberpunk_theme.dart';
 import 'package:fedispace/widgets/instagram_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart' as html;
-import 'package:video_player/video_player.dart';
 
 
 class Profile extends StatefulWidget {
@@ -90,10 +89,23 @@ class _Profile extends State<Profile> {
   }
 
   final ScrollController _scrollController = ScrollController();
+  late Future<Object> _accountFuture;
+  late Future<List<Map<String, dynamic>>> _dataFuture;
+  bool _accountLoaded = false;
 
   @override
   void initState() {
     super.initState();
+    // Defer until after first frame so ModalRoute is available
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _accountFuture = fetchAccount().then((result) {
+          _accountLoaded = true;
+          _dataFuture = _callAPIToGetListOfData();
+          return result;
+        });
+      });
+    });
     _scrollController.addListener(() async {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
@@ -109,9 +121,21 @@ class _Profile extends State<Profile> {
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (!_accountLoaded) {
+      return Scaffold(
+        backgroundColor: CyberpunkTheme.backgroundBlack,
+        body: const Center(child: InstagramLoadingIndicator(size: 32)),
+      );
+    }
     return FutureBuilder<Object>(
-      future: fetchAccount(),
+      future: _accountFuture,
       builder: (BuildContext context, AsyncSnapshot<Object> snapshot) {
         if (snapshot.hasData) {
           return Scaffold(
@@ -294,7 +318,7 @@ class _Profile extends State<Profile> {
                 // Grid
                 SliverToBoxAdapter(
                   child: FutureBuilder(
-                    future: _callAPIToGetListOfData(),
+                    future: _accountLoaded ? _dataFuture : null,
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
                       if (snapshot.hasData && snapshot.data != null) {
                         return GridView.builder(
@@ -328,7 +352,7 @@ class _Profile extends State<Profile> {
                                       ? Stack(
                                           fit: StackFit.expand,
                                           children: [
-                                            _ProfileVideoItem(url: url),
+                                            _ProfileVideoItem(url: url, previewUrl: media["preview_url"]),
                                             const Center(
                                               child: Icon(Icons.play_circle_outline, color: Colors.white, size: 36),
                                             ),
@@ -418,57 +442,32 @@ class _Profile extends State<Profile> {
   }
 }
 
-class _ProfileVideoItem extends StatefulWidget {
+/// Lightweight video thumbnail using preview image instead of full VideoPlayerController.
+/// VideoPlayerController should only be created when the user taps to play.
+class _ProfileVideoItem extends StatelessWidget {
   final String url;
-  const _ProfileVideoItem({Key? key, required this.url}) : super(key: key);
-
-  @override
-  State<_ProfileVideoItem> createState() => _ProfileVideoItemState();
-}
-
-class _ProfileVideoItemState extends State<_ProfileVideoItem> {
-  late VideoPlayerController _controller;
-  bool _initialized = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = VideoPlayerController.network(widget.url)
-      ..initialize().then((_) {
-        _controller.setVolume(0);
-        _controller.seekTo(const Duration(milliseconds: 100));
-        _controller.pause();
-        if (mounted) {
-          setState(() {
-            _initialized = true;
-          });
-        }
-      });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  final String? previewUrl;
+  const _ProfileVideoItem({Key? key, required this.url, this.previewUrl}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    if (_initialized) {
-      return SizedBox.expand(
-        child: FittedBox(
-          fit: BoxFit.cover,
-          child: SizedBox(
-            width: _controller.value.size.width,
-            height: _controller.value.size.height,
-            child: IgnorePointer(child: VideoPlayer(_controller)),
-          ),
+    if (previewUrl != null && previewUrl!.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: previewUrl!,
+        fit: BoxFit.cover,
+        placeholder: (context, url) => Container(
+          color: CyberpunkTheme.cardDark,
+          child: const Center(child: InstagramLoadingIndicator(size: 16)),
+        ),
+        errorWidget: (context, url, error) => Container(
+          color: CyberpunkTheme.cardDark,
+          child: const Icon(Icons.videocam_outlined, color: CyberpunkTheme.textTertiary, size: 24),
         ),
       );
     }
     return Container(
       color: CyberpunkTheme.cardDark,
-      child: const Center(child: InstagramLoadingIndicator(size: 16)),
+      child: const Icon(Icons.videocam_outlined, color: CyberpunkTheme.textTertiary, size: 24),
     );
   }
 }

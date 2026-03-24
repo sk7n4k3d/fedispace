@@ -9,7 +9,6 @@ import 'package:fedispace/widgets/instagram_widgets.dart';
 import 'package:fedispace/widgets/instagram_post_card.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_blurhash/flutter_blurhash.dart';
-import 'package:video_player/video_player.dart';
 import 'package:fedispace/routes/messages/conversation_detail_page.dart';
 import 'package:fedispace/routes/profile/collections_page.dart';
 
@@ -68,6 +67,7 @@ class _UserProfilePageState extends State<UserProfilePage>
         appLogger.error('Error loading relationships', e);
       }
 
+      if (!mounted) return;
       setState(() {
         _account = account;
         _isFollowing = following;
@@ -76,6 +76,7 @@ class _UserProfilePageState extends State<UserProfilePage>
       _loadPosts();
     } catch (error, stackTrace) {
       appLogger.error('Error loading profile', error, stackTrace);
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
@@ -91,6 +92,7 @@ class _UserProfilePageState extends State<UserProfilePage>
       final response =
           await widget.apiService.getUserStatus(widget.userId, 1, null);
       final List<dynamic> postsData = response as List<dynamic>;
+      if (!mounted) return;
       setState(() {
         _posts = postsData
             .map((data) => Status.fromJson(data as Map<String, dynamic>))
@@ -99,6 +101,7 @@ class _UserProfilePageState extends State<UserProfilePage>
       });
     } catch (error, stackTrace) {
       appLogger.error('Error loading posts', error, stackTrace);
+      if (!mounted) return;
       setState(() {
         _isLoadingPosts = false;
       });
@@ -112,6 +115,7 @@ class _UserProfilePageState extends State<UserProfilePage>
       } else {
         await widget.apiService.followStatus(widget.userId);
       }
+      if (!mounted) return;
       setState(() {
         _isFollowing = !_isFollowing;
       });
@@ -172,7 +176,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).block)));
               } else if (value == 'mute') {
                  await widget.apiService.muteUser(widget.userId);
-                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).mute)));
+                 if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).mute)));
               } else if (value == 'report') {
                  _showReportDialog();
               }
@@ -677,7 +681,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      _ProfileVideoItem(url: post.attach),
+                      _ProfileVideoItem(url: post.attach, previewUrl: post.preview_url),
                       const Center(
                         child: Icon(
                           Icons.play_circle_outline,
@@ -791,62 +795,31 @@ class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 
-class _ProfileVideoItem extends StatefulWidget {
+/// Lightweight video thumbnail - no VideoPlayerController until user taps play.
+class _ProfileVideoItem extends StatelessWidget {
   final String url;
-  const _ProfileVideoItem({Key? key, required this.url}) : super(key: key);
-
-  @override
-  State<_ProfileVideoItem> createState() => _ProfileVideoItemState();
-}
-
-class _ProfileVideoItemState extends State<_ProfileVideoItem> {
-  late VideoPlayerController _controller;
-  bool _initialized = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = VideoPlayerController.network(widget.url)
-      ..initialize().then((_) {
-        // Force load first frame
-        _controller.setVolume(0);
-        _controller.seekTo(const Duration(milliseconds: 100)); 
-        _controller.pause();
-        if (mounted) {
-          setState(() {
-            _initialized = true;
-          });
-        }
-      });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  final String? previewUrl;
+  const _ProfileVideoItem({Key? key, required this.url, this.previewUrl}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    if (_initialized) {
-      return SizedBox.expand(
-        child: FittedBox(
-          fit: BoxFit.cover,
-          child: SizedBox(
-            width: _controller.value.size.width,
-            height: _controller.value.size.height,
-            child: IgnorePointer( // Disable video controls interaction
-              child: VideoPlayer(_controller),
-            ),
-          ),
+    if (previewUrl != null && previewUrl!.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: previewUrl!,
+        fit: BoxFit.cover,
+        placeholder: (context, url) => Container(
+          color: CyberpunkTheme.cardDark,
+          child: const Center(child: InstagramLoadingIndicator(size: 16)),
+        ),
+        errorWidget: (context, url, error) => Container(
+          color: CyberpunkTheme.cardDark,
+          child: const Icon(Icons.videocam_outlined, color: CyberpunkTheme.textTertiary, size: 24),
         ),
       );
     }
     return Container(
-      color: Colors.black,
-      child: const Center(
-        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-      ),
+      color: CyberpunkTheme.cardDark,
+      child: const Icon(Icons.videocam_outlined, color: CyberpunkTheme.textTertiary, size: 24),
     );
   }
 }

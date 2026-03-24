@@ -1,4 +1,6 @@
 // Improved error handling and logging
+// TODO(H6): ApiService is a god object. Refactor into focused services
+// (AuthService, StatusService, AccountService, MediaService, etc.)
 
 /// Import Flutter
 ///
@@ -24,10 +26,37 @@ import 'package:fedispace/models/status.dart';
 ///
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:oauth2_client/access_token_response.dart';
 import 'package:oauth2_client/oauth2_helper.dart';
+
+
+/// Simple in-memory cache with TTL for frequently accessed API responses
+class _CacheEntry {
+  final dynamic data;
+  final DateTime time;
+  _CacheEntry(this.data, this.time);
+}
+
+class _ApiCache {
+  final Map<String, _CacheEntry> _cache = {};
+
+  T? get<T>(String key, Duration ttl) {
+    final entry = _cache[key];
+    if (entry != null && DateTime.now().difference(entry.time) < ttl) {
+      return entry.data as T;
+    }
+    if (entry != null) _cache.remove(key);
+    return null;
+  }
+
+  void set(String key, dynamic data) =>
+      _cache[key] = _CacheEntry(data, DateTime.now());
+
+  void invalidate(String key) => _cache.remove(key);
+
+  void clear() => _cache.clear();
+}
 
 class ApiService {
   static const FlutterSecureStorage secureStorage = FlutterSecureStorage();
@@ -48,6 +77,9 @@ class ApiService {
   AccountUsers? currentAccountOfUsers;
 
   http.Client httpClient = http.Client();
+
+  /// In-memory cache for frequently accessed endpoints
+  final _ApiCache _cache = _ApiCache();
 
   /// Cached custom emojis for the instance
   List<Map<String, dynamic>>? _cachedCustomEmojis;
@@ -143,7 +175,7 @@ class ApiService {
           id: 1,
           channelKey: 'internal',
           title: 'Uploading post failed',
-          body: 'Error: ${err.toString()}',
+          body: 'Upload failed. Please try again.',
         ),
       );
       return 0;
@@ -335,7 +367,13 @@ class ApiService {
     if (!newInstanceUrl.contains("://")) {
       instanceUrl = "https://$newInstanceUrl";
     } else {
-      instanceUrl = newInstanceUrl;
+      // H12: Reject http:// URLs, force HTTPS
+      if (newInstanceUrl.startsWith('http://')) {
+        instanceUrl = newInstanceUrl.replaceFirst('http://', 'https://');
+        appLogger.info('Forced HTTPS for instance URL');
+      } else {
+        instanceUrl = newInstanceUrl;
+      }
     }
 
     // This call would set `instanceUrl`, `oauthClientId` and
@@ -503,6 +541,10 @@ class ApiService {
 
   /// Get account information for a specific user
   Future<AccountUsers> getUserAccount(String id) async {
+    final cacheKey = 'user_account_$id';
+    final cached = _cache.get<AccountUsers>(cacheKey, const Duration(minutes: 5));
+    if (cached != null) return cached;
+
     final apiUrl = '${instanceUrl!}/api/v1/accounts/$id';
     appLogger.apiCall('GET', '/api/v1/accounts/$id');
     
@@ -512,6 +554,7 @@ class ApiService {
     if (resp.statusCode == 200) {
       Map<String, dynamic> jsonData = jsonDecode(resp.body);
       currentAccountOfUsers = AccountUsers.fromJson(jsonData);
+      _cache.set(cacheKey, currentAccountOfUsers!);
       return currentAccountOfUsers!;
     }
     
@@ -636,14 +679,6 @@ class ApiService {
     final apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/mute";
     http.Response resp = await _apiPost(apiUrl);
     if (resp.statusCode == 200) {
-      Fluttertoast.showToast(
-          msg: "You have muted user",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 2,
-          // backgroundColor: Colors.red,
-          // textColor: Colors.white,
-          fontSize: 16.0);
       return true;
     }
     throw ApiException(
@@ -655,14 +690,6 @@ class ApiService {
     final apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/unmute";
     http.Response resp = await _apiPost(apiUrl);
     if (resp.statusCode == 200) {
-      Fluttertoast.showToast(
-          msg: "You have unmuted user",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 2,
-          // backgroundColor: Colors.red,
-          // textColor: Colors.white,
-          fontSize: 16.0);
       return true;
     }
     throw ApiException(
@@ -696,14 +723,6 @@ class ApiService {
     final apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/follow";
     http.Response resp = await _apiPost(apiUrl);
     if (resp.statusCode == 200) {
-      Fluttertoast.showToast(
-          msg: "You have followed user",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 2,
-          // backgroundColor: Colors.red,
-          // textColor: Colors.white,
-          fontSize: 16.0);
       return true;
     }
     throw ApiException(
@@ -715,14 +734,6 @@ class ApiService {
     final apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/unfollow";
     http.Response resp = await _apiPost(apiUrl);
     if (resp.statusCode == 200) {
-      Fluttertoast.showToast(
-          msg: "You have unfollowed user",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 2,
-          // backgroundColor: Colors.red,
-          // textColor: Colors.white,
-          fontSize: 16.0);
       return true;
     }
     throw ApiException(
@@ -734,14 +745,6 @@ class ApiService {
     final apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/block";
     http.Response resp = await _apiPost(apiUrl);
     if (resp.statusCode == 200) {
-      Fluttertoast.showToast(
-          msg: "You have blocked user",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 2,
-          // backgroundColor: Colors.red,
-          // textColor: Colors.white,
-          fontSize: 16.0);
       return true;
     }
     throw ApiException(
@@ -753,14 +756,6 @@ class ApiService {
     final apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/unblock";
     http.Response resp = await _apiPost(apiUrl);
     if (resp.statusCode == 200) {
-      Fluttertoast.showToast(
-          msg: "You have unblocked user",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 2,
-          // backgroundColor: Colors.red,
-          // textColor: Colors.white,
-          fontSize: 16.0);
       return true;
     }
     throw ApiException(
@@ -802,15 +797,9 @@ class ApiService {
       httpClient: httpClient,
     );
     
-    appLogger.apiResponse('/api/v1/reports', response.statusCode, body: response.body);
+    appLogger.apiResponse('/api/v1/reports', response.statusCode);
 
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(
-          msg: "User reported",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 2,
-          fontSize: 16.0);
       return true;
     }
     
@@ -1243,13 +1232,6 @@ class ApiService {
       appLogger.apiResponse(apiUrl, resp.statusCode);
 
       if (resp.statusCode == 200 || resp.statusCode == 204) {
-        Fluttertoast.showToast(
-          msg: 'Post deleted',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 2,
-          fontSize: 16.0,
-        );
         return true;
       }
 
@@ -1337,7 +1319,7 @@ class ApiService {
         },
       );
 
-      appLogger.apiResponse('/api/v1/conversations?scope=$scope', response.statusCode, body: response.body);
+      appLogger.apiResponse('/api/v1/conversations?scope=$scope', response.statusCode);
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
@@ -1449,7 +1431,7 @@ class ApiService {
              }
         }
         
-        appLogger.apiCall('POST', '/api/v1.1/direct/thread/send', params: bodyMap);
+        appLogger.apiCall('POST', '/api/v1.1/direct/thread/send');
         
         final response = await helper!.post(
             uri,
@@ -1459,14 +1441,14 @@ class ApiService {
             },
         );
         
-        appLogger.apiResponse('/api/v1.1/direct/thread/send', response.statusCode, body: response.body);
+        appLogger.apiResponse('/api/v1.1/direct/thread/send', response.statusCode);
         
         if (response.statusCode == 200 || response.statusCode == 201) {
              // Success
              return jsonDecode(response.body); // Return map
         } else {
              // Log
-             appLogger.error('Chat DM Failed ${response.statusCode}: ${response.body}');
+             appLogger.error('Chat DM Failed with status ${response.statusCode}');
              return {'error': 'Chat API ${response.statusCode}: ${response.body}'};
         }
     } catch (e, stack) {
@@ -1519,7 +1501,7 @@ class ApiService {
           },
         );
         
-        appLogger.apiResponse('/api/v1.1/direct/thread?pid=$partnerId', response.statusCode, body: response.body);
+        appLogger.apiResponse('/api/v1.1/direct/thread?pid=$partnerId', response.statusCode);
         
         if (response.statusCode == 200) {
             final decoded = jsonDecode(response.body);
@@ -1605,11 +1587,17 @@ class ApiService {
   /// GET /api/v1/discover/posts
   Future<List<Status>> discoverPosts({int limit = 40}) async {
     try {
+      final cacheKey = 'discover_posts_$limit';
+      final cached = _cache.get<List<Status>>(cacheKey, const Duration(minutes: 5));
+      if (cached != null) return cached;
+
       final resp = await _apiGet('${instanceUrl!}/api/v1/discover/posts?limit=$limit');
       appLogger.apiCall('GET', '/api/v1/discover/posts');
       if (resp.statusCode == 200) {
         final List<dynamic> data = json.decode(resp.body);
-        return data.map((s) => Status.fromJson(s)).toList();
+        final result = data.map((s) => Status.fromJson(s)).toList();
+        _cache.set(cacheKey, result);
+        return result;
       }
       return [];
     } catch (e, s) {
@@ -1639,13 +1627,19 @@ class ApiService {
   /// GET /api/v1.1/discover/posts/trending
   Future<List<Status>> getTrendingPosts({int limit = 40}) async {
     try {
+      final cacheKey = 'trending_posts_$limit';
+      final cached = _cache.get<List<Status>>(cacheKey, const Duration(minutes: 5));
+      if (cached != null) return cached;
+
       final resp = await _apiGet('${instanceUrl!}/api/v1.1/discover/posts/trending?limit=$limit');
       appLogger.apiCall('GET', '/api/v1.1/discover/posts/trending');
       if (resp.statusCode == 200) {
         final decoded = json.decode(resp.body);
         // Pixelfed may return {data: [...]} or [...]
         final List<dynamic> data = decoded is List ? decoded : (decoded['data'] ?? decoded);
-        return data.map((s) => Status.fromJson(s)).toList();
+        final result = data.map((s) => Status.fromJson(s)).toList();
+        _cache.set(cacheKey, result);
+        return result;
       }
       return [];
     } catch (e, s) {
@@ -1764,7 +1758,7 @@ class ApiService {
       appLogger.apiCall('POST', '/api/v1.1/direct/thread/media');
       final response = await request.send();
       final responseBody = await http.Response.fromStream(response);
-      appLogger.apiResponse('/api/v1.1/direct/thread/media', responseBody.statusCode, body: responseBody.body);
+      appLogger.apiResponse('/api/v1.1/direct/thread/media', responseBody.statusCode);
 
       if (responseBody.statusCode == 200 || responseBody.statusCode == 201) {
         final data = json.decode(responseBody.body);
@@ -2847,7 +2841,7 @@ class ApiService {
       'data[alerts][follow_request]': 'true',
     };
 
-    appLogger.apiCall('POST', '/api/v1/push/subscription', params: body);
+    appLogger.apiCall('POST', '/api/v1/push/subscription');
 
     try {
       final response = await helper!.post(
@@ -2856,7 +2850,7 @@ class ApiService {
         httpClient: httpClient,
       );
 
-      appLogger.apiResponse('/api/v1/push/subscription', response.statusCode, body: response.body);
+      appLogger.apiResponse('/api/v1/push/subscription', response.statusCode);
 
       if (response.statusCode == 200) {
         return json.decode(response.body) as Map<String, dynamic>;

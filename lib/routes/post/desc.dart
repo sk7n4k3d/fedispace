@@ -15,15 +15,12 @@ class Desc extends StatefulWidget {
   State<Desc> createState() => _DescState();
 }
 
-final _myController = SocialTextEditingController();
-List<String> fileNames = [];
-
 class _DescState extends State<Desc> {
+  final _myController = SocialTextEditingController();
+  List<String> fileNames = [];
   @override
   void initState() {
     super.initState();
-    final _myController = SocialTextEditingController();
-
     _myController.clear();
     fileNames.clear();
   }
@@ -198,7 +195,7 @@ class _DescState extends State<Desc> {
 
   @override
   void dispose() {
-    //_myController.dispose();
+    _myController.dispose();
     super.dispose();
   }
 }

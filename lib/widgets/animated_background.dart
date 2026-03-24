@@ -26,7 +26,7 @@ class _AnimatedPremiumBackgroundState extends State<AnimatedPremiumBackground>
     _orbs = List.generate(5, (i) => _FloatingOrb.random(rng, i));
 
     // Generate small drifting particles
-    _particles = List.generate(30, (i) => _Particle.random(rng));
+    _particles = List.generate(15, (i) => _Particle.random(rng));
 
     _controller = AnimationController(
       vsync: this,
@@ -42,18 +42,22 @@ class _AnimatedPremiumBackgroundState extends State<AnimatedPremiumBackground>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, _) {
-        return CustomPaint(
-          painter: _BackgroundPainter(
-            progress: _controller.value,
-            orbs: _orbs,
-            particles: _particles,
-          ),
-          size: Size.infinite,
-        );
-      },
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, _) {
+          return CustomPaint(
+            isComplex: true,
+            willChange: true,
+            painter: _BackgroundPainter(
+              progress: _controller.value,
+              orbs: _orbs,
+              particles: _particles,
+            ),
+            size: Size.infinite,
+          );
+        },
+      ),
     );
   }
 }

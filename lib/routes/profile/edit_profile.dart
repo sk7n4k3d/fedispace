@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fedispace/core/api.dart';
+import 'package:fedispace/l10n/app_localizations.dart';
 import 'package:fedispace/core/logger.dart';
 import 'package:fedispace/models/account.dart';
 import 'package:fedispace/widgets/instagram_widgets.dart';
@@ -90,7 +91,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully')),
+          SnackBar(content: Text(S.of(context).profileUpdated)),
         );
         Navigator.pop(context, true);
       }
@@ -98,7 +99,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       appLogger.error('Error saving profile', error, stackTrace);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${error.toString()}')),
+          SnackBar(content: Text(S.of(context).error)),
         );
       }
     } finally {
@@ -123,14 +124,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Edit Profile')),
+        appBar: AppBar(title: Text(S.of(context).editProfile)),
         body: const Center(child: InstagramLoadingIndicator(size: 32)),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Profile'),
+        title: Text(S.of(context).editProfile),
         actions: [
           TextButton(
             onPressed: _isSaving ? null : _saveProfile,
@@ -140,8 +141,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     height: 20,
                     child: InstagramLoadingIndicator(size: 20),
                   )
-                : const Text(
-                    'Done',
+                : Text(
+                    S.of(context).done,
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
@@ -198,8 +199,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Change Profile Photo',
-                style: TextStyle(
+                S.of(context).changeProfilePhoto,
+                style: const TextStyle(
                   color: const Color(0xFF0095F6),
                   fontWeight: FontWeight.w600,
                   fontSize: 14,

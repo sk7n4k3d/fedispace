@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:fedispace/core/api.dart';
 import 'package:fedispace/core/logger.dart';
@@ -21,6 +22,7 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  Timer? _debounceTimer;
 
   // Search results
   List<AccountUsers> _accountResults = [];
@@ -53,6 +55,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
     _searchController.dispose();
     _focusNode.dispose();
     _pulseController.dispose();
@@ -135,6 +138,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
         _hashtagResults = [];
         _hasSearched = false;
       });
+      if (!_pulseController.isAnimating) _pulseController.repeat(reverse: true);
       return;
     }
 
@@ -142,6 +146,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
       _isSearching = true;
       _hasSearched = true;
     });
+    _pulseController.stop();
 
     try {
       appLogger.debug('V2 search: $query');
@@ -330,6 +335,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
                                     _hashtagResults = [];
                                     _hasSearched = false;
                                   });
+                                  if (!_pulseController.isAnimating) _pulseController.repeat(reverse: true);
                                 },
                               )
                             : null,
@@ -341,8 +347,9 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
                       onChanged: (value) {
                         setState(() {});
                         if (value.length >= 2) {
-                          Future.delayed(const Duration(milliseconds: 400), () {
-                            if (_searchController.text == value) _performSearch(value);
+                          _debounceTimer?.cancel();
+                          _debounceTimer = Timer(const Duration(milliseconds: 400), () {
+                            _performSearch(value);
                           });
                         }
                       },

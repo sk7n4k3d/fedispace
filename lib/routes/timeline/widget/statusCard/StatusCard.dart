@@ -45,11 +45,26 @@ class _StatusCardState extends State<StatusCard> {
   late Status status;
 
   final AudioPlayer player = AudioPlayer();
+  late Future<List<Favourited>> _favourFuture;
+  Uint8List? _cachedSoundBytes;
 
   @override
   void initState() {
     status = widget.initialStatus;
     super.initState();
+    _favourFuture = fetchFavour(status.id);
+    _preloadSound();
+  }
+
+  /// H5: Pre-load sound bytes once instead of on every like
+  Future<void> _preloadSound() async {
+    try {
+      String audioasset = "assets/sounds/soundtrack1.wav";
+      ByteData bytes = await rootBundle.load(audioasset);
+      _cachedSoundBytes = bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+    } catch (e) {
+      // Sound loading failed, non-critical
+    }
   }
 
   static String stripHtmlIfNeeded(String text) {
@@ -72,13 +87,9 @@ class _StatusCardState extends State<StatusCard> {
   Future<bool> onFavoritePress(bool isLiked) async {
     Status newStatus;
     try {
-      String audioasset = "assets/sounds/soundtrack1.wav";
-      ByteData bytes =
-          await rootBundle.load(audioasset); //load sound from assets
-      Uint8List soundbytes =
-          bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
-      await player.play(BytesSource(soundbytes));
-      print("Sound playing successful.");
+      if (_cachedSoundBytes != null) {
+        await player.play(BytesSource(_cachedSoundBytes!));
+      }
       if (status.favorited) {
         newStatus = await widget.apiService.undoFavoriteStatus(status.id);
       } else {
@@ -97,31 +108,7 @@ class _StatusCardState extends State<StatusCard> {
     }
   }
 
-  Future<void> onFavorite() async {
-    Status newStatus;
-    try {
-      String audioasset = "assets/sounds/soundtrack1.wav";
-      ByteData bytes =
-          await rootBundle.load(audioasset); //load sound from assets
-      Uint8List soundbytes =
-          bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
-      await player.play(BytesSource(soundbytes));
-      print("Sound playing successful.");
-      if (status.favorited) {
-        newStatus = await widget.apiService.undoFavoriteStatus(status.id);
-      } else {
-        newStatus = await widget.apiService.favoriteStatus(status.id);
-      }
-      setState(() {
-        //status = newStatus;
-      });
-    } on ApiException {
-      showSnackBar(
-        context,
-        "We couldn't perform that action, please try again!",
-      );
-    }
-  }
+
 
   Future<void> onReblogPress() async {
     Status newStatus;
@@ -329,7 +316,7 @@ class _StatusCardState extends State<StatusCard> {
                 ],
               ),
               FutureBuilder<List>(
-                  future: fetchFavour(status.id),
+                  future: _favourFuture,
                   builder:
                       (BuildContext context, AsyncSnapshot<List> snapshot) {
                     if (snapshot.data != null) {

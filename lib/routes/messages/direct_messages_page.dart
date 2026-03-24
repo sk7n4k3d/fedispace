@@ -36,8 +36,13 @@ class _DirectMessagesPageState extends State<DirectMessagesPage> {
     try {
       appLogger.debug('Loading direct messages');
       
-      final inboxConversations = await widget.apiService.getConversationsByScope(scope: 'inbox', limit: 40);
-      final sentConversations = await widget.apiService.getConversationsByScope(scope: 'sent', limit: 40);
+      // H3: Parallel fetch instead of sequential
+      final results = await Future.wait([
+        widget.apiService.getConversationsByScope(scope: 'inbox', limit: 40),
+        widget.apiService.getConversationsByScope(scope: 'sent', limit: 40),
+      ]);
+      final inboxConversations = results[0];
+      final sentConversations = results[1];
       
       final List<dynamic> allConversations = [...inboxConversations, ...sentConversations];
       
