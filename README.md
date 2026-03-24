@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/AI_Powered-OpenAI_Compatible-ff6b6b?style=for-the-badge&labelColor=0a0e1a" alt="AI Powered">
   <img src="https://img.shields.io/badge/16_Languages-Supported-success?style=for-the-badge&color=00ff88&labelColor=0a0e1a" alt="16 Languages">
   <img src="https://img.shields.io/badge/Android-Ready-success?style=for-the-badge&color=3ddc84&labelColor=0a0e1a" alt="Android">
-  <img src="https://img.shields.io/badge/Push_Notifications-UnifiedPush-blueviolet?style=for-the-badge&labelColor=0a0e1a" alt="Push Notifications">
+
 </p>
 
 ---
@@ -71,30 +71,16 @@ FediSpace works with **any OpenAI-compatible API**:
 - Post detail page with threaded replies
 - View edit history of modified posts
 
-### Reels / Loops (NEW)
-- Dedicated Loops instance integration
-- Separate OAuth login for Loops content
-- Vertical video feed with auto-play
-- Full-screen immersive video experience
-
-### Multi-Account (NEW)
-- Add and switch between multiple Pixelfed accounts
-- Per-account settings and preferences
-- Quick account switcher in navigation
-
-### Post Creation (NEW)
+### Post Creation
 - Gallery, Camera, and Video capture options
-- Photo filters and AI-powered image editing
-- Post drafts -- save and resume later
 - Story creation from gallery or camera
 
 ### Stories
 - Story bar with avatar bubbles
 - Full-screen story viewer with progress indicators
 - Story creation from camera or gallery
-- AI-powered image editing with creative filters
 - Viewer count and list for your own stories
-- Story replies and auto-advance navigation
+- Auto-advance navigation
 
 ### Discover and Search
 - Explore page with trending content
@@ -110,16 +96,13 @@ FediSpace works with **any OpenAI-compatible API**:
 - Delete conversations with confirmation dialogs
 
 ### Notifications
-- Real-time push notifications via [UnifiedPush](https://unifiedpush.org/)
-- In-app notification polling with badge counts (NEW)
-- Notification types: follows, likes, boosts, mentions, polls
-- Clear all with confirmation
-- Tap to navigate directly to relevant content
+- In-app notification polling with badge counts
+- Notification types: follows, likes, boosts, mentions
+- Tap to navigate to relevant content
 
 ### Profile and Social
 - Rich user profiles with stats
 - Profile editing capabilities
-- QR code profile sharing (NEW)
 - Follow / Unfollow / Mute / Block actions
 - Report users with reason description
 - Follow requests management
@@ -157,7 +140,7 @@ English, French, Spanish, German, Italian, Portuguese, Dutch, Russian, Chinese, 
 |---|---|
 | **Flutter / Dart** | Cross-platform framework |
 | **OAuth2** | Secure authentication |
-| **UnifiedPush** | Decentralized push notifications |
+| **Notification Polling** | In-app notification service |
 | **SharedPreferences** | Local settings persistence |
 | **CachedNetworkImage** | Image caching and blur hash |
 | **Camera** | Photo and video capture |
@@ -202,7 +185,6 @@ lib/
     notifications/
     post/         Post creation and detail
     profile/      Profile, collections, archives, QR
-    reels/        Loops/Reels video feed
     search/       Discover and search
     settings/     Settings, filters, blocks
     timeline/     Main feed
@@ -228,7 +210,6 @@ lib/
 | Resource | Description |
 |---|---|
 | [Pixelfed](https://pixelfed.org/) | The federated image sharing platform |
-| [UnifiedPush](https://unifiedpush.org/) | Decentralized push notification protocol |
 | [Feathr](https://github.com/feathr-space/feathr) | Original project base |
 
 ---

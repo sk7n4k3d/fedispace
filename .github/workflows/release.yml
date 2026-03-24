@@ -1,0 +1,94 @@
+name: Auto Release
+
+on:
+  push:
+    branches: [master]
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version_changed: ${{ steps.check.outputs.changed }}
+      version: ${{ steps.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+      - id: check
+        run: |
+          CURRENT=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
+          PREVIOUS=$(git show HEAD~1:pubspec.yaml 2>/dev/null | grep '^version:' | sed 's/version: //' | cut -d'+' -f1 || echo "")
+          echo "current=$CURRENT previous=$PREVIOUS"
+          if [ "$CURRENT" != "$PREVIOUS" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "version=$CURRENT" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  release:
+    needs: check-version
+    if: needs.check-version.outputs.version_changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Decode keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/release.jks
+
+      - name: Create key.properties
+        run: |
+          cat > android/key.properties <<EOF
+          storePassword=${{ secrets.KEY_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=release.jks
+          EOF
+
+      - run: flutter pub get
+      - run: flutter build apk --release
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.check-version.outputs.version }}
+        run: |
+          cp build/app/outputs/flutter-apk/app-release.apk "fedispace-v${VERSION}.apk"
+
+          # Generate changelog from commits since last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+          if [ -n "$LAST_TAG" ]; then
+            CHANGELOG=$(git log "${LAST_TAG}..HEAD" --pretty=format:"- %s" --no-merges)
+          else
+            CHANGELOG=$(git log -10 --pretty=format:"- %s" --no-merges)
+          fi
+
+          cat > /tmp/release-notes.md <<NOTES
+          ## FediSpace v${VERSION}
+
+          ### Changes
+          ${CHANGELOG}
+
+          ### APK
+          - \`fedispace-v${VERSION}.apk\` — Release-signed, ProGuard minified
+          NOTES
+
+          gh release create "v${VERSION}" "fedispace-v${VERSION}.apk" \
+            -t "FediSpace v${VERSION}" \
+            -F /tmp/release-notes.md
