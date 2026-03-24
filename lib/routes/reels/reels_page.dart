@@ -1,17 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:fedispace/core/api.dart';
-import 'package:fedispace/models/status.dart';
+import 'package:fedispace/core/loops_api.dart';
 import 'package:fedispace/themes/cyberpunk_theme.dart';
 import 'package:fedispace/routes/reels/reel_item.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 /// Full-screen vertical Reels/Video feed page.
-/// Filters timeline for video posts and presents them in a TikTok-style viewer.
+/// Loads videos from the Loops.video public feed API.
 class ReelsPage extends StatefulWidget {
-  final ApiService apiService;
-
-  const ReelsPage({Key? key, required this.apiService}) : super(key: key);
+  const ReelsPage({Key? key}) : super(key: key);
 
   @override
   State<ReelsPage> createState() => _ReelsPageState();
@@ -19,38 +16,34 @@ class ReelsPage extends StatefulWidget {
 
 class _ReelsPageState extends State<ReelsPage> {
   final PageController _pageController = PageController();
-  final List<Status> _videoPosts = [];
+  late final LoopsApi _loopsApi;
+  final List<LoopsVideo> _videos = [];
   final Map<int, GlobalKey<ReelItemState>> _reelKeys = {};
   bool _isLoading = true;
+  bool _isLoadingMore = false;
   int _currentIndex = 0;
   bool _showHeart = false;
 
   @override
   void initState() {
     super.initState();
-    _loadVideoPosts();
+    _loopsApi = LoopsApi(instanceUrl: 'https://loops.video');
+    _loadVideos();
   }
 
   @override
   void dispose() {
     _pageController.dispose();
+    _loopsApi.dispose();
     super.dispose();
   }
 
-  Future<void> _loadVideoPosts() async {
+  Future<void> _loadVideos() async {
     try {
-      // Fetch public timeline and filter for video content
-      final allPosts = await widget.apiService.getStatusList(null, 40, 'public');
-      final videos = allPosts.where((status) {
-        return status.attachement.any((a) {
-          final type = (a as Map<String, dynamic>)['type'] ?? '';
-          return type == 'video' || type == 'gifv';
-        });
-      }).toList();
-
+      final response = await _loopsApi.getPublicFeed();
       if (mounted) {
         setState(() {
-          _videoPosts.addAll(videos);
+          _videos.addAll(response);
           _isLoading = false;
         });
       }
@@ -61,41 +54,66 @@ class _ReelsPageState extends State<ReelsPage> {
     }
   }
 
-  String _getVideoUrl(Status status) {
-    for (final a in status.attachement) {
-      final map = a as Map<String, dynamic>;
-      final type = map['type'] ?? '';
-      if (type == 'video' || type == 'gifv') {
-        return map['url'] ?? '';
+  Future<void> _loadMoreVideos() async {
+    if (_isLoadingMore) return;
+    _isLoadingMore = true;
+    try {
+      final response = await _loopsApi.getPublicFeed();
+      if (mounted) {
+        setState(() {
+          _videos.addAll(response);
+        });
       }
+    } catch (_) {
+      // Silently fail for infinite scroll
+    } finally {
+      _isLoadingMore = false;
     }
-    return status.attach;
   }
 
-  String _getPreviewUrl(Status status) {
-    for (final a in status.attachement) {
-      final map = a as Map<String, dynamic>;
-      final type = map['type'] ?? '';
-      if (type == 'video' || type == 'gifv') {
-        return map['preview_url'] ?? '';
-      }
+  void _onPageChanged(int index) {
+    setState(() => _currentIndex = index);
+    // Infinite scroll: load more when reaching last 3 videos
+    if (index >= _videos.length - 3) {
+      _loadMoreVideos();
     }
-    return status.preview_url;
   }
 
-  void _onDoubleTap(Status status, int index) {
+  void _onDoubleTap(LoopsVideo video, int index) {
     setState(() => _showHeart = true);
     Future.delayed(const Duration(milliseconds: 800), () {
       if (mounted) setState(() => _showHeart = false);
     });
-    // Trigger like if not already liked
-    if (!status.favorited) {
-      widget.apiService.favoriteStatus(status.id);
-    }
+    // Auth required for likes
+    _showAuthSnackbar('like');
   }
 
-  String _stripHtml(String html) {
-    return html.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+  void _showAuthSnackbar(String action) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Sign in to Loops to $action',
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: CyberpunkTheme.surfaceDark,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  String _formatCount(int count) {
+    if (count >= 1000000) return '${(count / 1000000).toStringAsFixed(1)}M';
+    if (count >= 1000) return '${(count / 1000).toStringAsFixed(1)}K';
+    return count.toString();
+  }
+
+  String _formatDuration(int? seconds) {
+    if (seconds == null || seconds <= 0) return '';
+    final m = seconds ~/ 60;
+    final s = seconds % 60;
+    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
   GlobalKey<ReelItemState> _getReelKey(int index) {
@@ -110,16 +128,38 @@ class _ReelsPageState extends State<ReelsPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
-          'Reels',
-          style: TextStyle(
-            color: CyberpunkTheme.neonCyan,
-            fontWeight: FontWeight.w700,
-            fontSize: 20,
-            shadows: [
-              Shadow(color: CyberpunkTheme.neonCyan, blurRadius: 12),
-            ],
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Reels',
+              style: TextStyle(
+                color: CyberpunkTheme.neonCyan,
+                fontWeight: FontWeight.w700,
+                fontSize: 20,
+                shadows: [
+                  Shadow(color: CyberpunkTheme.neonCyan, blurRadius: 12),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: CyberpunkTheme.neonPink.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: CyberpunkTheme.neonPink.withOpacity(0.5), width: 0.5),
+              ),
+              child: const Text(
+                'Loops',
+                style: TextStyle(
+                  color: CyberpunkTheme.neonPink,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 10,
+                ),
+              ),
+            ),
+          ],
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
@@ -130,7 +170,7 @@ class _ReelsPageState extends State<ReelsPage> {
           ? const Center(
               child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan),
             )
-          : _videoPosts.isEmpty
+          : _videos.isEmpty
               ? Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -150,29 +190,27 @@ class _ReelsPageState extends State<ReelsPage> {
                     PageView.builder(
                       controller: _pageController,
                       scrollDirection: Axis.vertical,
-                      itemCount: _videoPosts.length,
-                      onPageChanged: (index) {
-                        setState(() => _currentIndex = index);
-                      },
+                      itemCount: _videos.length,
+                      onPageChanged: _onPageChanged,
                       itemBuilder: (context, index) {
-                        final status = _videoPosts[index];
+                        final video = _videos[index];
                         return Stack(
                           fit: StackFit.expand,
                           children: [
                             // Video player
                             ReelItem(
                               key: _getReelKey(index),
-                              videoUrl: _getVideoUrl(status),
-                              previewUrl: _getPreviewUrl(status),
+                              videoUrl: video.videoUrl ?? '',
+                              previewUrl: video.thumbnailUrl ?? '',
                               shouldPlay: index == _currentIndex,
-                              onDoubleTap: () => _onDoubleTap(status, index),
+                              onDoubleTap: () => _onDoubleTap(video, index),
                             ),
 
                             // Right side action buttons
                             Positioned(
                               right: 12,
                               bottom: 120,
-                              child: _buildActionButtons(status),
+                              child: _buildActionButtons(video),
                             ),
 
                             // Bottom author info + caption
@@ -180,7 +218,7 @@ class _ReelsPageState extends State<ReelsPage> {
                               left: 0,
                               right: 72,
                               bottom: 24,
-                              child: _buildCaptionOverlay(status),
+                              child: _buildCaptionOverlay(video),
                             ),
                           ],
                         );
@@ -213,36 +251,45 @@ class _ReelsPageState extends State<ReelsPage> {
     );
   }
 
-  Widget _buildActionButtons(Status status) {
+  Widget _buildActionButtons(LoopsVideo video) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Like
         _buildNeonButton(
-          icon: status.favorited ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-          label: status.favourites_count.toString(),
-          color: status.favorited ? CyberpunkTheme.neonPink : Colors.white,
-          onTap: () => widget.apiService.favoriteStatus(status.id),
+          icon: video.hasLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+          label: _formatCount(video.likes),
+          color: video.hasLiked ? CyberpunkTheme.neonPink : Colors.white,
+          onTap: () => _showAuthSnackbar('like'),
         ),
         const SizedBox(height: 20),
+        // Comments
         _buildNeonButton(
           icon: Icons.comment_rounded,
-          label: status.replies_count.toString(),
+          label: _formatCount(video.comments),
           color: Colors.white,
-          onTap: () {},
+          onTap: () => _showAuthSnackbar('comment'),
         ),
         const SizedBox(height: 20),
+        // Share
         _buildNeonButton(
           icon: Icons.share_rounded,
-          label: '',
+          label: _formatCount(video.shares),
           color: Colors.white,
-          onTap: () {},
+          onTap: () {
+            // Share could work without auth - open video URL
+            if (video.url != null) {
+              // TODO: Share intent
+            }
+          },
         ),
         const SizedBox(height: 20),
+        // Bookmark
         _buildNeonButton(
-          icon: Icons.bookmark_border_rounded,
-          label: '',
-          color: Colors.white,
-          onTap: () {},
+          icon: video.hasBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+          label: _formatCount(video.bookmarks),
+          color: video.hasBookmarked ? CyberpunkTheme.neonCyan : Colors.white,
+          onTap: () => _showAuthSnackbar('bookmark'),
         ),
       ],
     );
@@ -266,7 +313,9 @@ class _ReelsPageState extends State<ReelsPage> {
                 BoxShadow(
                   color: color == CyberpunkTheme.neonPink
                       ? CyberpunkTheme.neonPink.withOpacity(0.4)
-                      : Colors.transparent,
+                      : color == CyberpunkTheme.neonCyan
+                          ? CyberpunkTheme.neonCyan.withOpacity(0.4)
+                          : Colors.transparent,
                   blurRadius: 12,
                   spreadRadius: 2,
                 ),
@@ -274,7 +323,7 @@ class _ReelsPageState extends State<ReelsPage> {
             ),
             child: Icon(icon, color: color, size: 30),
           ),
-          if (label.isNotEmpty) ...[
+          if (label.isNotEmpty && label != '0') ...[
             const SizedBox(height: 4),
             Text(
               label,
@@ -286,7 +335,13 @@ class _ReelsPageState extends State<ReelsPage> {
     );
   }
 
-  Widget _buildCaptionOverlay(Status status) {
+  Widget _buildCaptionOverlay(LoopsVideo video) {
+    final authorName = video.account['name'] as String? ??
+        video.account['username'] as String? ??
+        'Unknown';
+    final authorAvatar = video.account['avatar'] as String? ?? '';
+    final duration = _formatDuration(video.duration);
+
     return Container(
       margin: const EdgeInsets.only(left: 16, bottom: 8),
       padding: const EdgeInsets.all(12),
@@ -304,15 +359,15 @@ class _ReelsPageState extends State<ReelsPage> {
             children: [
               CircleAvatar(
                 radius: 16,
-                backgroundImage: status.avatar.isNotEmpty
-                    ? CachedNetworkImageProvider(status.avatar)
+                backgroundImage: authorAvatar.isNotEmpty
+                    ? CachedNetworkImageProvider(authorAvatar)
                     : null,
                 backgroundColor: CyberpunkTheme.surfaceDark,
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  status.acct,
+                  authorName,
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
@@ -321,13 +376,31 @@ class _ReelsPageState extends State<ReelsPage> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              if (duration.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    duration,
+                    style: const TextStyle(
+                      color: CyberpunkTheme.neonCyan,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
           // Caption
-          if (_stripHtml(status.content).isNotEmpty) ...[
+          if (video.caption != null && video.caption!.isNotEmpty) ...[
             const SizedBox(height: 8),
             Text(
-              _stripHtml(status.content),
+              video.caption!,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(color: Colors.white70, fontSize: 13),

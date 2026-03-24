@@ -99,7 +99,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         return Container();
       case 3:
         // Reels - vertical video feed
-        return ReelsPage(apiService: widget.apiService);
+        return const ReelsPage();
       case 4:
         // Direct Messages & Stories
         return DirectMessagesPage(apiService: widget.apiService);
