@@ -54,8 +54,8 @@ class InstagramBottomNav extends StatelessWidget {
                 isCreate: true,
               ),
               _NavItem(
-                icon: Icons.play_circle_outline,
-                activeIcon: Icons.play_circle_filled,
+                icon: Icons.movie_filter_outlined,
+                activeIcon: Icons.movie_filter_rounded,
                 isActive: currentIndex == 3,
                 onTap: () => onTap(3),
               ),

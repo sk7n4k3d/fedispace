@@ -6,7 +6,10 @@
 // Based on the Loops server API (routes/api.php).
 //
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
+import 'dart:io';
 
 // ---------------------------------------------------------------------------
 // Exceptions
@@ -310,7 +313,9 @@ class LoopsApi {
     required this.instanceUrl,
     this.accessToken,
     http.Client? client,
-  }) : _client = client ?? http.Client();
+  }) : _client = client ?? IOClient(HttpClient()
+    ..connectionTimeout = const Duration(seconds: 15)
+    ..idleTimeout = const Duration(seconds: 15));
 
   // -------------------------------------------------------------------------
   // Private helpers
@@ -319,6 +324,7 @@ class LoopsApi {
   Map<String, String> get _headers => {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 16) FediSpace/0.1.5',
         if (accessToken != null) 'Authorization': 'Bearer $accessToken',
       };
 
@@ -336,7 +342,7 @@ class LoopsApi {
     final response = await _client.get(
       _uri(path, queryParams),
       headers: _headers,
-    );
+    ).timeout(const Duration(seconds: 15));
     return _handleResponse(response);
   }
 
