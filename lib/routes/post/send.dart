@@ -1645,7 +1645,6 @@ class _SendPostsState extends State<SendPosts> {
                       GestureDetector(
                         onTap: _showMediaSourceSheet,
                         child: Container(
-                          height: 140,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             gradient: RadialGradient(
