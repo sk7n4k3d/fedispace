@@ -143,6 +143,7 @@ class UnifiedPushService {
     // Try to parse as JSON (Mastodon/Pixelfed notification format)
     try {
       final data = json.decode(decoded);
+      debugPrint("[UP] Parsed JSON notification: $data");
       _handleParsedNotification(data);
     } catch (e) {
       // Not JSON or parsing failed - show raw message

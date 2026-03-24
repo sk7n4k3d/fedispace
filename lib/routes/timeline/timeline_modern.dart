@@ -136,23 +136,19 @@ class _TimelineState extends State<Timeline> with TickerProviderStateMixin {
                   shaderCallback: (bounds) => LinearGradient(
                     colors: const [
                       CyberpunkTheme.neonCyan,
-                      CyberpunkTheme.neonPink,
+                      CyberpunkTheme.neonCyan,
                     ],
                   ).createShader(bounds),
                   child: Text(
                     'FediSpace',
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.spaceGrotesk(
                       fontSize: 24,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                       color: Colors.white,
                       shadows: [
                         Shadow(
                           color: CyberpunkTheme.neonCyan.withOpacity(0.8),
                           blurRadius: 20 + (glowValue * 15),
-                        ),
-                        Shadow(
-                          color: CyberpunkTheme.neonPink.withOpacity(0.5),
-                          blurRadius: 30 + (glowValue * 20),
                         ),
                       ],
                     ),
@@ -169,20 +165,19 @@ class _TimelineState extends State<Timeline> with TickerProviderStateMixin {
                   end: Alignment(0.0 + (shimmerValue * 3.0), 0.0),
                   colors: const [
                     CyberpunkTheme.neonCyan,
-                    CyberpunkTheme.neonPink,
-                    CyberpunkTheme.neonYellow,
+                    Colors.white,
                     CyberpunkTheme.neonCyan,
                   ],
-                  stops: const [0.0, 0.33, 0.66, 1.0],
+                  stops: const [0.0, 0.5, 1.0],
                   tileMode: TileMode.mirror,
                 ).createShader(bounds);
               },
               child: Text(
                 'FediSpace',
-                style: GoogleFonts.inter(
+                style: GoogleFonts.spaceGrotesk(
                   fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.5,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.5,
                   color: Colors.white, // Required for ShaderMask
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:fedispace/core/api.dart';
@@ -25,6 +26,7 @@ class NotificationPollingService {
 
   void init(ApiService apiService) {
     _apiService = apiService;
+    debugPrint("[NOTIF] init() called - ApiService set");
     appLogger.info("NotificationPollingService initialized");
     initializeNotifications();
   }
@@ -133,10 +135,12 @@ class NotificationPollingService {
       return;
     }
 
+    debugPrint("[NOTIF] startPolling() - interval: 10s");
     appLogger.info("Starting notification polling (10s interval)");
     _isPolling = true;
 
     // Initial fetch to set the baseline (don't notify for existing ones)
+    debugPrint("[NOTIF] Fetching initial baseline notifications and DMs");
     _fetchNotifications(isInitial: true);
     _fetchDMs(isInitial: true);
 
@@ -158,7 +162,11 @@ class NotificationPollingService {
 
   Future<void> _fetchNotifications({bool isInitial = false}) async {
     try {
-      if (_apiService == null) return;
+      if (_apiService == null) {
+        debugPrint("[NOTIF] _fetchNotifications() - ApiService is null, skipping");
+        return;
+      }
+      debugPrint("[NOTIF] _fetchNotifications(isInitial: $isInitial) - calling API");
 
       // check if we are logged in
       final account = await _apiService!.getCurrentAccount(); // This throws if not logged in usually, or returns null? 
@@ -166,8 +174,12 @@ class NotificationPollingService {
 
       final responseBody = await _apiService!.getNotification();
       final List<dynamic> notifications = jsonDecode(responseBody);
+      debugPrint("[NOTIF] Got ${notifications.length} notifications from API");
 
-      if (notifications.isEmpty) return;
+      if (notifications.isEmpty) {
+        debugPrint("[NOTIF] No notifications, returning");
+        return;
+      }
 
       // Sort by ID to ensure we have the latest
       // IDs are strings in Mastodon/Pixelfed but usually lexicographically sortable or numeric
@@ -217,14 +229,16 @@ class NotificationPollingService {
          }
       }
 
-    } catch (e) {
-      // appLogger.error("Error polling notifications", e);
-      // Fail silently to catch intermittent network issues without spamming logs too hard
+    } catch (e, stackTrace) {
+      debugPrint("[NOTIF] ERROR in _fetchNotifications: $e");
+      debugPrint("[NOTIF] Stack: $stackTrace");
+      appLogger.error("Error polling notifications", e);
     }
   }
 
   Future<void> _showNotification(Map<String, dynamic> notification) async {
     try {
+      debugPrint("[NOTIF] _showNotification() - raw: $notification");
       final type = notification['type'];
       final account = notification['account'];
       final username = account['display_name'] != "" ? account['display_name'] : account['username'];
@@ -266,6 +280,7 @@ class NotificationPollingService {
           channelKey = "internal";
       }
 
+      debugPrint("[NOTIF] Showing notification - title: $title, body: $body, channel: $channelKey");
       await AwesomeNotifications().createNotification(
         content: NotificationContent(
           id: DateTime.now().millisecondsSinceEpoch ~/ 1000, // Unique Int ID
@@ -285,9 +300,14 @@ class NotificationPollingService {
   /// Poll for new DMs globally
   Future<void> _fetchDMs({bool isInitial = false}) async {
     try {
-      if (_apiService == null) return;
+      if (_apiService == null) {
+        debugPrint("[NOTIF] _fetchDMs() - ApiService is null, skipping");
+        return;
+      }
+      debugPrint("[NOTIF] _fetchDMs(isInitial: $isInitial) - calling API");
 
       final conversations = await _apiService!.getConversationsByScope(scope: 'inbox', limit: 20);
+      debugPrint("[NOTIF] Got ${conversations.length} DM conversations");
       
       if (conversations.isEmpty) return;
       
@@ -357,8 +377,10 @@ class NotificationPollingService {
       _knownDmIds.addAll(currentIds);
       if (!_dmBaselineSet) _dmBaselineSet = true;
       
-    } catch (e) {
-      // Fail silently
+    } catch (e, stackTrace) {
+      debugPrint("[NOTIF] ERROR in _fetchDMs: $e");
+      debugPrint("[NOTIF] Stack: $stackTrace");
+      appLogger.error("Error polling DMs", e);
     }
   }
 }

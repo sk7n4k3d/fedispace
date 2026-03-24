@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 // Improved error handling and logging
 // TODO(H6): ApiService is a god object. Refactor into focused services
 // (AuthService, StatusService, AccountService, MediaService, etc.)
@@ -1417,6 +1418,8 @@ class ApiService {
     try {
         // Correct path confirmed from source: /api/v1.1/direct/thread/send
         final uri = '$_baseUrl/api/v1.1/direct/thread/send';
+        debugPrint('[DM-SEND] sendChatDirectMessage() called');
+        debugPrint('[DM-SEND] recipientId: $recipientId, content length: ${content.length}, mediaIds: $mediaIds');
         
         final Map<String, String> bodyMap = {
            'to_id': recipientId,  // Changed from recipient_id
@@ -1442,16 +1445,22 @@ class ApiService {
         );
         
         appLogger.apiResponse('/api/v1.1/direct/thread/send', response.statusCode);
+        debugPrint('[DM-SEND] Response status: ${response.statusCode}');
+        debugPrint('[DM-SEND] Response body: ${response.body}');
         
         if (response.statusCode == 200 || response.statusCode == 201) {
              // Success
+             debugPrint('[DM-SEND] SUCCESS');
              return jsonDecode(response.body); // Return map
         } else {
              // Log
+             debugPrint('[DM-SEND] FAILED: ${response.statusCode} - ${response.body}');
              appLogger.error('Chat DM Failed with status ${response.statusCode}');
              return {'error': 'Chat API ${response.statusCode}: ${response.body}'};
         }
     } catch (e, stack) {
+        debugPrint('[DM-SEND] EXCEPTION: $e');
+        debugPrint('[DM-SEND] Stack: $stack');
         appLogger.error('Chat DM Error', e, stack);
         return {'error': 'Exception: $e'};
     }
@@ -1744,28 +1753,45 @@ class ApiService {
 
   /// Upload media in a direct message thread
   /// POST /api/v1.1/direct/thread/media
-  Future<String?> uploadDirectMessageMedia(String filePath) async {
+  Future<String?> uploadDirectMessageMedia(String filePath, String recipientId) async {
     try {
+      debugPrint('[DM-UPLOAD] uploadDirectMessageMedia() called');
+      debugPrint('[DM-UPLOAD] filePath: $filePath');
       final uri = Uri.parse('${instanceUrl!}/api/v1.1/direct/thread/media');
+      debugPrint('[DM-UPLOAD] URI: $uri');
       final tokenResponse = await helper!.getTokenFromStorage();
       final token = tokenResponse?.accessToken;
-      if (token == null) throw AuthenticationException('No access token');
+      if (token == null) {
+        debugPrint('[DM-UPLOAD] ERROR: No access token!');
+        throw AuthenticationException('No access token');
+      }
+      debugPrint('[DM-UPLOAD] Token present');
 
       final request = http.MultipartRequest('POST', uri);
       request.headers.addAll({'Authorization': 'Bearer $token'});
+      request.fields['to_id'] = recipientId;
       request.files.add(await http.MultipartFile.fromPath('file', filePath));
+      debugPrint('[DM-UPLOAD] Multipart request prepared, sending...');
 
       appLogger.apiCall('POST', '/api/v1.1/direct/thread/media');
       final response = await request.send();
       final responseBody = await http.Response.fromStream(response);
       appLogger.apiResponse('/api/v1.1/direct/thread/media', responseBody.statusCode);
+      debugPrint('[DM-UPLOAD] Response status: ${responseBody.statusCode}');
+      debugPrint('[DM-UPLOAD] Response body: ${responseBody.body}');
 
       if (responseBody.statusCode == 200 || responseBody.statusCode == 201) {
         final data = json.decode(responseBody.body);
-        return data['id']?.toString() ?? data['media_id']?.toString();
+        debugPrint('[DM-UPLOAD] Parsed data: $data');
+        final mediaId = data['id']?.toString() ?? data['media_id']?.toString();
+        debugPrint('[DM-UPLOAD] Extracted mediaId: $mediaId');
+        return mediaId;
       }
+      debugPrint('[DM-UPLOAD] FAILED: status ${responseBody.statusCode}');
       return null;
     } catch (e, s) {
+      debugPrint('[DM-UPLOAD] EXCEPTION: $e');
+      debugPrint('[DM-UPLOAD] Stack: $s');
       appLogger.error('Error uploading DM media', e, s);
       return null;
     }

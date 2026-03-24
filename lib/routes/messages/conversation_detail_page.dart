@@ -619,16 +619,25 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
 
   Future<void> _pickAndSendMedia() async {
     try {
+      debugPrint('[DM-UI] _pickAndSendMedia() called');
       final picker = ImagePicker();
       final image = await picker.pickImage(source: ImageSource.gallery);
-      if (image == null) return;
+      if (image == null) {
+        debugPrint('[DM-UI] User cancelled image picker');
+        return;
+      }
+      debugPrint('[DM-UI] Image picked: ${image.path}');
 
-      final result = await widget.apiService.uploadDirectMessageMedia(image.path);
+      debugPrint('[DM-UI] Calling uploadDirectMessageMedia(${image.path})');
+      final result = await widget.apiService.uploadDirectMessageMedia(image.path, widget.recipientId);
+      debugPrint('[DM-UI] Upload result: $result');
       if (result != null) {
+        debugPrint('[DM-UI] Upload SUCCESS, mediaId: $result, refreshing messages');
         appLogger.debug('DM media uploaded: $result');
         // The upload usually triggers a message in the thread, so refresh
         await _refreshMessages();
       } else {
+        debugPrint('[DM-UI] Upload FAILED - returned null');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Failed to send photo'), backgroundColor: Colors.red),
@@ -636,6 +645,8 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
         }
       }
     } catch (e, s) {
+      debugPrint('[DM-UI] EXCEPTION in _pickAndSendMedia: $e');
+      debugPrint('[DM-UI] Stack: $s');
       appLogger.error('Error picking/sending media', e, s);
     }
   }
