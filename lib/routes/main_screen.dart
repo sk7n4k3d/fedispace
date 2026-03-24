@@ -7,6 +7,8 @@ import 'package:fedispace/routes/profile/profile.dart';
 import 'package:fedispace/core/notification_service.dart';
 import 'package:fedispace/routes/messages/direct_messages_page.dart';
 import 'package:fedispace/routes/post/send.dart';
+import 'package:fedispace/core/unifiedpush.dart';
+import 'dart:io';
 import 'package:fedispace/routes/reels/reels_page.dart';
 
 /// Main screen with Instagram-style bottom navigation
@@ -29,6 +31,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _initNotifications();
+    _initUnifiedPush();
     _loadProfileImage();
     // Pre-cache custom emojis for the instance
     widget.apiService.getCachedCustomEmojis();
@@ -53,6 +56,22 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   void _initNotifications() {
      NotificationPollingService().init(widget.apiService);
      NotificationPollingService().startPolling();
+  }
+
+  Future<void> _initUnifiedPush() async {
+    if (Platform.isAndroid) {
+      try {
+        debugPrint('[MAIN] Initializing UnifiedPush...');
+        final upService = UnifiedPushService();
+        await upService.initUnifiedPush();
+        if (mounted) {
+          await upService.startUnifiedPush(context, widget.apiService);
+          debugPrint('[MAIN] UnifiedPush initialized successfully');
+        }
+      } catch (e) {
+        debugPrint('[MAIN] UnifiedPush init failed: $e');
+      }
+    }
   }
 
   Future<void> _loadProfileImage() async {
