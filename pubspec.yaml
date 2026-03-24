@@ -60,7 +60,7 @@ dependencies:
   carousel_slider: ^5.0.0
   zoom_pinch_overlay: ^1.2.0
   audioplayers: ^6.0.0
-  awesome_notifications: ^0.10.1
+  awesome_notifications: ^0.11.0
   toggle_switch: ^2.1.0
   wechat_assets_picker: ^8.6.3
   flutter_vibrate:
