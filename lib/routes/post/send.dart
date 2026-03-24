@@ -1706,6 +1706,8 @@ class _SendPostsState extends State<SendPosts> {
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
                                 child: Column(
                                   children: [
+                                    Text('Post', style: TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 1)),
+                                    const SizedBox(height: 10),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                       children: [
@@ -1714,26 +1716,17 @@ class _SendPostsState extends State<SendPosts> {
                                         _compactSourceButton(Icons.videocam_outlined, 'Video', const Color(0xFFFF9800), _pickVideoFromCamera),
                                       ],
                                     ),
-                                    const SizedBox(height: 14),
-                                    GestureDetector(
-                                      onTap: _createStoryFromGallery,
-                                      child: Container(
-                                        width: double.infinity,
-                                        padding: const EdgeInsets.symmetric(vertical: 14),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF9C27B0).withOpacity(0.1),
-                                          borderRadius: BorderRadius.circular(16),
-                                          border: Border.all(color: const Color(0xFF9C27B0).withOpacity(0.3), width: 1),
-                                        ),
-                                        child: const Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Icon(Icons.auto_stories_rounded, color: Color(0xFF9C27B0), size: 22),
-                                            SizedBox(width: 10),
-                                            Text('Create a Story', style: TextStyle(color: CyberpunkTheme.textWhite, fontSize: 15, fontWeight: FontWeight.w600)),
-                                          ],
-                                        ),
-                                      ),
+                                    const SizedBox(height: 20),
+                                    // Story section label
+                                    Text('Story', style: TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 1)),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        _compactSourceButton(Icons.photo_library_outlined, 'Gallery', const Color(0xFF9C27B0), _createStoryFromGallery),
+                                        _compactSourceButton(Icons.camera_alt_outlined, 'Camera', const Color(0xFF9C27B0), () => _pickFromCamera(ImageSource.camera)),
+                                        _compactSourceButton(Icons.videocam_outlined, 'Video', const Color(0xFF9C27B0), _pickVideoFromCamera),
+                                      ],
                                     ),
                                   ],
                                 ),
