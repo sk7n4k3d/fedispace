@@ -57,32 +57,46 @@ class _LoopsLoginPageState extends State<LoopsLoginPage>
     });
 
     try {
-      // Register the app first
+      debugPrint('[LOOPS AUTH] Step 1: Registering app...');
       final creds = await LoopsAuth.registerApp();
       final clientId = creds['client_id']!;
+      debugPrint('[LOOPS AUTH] Step 2: Got client_id: $clientId');
 
-      // Build auth URL
       final authUrl = LoopsAuth.getAuthorizationUrl(clientId);
+      debugPrint('[LOOPS AUTH] Step 3: Auth URL: $authUrl');
 
-      // Open browser for OAuth
+      debugPrint('[LOOPS AUTH] Step 4: Opening FlutterWebAuth2...');
       final result = await FlutterWebAuth2.authenticate(
         url: authUrl,
         callbackUrlScheme: 'space.echelon4.fedispace',
+        options: const FlutterWebAuth2Options(
+          timeout: 120,
+          preferEphemeral: true,
+        ),
       );
+      debugPrint('[LOOPS AUTH] Step 5: Got callback result: $result');
 
-      // Extract code from callback URL
       final uri = Uri.parse(result);
       final code = uri.queryParameters['code'];
+      final error = uri.queryParameters['error'];
+      debugPrint('[LOOPS AUTH] Step 6: code=$code error=$error');
 
-      if (code != null && code.isNotEmpty) {
+      if (error != null) {
+        setState(() => _error = 'Authorization denied: $error');
+      } else if (code != null && code.isNotEmpty) {
+        debugPrint('[LOOPS AUTH] Step 7: Exchanging code for token...');
         await LoopsAuth.exchangeCode(code);
+        debugPrint('[LOOPS AUTH] Step 8: Token exchange complete!');
         widget.onAuthenticated();
       } else {
-        setState(() => _error = 'Authorization failed - no code received');
+        debugPrint('[LOOPS AUTH] Step 6b: No code in callback URL');
+        setState(() => _error = 'Authorization failed - no code received. URL: $result');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint('[LOOPS AUTH] ERROR: $e');
+      debugPrint('[LOOPS AUTH] STACK: $stackTrace');
       if (mounted) {
-        setState(() => _error = 'Authentication cancelled or failed');
+        setState(() => _error = 'Error: $e');
       }
     } finally {
       if (mounted) {
