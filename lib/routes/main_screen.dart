@@ -7,6 +7,7 @@ import 'package:fedispace/routes/profile/profile.dart';
 import 'package:fedispace/core/notification_service.dart';
 import 'package:fedispace/routes/messages/direct_messages_page.dart';
 import 'package:fedispace/routes/post/send.dart';
+import 'package:fedispace/routes/reels/reels_page.dart';
 
 /// Main screen with Instagram-style bottom navigation
 /// Handles navigation between Home, Search, Create, Stories/Reels, and Profile
@@ -97,9 +98,12 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         // Create post (modal - technically unreachable via tab tap now)
         return Container();
       case 3:
+        // Reels - vertical video feed
+        return ReelsPage(apiService: widget.apiService);
+      case 4:
         // Direct Messages & Stories
         return DirectMessagesPage(apiService: widget.apiService);
-      case 4:
+      case 5:
         // Profile
         return Profile(apiService: widget.apiService);
       default:

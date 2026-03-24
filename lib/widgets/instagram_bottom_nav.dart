@@ -54,15 +54,21 @@ class InstagramBottomNav extends StatelessWidget {
                 isCreate: true,
               ),
               _NavItem(
-                icon: Icons.forum_outlined,
-                activeIcon: Icons.forum_rounded,
+                icon: Icons.play_circle_outline,
+                activeIcon: Icons.play_circle_filled,
                 isActive: currentIndex == 3,
                 onTap: () => onTap(3),
               ),
-              _ProfileNavItem(
-                imageUrl: profileImageUrl,
+              _NavItem(
+                icon: Icons.forum_outlined,
+                activeIcon: Icons.forum_rounded,
                 isActive: currentIndex == 4,
                 onTap: () => onTap(4),
+              ),
+              _ProfileNavItem(
+                imageUrl: profileImageUrl,
+                isActive: currentIndex == 5,
+                onTap: () => onTap(5),
               ),
             ],
           ),
