@@ -852,8 +852,8 @@ class _FullScreenImageViewState extends State<_FullScreenImageView> {
     } else {
       final position = _doubleTapDetails!.localPosition;
       _transformController.value = Matrix4.identity()
-        ..translate(-position.dx * 1.5, -position.dy * 1.5)
-        ..scale(2.5);
+        ..translate(-position.dx, -position.dy)
+        ..scale(2.0);
     }
   }
 
@@ -875,8 +875,8 @@ class _FullScreenImageViewState extends State<_FullScreenImageView> {
                 onDoubleTap: _handleDoubleTap,
                 child: InteractiveViewer(
                   transformationController: _transformController,
-                  minScale: 0.5,
-                  maxScale: 4.0,
+                  minScale: 1.0,
+                  maxScale: 3.0,
                   child: CachedNetworkImage(
                     imageUrl: widget.imageUrl,
                     fit: BoxFit.contain,

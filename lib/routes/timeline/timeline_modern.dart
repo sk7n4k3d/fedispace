@@ -220,7 +220,7 @@ class _TimelineState extends State<Timeline> with TickerProviderStateMixin {
               backgroundColor: CyberpunkTheme.backgroundBlack,
               elevation: 0,
               automaticallyImplyLeading: false,
-              title: _buildAnimatedLogo(),
+              toolbarHeight: 0,
               bottom: PreferredSize(
                 preferredSize: const Size.fromHeight(44),
                 child: Container(

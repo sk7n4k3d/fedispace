@@ -4,6 +4,7 @@ import 'package:fedispace/models/story.dart';
 import 'package:fedispace/routes/post/takecamera.dart';
 import 'package:fedispace/widgets/story_viewer.dart';
 import 'package:flutter/material.dart';
+import 'package:fedispace/themes/cyberpunk_theme.dart';
 
 class StoryBar extends StatefulWidget {
   final ApiService apiService;
@@ -104,7 +105,7 @@ class _StoryBarState extends State<StoryBar> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: hasStory 
-                      ? Border.all(color: Colors.cyanAccent, width: 2)
+                      ? Border.all(color: CyberpunkTheme.neonCyan, width: 2)
                       : null,
                   ),
                   child: CircleAvatar(
@@ -112,7 +113,7 @@ class _StoryBarState extends State<StoryBar> {
                     backgroundImage: widget.apiService.currentAccount?.avatar != null
                         ? CachedNetworkImageProvider(widget.apiService.currentAccount!.avatar)
                         : null,
-                    backgroundColor: Colors.grey[800],
+                    backgroundColor: CyberpunkTheme.cardDark,
                   ),
                 ),
                 if (!hasStory)
@@ -122,7 +123,7 @@ class _StoryBarState extends State<StoryBar> {
                     child: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: const BoxDecoration(
-                        color: Colors.blue,
+                        color: CyberpunkTheme.neonCyan,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.add, size: 16, color: Colors.white),
@@ -155,7 +156,7 @@ class _StoryBarState extends State<StoryBar> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: const LinearGradient(
-                  colors: [Colors.purple, Colors.orange],
+                  colors: [CyberpunkTheme.neonCyan, CyberpunkTheme.neonCyan],
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
                 ),
@@ -164,7 +165,7 @@ class _StoryBarState extends State<StoryBar> {
                 padding: const EdgeInsets.all(2), // White border between gradient and image
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.black, 
+                  color: CyberpunkTheme.backgroundBlack, 
                 ),
                 child: CircleAvatar(
                   radius: 28,
