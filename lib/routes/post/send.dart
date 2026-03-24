@@ -1701,38 +1701,17 @@ class _SendPostsState extends State<SendPosts> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              // Inline media source options
+                              // Compact media source grid
+                              const SizedBox(height: 8),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 24),
-                                child: Column(
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    _inlineSourceButton(
-                                      icon: Icons.photo_library_outlined,
-                                      label: 'Choose from Gallery',
-                                      color: CyberpunkTheme.neonCyan,
-                                      onTap: _pickFromGallery,
-                                    ),
-                                    const SizedBox(height: 8),
-                                    _inlineSourceButton(
-                                      icon: Icons.camera_alt_outlined,
-                                      label: 'Take a Photo',
-                                      color: CyberpunkTheme.neonPink,
-                                      onTap: () => _pickFromCamera(ImageSource.camera),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    _inlineSourceButton(
-                                      icon: Icons.videocam_outlined,
-                                      label: 'Record a Video',
-                                      color: const Color(0xFFFF9800),
-                                      onTap: _pickVideoFromCamera,
-                                    ),
-                                    const SizedBox(height: 8),
-                                    _inlineSourceButton(
-                                      icon: Icons.auto_stories_rounded,
-                                      label: 'Create a Story',
-                                      color: const Color(0xFF9C27B0),
-                                      onTap: _createStoryFromGallery,
-                                    ),
+                                    _compactSourceButton(Icons.photo_library_outlined, 'Gallery', CyberpunkTheme.neonCyan, _pickFromGallery),
+                                    _compactSourceButton(Icons.camera_alt_outlined, 'Camera', CyberpunkTheme.neonPink, () => _pickFromCamera(ImageSource.camera)),
+                                    _compactSourceButton(Icons.videocam_outlined, 'Video', const Color(0xFFFF9800), _pickVideoFromCamera),
+                                    _compactSourceButton(Icons.auto_stories_rounded, 'Story', const Color(0xFF9C27B0), _createStoryFromGallery),
                                   ],
                                 ),
                               ),
@@ -1985,44 +1964,24 @@ class _SendPostsState extends State<SendPosts> {
   }
 
 
-  Widget _inlineSourceButton({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
+  Widget _compactSourceButton(IconData icon, String label, Color color, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.2), width: 0.5),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 38, height: 38,
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: color, size: 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 52, height: 52,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: color.withOpacity(0.3), width: 1),
             ),
-            const SizedBox(width: 14),
-            Text(
-              label,
-              style: TextStyle(
-                color: CyberpunkTheme.textWhite,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const Spacer(),
-            Icon(Icons.chevron_right_rounded, color: color.withOpacity(0.5), size: 20),
-          ],
-        ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(height: 6),
+          Text(label, style: TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 11, fontWeight: FontWeight.w500)),
+        ],
       ),
     );
   }
