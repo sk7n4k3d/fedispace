@@ -50,8 +50,8 @@ android {
         applicationId "space.echelon4.fedispace"
         minSdk 24
         targetSdk flutter.targetSdkVersion
-        versionCode 26
-        versionName "0.2.0"
+        versionCode 27
+        versionName "2.0.0"
         multiDexEnabled true
     }
 
