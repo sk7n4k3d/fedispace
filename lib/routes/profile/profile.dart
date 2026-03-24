@@ -214,32 +214,59 @@ class _Profile extends State<Profile> {
                                 ],
                               ),
                               child: GestureDetector(
-                              onTap: () {
-                                // Navigate to story viewer or creation
-                                Navigator.pushNamed(context, '/StoryViewer', arguments: {
-                                  'userId': _userAccount?.id,
-                                  'username': _userAccount?.acct ?? '',
-                                  'avatarUrl': avatarUrl(),
-                                }).catchError((_) {
-                                  // StoryViewer route may not exist yet - show avatar fullscreen instead
-                                  showDialog(
-                                    context: context,
-                                    builder: (ctx) => Dialog(
-                                      backgroundColor: Colors.transparent,
-                                      insetPadding: const EdgeInsets.all(16),
-                                      child: GestureDetector(
-                                        onTap: () => Navigator.pop(ctx),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(16),
-                                          child: CachedNetworkImage(
-                                            imageUrl: avatarUrl(),
-                                            fit: BoxFit.contain,
+                              onTap: () async {
+                                // Try to load own stories and navigate to viewer
+                                try {
+                                  final carousel = await widget.apiService.getStoryCarousel();
+                                  if (carousel.self != null && carousel.self!.items.isNotEmpty && mounted) {
+                                    Navigator.pushNamed(context, '/StoryViewer', arguments: {
+                                      'story': carousel.self,
+                                      'apiService': widget.apiService,
+                                    });
+                                  } else {
+                                    // No stories — show avatar fullscreen
+                                    if (mounted) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (ctx) => Dialog(
+                                          backgroundColor: Colors.transparent,
+                                          insetPadding: const EdgeInsets.all(16),
+                                          child: GestureDetector(
+                                            onTap: () => Navigator.pop(ctx),
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(16),
+                                              child: CachedNetworkImage(
+                                                imageUrl: avatarUrl(),
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  }
+                                } catch (_) {
+                                  // Fallback — show avatar fullscreen
+                                  if (mounted) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (ctx) => Dialog(
+                                        backgroundColor: Colors.transparent,
+                                        insetPadding: const EdgeInsets.all(16),
+                                        child: GestureDetector(
+                                          onTap: () => Navigator.pop(ctx),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(16),
+                                            child: CachedNetworkImage(
+                                              imageUrl: avatarUrl(),
+                                              fit: BoxFit.contain,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                });
+                                    );
+                                  }
+                                }
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(3),
