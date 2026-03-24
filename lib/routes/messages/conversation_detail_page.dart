@@ -628,16 +628,45 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
       }
       debugPrint('[DM-UI] Image picked: ${image.path}');
 
+      // Show upload in progress
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(children: [
+              SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: CyberpunkTheme.neonCyan)),
+              SizedBox(width: 12),
+              Text('Sending photo...'),
+            ]),
+            backgroundColor: CyberpunkTheme.cardDark,
+            duration: Duration(seconds: 10),
+          ),
+        );
+      }
       debugPrint('[DM-UI] Calling uploadDirectMessageMedia(${image.path})');
       final result = await widget.apiService.uploadDirectMessageMedia(image.path, widget.recipientId);
       debugPrint('[DM-UI] Upload result: $result');
       if (result != null) {
-        debugPrint('[DM-UI] Upload SUCCESS, mediaId: $result, refreshing messages');
+        debugPrint('[DM-UI] Upload SUCCESS, url: $result, adding optimistic message');
+        if (mounted) ScaffoldMessenger.of(context).hideCurrentSnackBar();
         appLogger.debug('DM media uploaded: $result');
-        // The upload usually triggers a message in the thread, so refresh
+        // Add optimistic photo message immediately
+        if (mounted) {
+          setState(() {
+            _messages.insert(0, _Message(
+              id: 'optimistic_$result',
+              content: '',
+              timestamp: DateTime.now(),
+              isFromMe: true,
+              mediaUrls: [result.toString().startsWith('http') ? result.toString() : ''],
+              isNew: true,
+            ));
+          });
+        }
+        // Also refresh to get the real message from server
         await _refreshMessages();
       } else {
         debugPrint('[DM-UI] Upload FAILED - returned null');
+        if (mounted) ScaffoldMessenger.of(context).hideCurrentSnackBar();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Failed to send photo'), backgroundColor: Colors.red),
