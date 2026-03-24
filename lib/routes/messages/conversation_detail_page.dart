@@ -112,6 +112,36 @@ class _ConversationDetailPageState extends State<ConversationDetailPage> {
           }
         }
       }
+
+      // Pixelfed DM format: type=photo/photos, media=URL or list
+      if (urls.isEmpty) {
+        final msgType = data['type']?.toString() ?? '';
+        if (['photo', 'photos', 'video'].contains(msgType)) {
+          final media = data['media'];
+          if (media is String && media.isNotEmpty) {
+            appLogger.debug('Found DM media URL from type=$msgType: $media');
+            urls.add(media);
+          } else if (media is List) {
+            for (var m in media) {
+              if (m is String && m.isNotEmpty) urls.add(m);
+              if (m is Map) {
+                final url = m['url'] ?? m['preview_url'];
+                if (url != null) urls.add(url.toString());
+              }
+            }
+          }
+          // Also check carousel for multiple images
+          final carousel = data['carousel'];
+          if (carousel is List && urls.isEmpty) {
+            for (var item in carousel) {
+              if (item is Map) {
+                final url = item['url'] ?? item['media_url'];
+                if (url != null) urls.add(url.toString());
+              }
+            }
+          }
+        }
+      }
     } catch (e) {
       appLogger.error('Error extracting media URLs', e);
     }
