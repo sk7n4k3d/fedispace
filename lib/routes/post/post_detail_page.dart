@@ -113,16 +113,57 @@ class _PostDetailPageState extends State<PostDetailPage> {
   Future<void> _postComment() async {
     final text = _commentController.text.trim();
     if (text.isEmpty) return;
+
+    // Build optimistic comment from current account info
+    final currentAccount = widget.apiService.currentAccount;
+    final optimisticComment = Status(
+      id: 'temp_${DateTime.now().millisecondsSinceEpoch}',
+      content: '<p>${text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')}</p>',
+      account: currentAccount ?? widget.post.account,
+      favorited: false,
+      reblogged: false,
+      visibility: 'public',
+      uri: '',
+      url: '',
+      in_reply_to_id: _replyToId ?? widget.post.id,
+      in_reply_to_account_id: '',
+      muted: false,
+      sensitive: false,
+      spoiler_text: '',
+      language: '',
+      avatar: currentAccount?.avatar ?? '',
+      acct: currentAccount?.username ?? '',
+      attach: '',
+      blurhash: '',
+      preview_url: '',
+      created_at: DateTime.now().toIso8601String(),
+      favourites_count: 0,
+      replies_count: 0,
+      reblogs_count: 0,
+      attachement: [],
+    );
+
+    // Optimistic update: add comment immediately
+    final commentText = _commentController.text;
+    _commentController.clear();
+    _commentFocus.unfocus();
+    setState(() {
+      _comments.add(optimisticComment);
+      _replyToId = null;
+    });
+
     try {
-      final replyId = _replyToId ?? widget.post.id;
-      await widget.apiService.createPosts(inReplyToId: replyId, content: text);
-      _commentController.clear();
-      _commentFocus.unfocus();
-      setState(() => _replyToId = null);
+      final replyId = optimisticComment.in_reply_to_id;
+      await widget.apiService.createPosts(inReplyToId: replyId, content: commentText);
+      // Reload to get the real comment with correct ID
       _loadComments();
     } catch (error, stackTrace) {
       appLogger.error('Error posting comment', error, stackTrace);
+      // Remove optimistic comment on failure
       if (mounted) {
+        setState(() {
+          _comments.removeWhere((c) => c.id == optimisticComment.id);
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Failed to post comment'),
@@ -570,47 +611,101 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   // ── Post image / carousel ────────────────────────────────────────
 
+  int _carouselIndex = 0;
+
   Widget _buildPostImage() {
     if (widget.post.attachement.length > 1) {
-      return CarouselSlider.builder(
-        itemCount: widget.post.attachement.length,
-        options: CarouselOptions(
-          height: 420,
-          viewportFraction: 1.0,
-          enableInfiniteScroll: false,
-          autoPlay: false,
-        ),
-        itemBuilder: (context, index, realIdx) {
-          final attachment = widget.post.attachement[index];
-          final url = attachment["url"] ?? "";
-          final isVideo = url.toLowerCase().contains(".mp4") || url.toLowerCase().contains(".mov");
-          if (isVideo) {
-            return SizedBox(
-              width: double.infinity,
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          CarouselSlider.builder(
+            itemCount: widget.post.attachement.length,
+            options: CarouselOptions(
               height: 420,
-              child: SimpleVideoPlayer(url: url),
-            );
-          } else {
-            return FullScreenWidget(
-              child: Hero(
-                tag: 'post_image_${widget.post.id}_$index',
-                child: CachedNetworkImage(
-                  imageUrl: url,
-                  fit: BoxFit.cover,
+              viewportFraction: 1.0,
+              enableInfiniteScroll: false,
+              autoPlay: false,
+              onPageChanged: (index, reason) {
+                setState(() => _carouselIndex = index);
+              },
+            ),
+            itemBuilder: (context, index, realIdx) {
+              final attachment = widget.post.attachement[index];
+              final url = attachment["url"] ?? "";
+              final isVideo = url.toLowerCase().contains(".mp4") || url.toLowerCase().contains(".mov");
+              if (isVideo) {
+                return SizedBox(
                   width: double.infinity,
-                  placeholder: (context, url) => Container(
-                    color: CyberpunkTheme.cardDark,
-                    child: const Center(child: InstagramLoadingIndicator()),
+                  height: 420,
+                  child: SimpleVideoPlayer(url: url),
+                );
+              } else {
+                return GestureDetector(
+                  onTap: () => _openFullScreenImage(url, 'post_image_${widget.post.id}_$index'),
+                  child: Hero(
+                    tag: 'post_image_${widget.post.id}_$index',
+                    child: CachedNetworkImage(
+                      imageUrl: url,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      placeholder: (context, url) => Container(
+                        color: CyberpunkTheme.cardDark,
+                        child: const Center(child: InstagramLoadingIndicator()),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: CyberpunkTheme.cardDark,
+                        child: const Icon(Icons.broken_image_rounded, color: CyberpunkTheme.textTertiary, size: 40),
+                      ),
+                    ),
                   ),
-                  errorWidget: (context, url, error) => Container(
-                    color: CyberpunkTheme.cardDark,
-                    child: const Icon(Icons.broken_image_rounded, color: CyberpunkTheme.textTertiary, size: 40),
-                  ),
+                );
+              }
+            },
+          ),
+          // Counter chip top-right
+          Positioned(
+            top: 12,
+            right: 12,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '${_carouselIndex + 1}/${widget.post.attachement.length}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-            );
-          }
-        },
+            ),
+          ),
+          // Dots at bottom
+          Positioned(
+            bottom: 12,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(widget.post.attachement.length, (i) {
+                return Container(
+                  width: _carouselIndex == i ? 8 : 6,
+                  height: _carouselIndex == i ? 8 : 6,
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _carouselIndex == i
+                        ? CyberpunkTheme.neonCyan
+                        : CyberpunkTheme.textTertiary.withOpacity(0.5),
+                    boxShadow: _carouselIndex == i
+                        ? [BoxShadow(color: CyberpunkTheme.neonCyan.withOpacity(0.5), blurRadius: 4)]
+                        : null,
+                  ),
+                );
+              }),
+            ),
+          ),
+        ],
       );
     }
 
@@ -627,9 +722,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
       );
     }
 
-    return AspectRatio(
-      aspectRatio: 1.0,
-      child: FullScreenWidget(
+    return GestureDetector(
+      onTap: () => _openFullScreenImage(widget.post.attach, 'post_image_${widget.post.id}'),
+      child: AspectRatio(
+        aspectRatio: 1.0,
         child: Hero(
           tag: 'post_image_${widget.post.id}',
           child: CachedNetworkImage(
@@ -645,6 +741,25 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  // ── Full-screen image viewer with pinch-to-zoom ────────────────
+  void _openFullScreenImage(String imageUrl, String heroTag) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        barrierColor: Colors.black87,
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return _FullScreenImageView(
+            imageUrl: imageUrl,
+            heroTag: heroTag,
+          );
+        },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
       ),
     );
   }
@@ -1239,6 +1354,103 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+// ── Full-screen image viewer with pinch-to-zoom ──────────────────────────
+class _FullScreenImageView extends StatefulWidget {
+  final String imageUrl;
+  final String heroTag;
+
+  const _FullScreenImageView({
+    required this.imageUrl,
+    required this.heroTag,
+  });
+
+  @override
+  State<_FullScreenImageView> createState() => _FullScreenImageViewState();
+}
+
+class _FullScreenImageViewState extends State<_FullScreenImageView> {
+  final TransformationController _transformController = TransformationController();
+  TapDownDetails? _doubleTapDetails;
+
+  @override
+  void dispose() {
+    _transformController.dispose();
+    super.dispose();
+  }
+
+  void _handleDoubleTap() {
+    if (_transformController.value != Matrix4.identity()) {
+      _transformController.value = Matrix4.identity();
+    } else {
+      final position = _doubleTapDetails!.localPosition;
+      _transformController.value = Matrix4.identity()
+        ..translate(-position.dx * 1.5, -position.dy * 1.5)
+        ..scale(2.5);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: GestureDetector(
+        onVerticalDragEnd: (details) {
+          if (details.primaryVelocity != null && details.primaryVelocity!.abs() > 300) {
+            Navigator.of(context).pop();
+          }
+        },
+        child: Stack(
+          children: [
+            Center(
+              child: GestureDetector(
+                onDoubleTapDown: (details) => _doubleTapDetails = details,
+                onDoubleTap: _handleDoubleTap,
+                child: InteractiveViewer(
+                  transformationController: _transformController,
+                  minScale: 0.5,
+                  maxScale: 4.0,
+                  child: Hero(
+                    tag: widget.heroTag,
+                    child: CachedNetworkImage(
+                      imageUrl: widget.imageUrl,
+                      fit: BoxFit.contain,
+                      placeholder: (_, __) => const Center(
+                        child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan),
+                      ),
+                      errorWidget: (_, __, ___) => const Icon(
+                        Icons.broken_image_rounded,
+                        color: CyberpunkTheme.textTertiary,
+                        size: 48,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Close button
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 8,
+              right: 16,
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close_rounded, color: Colors.white, size: 24),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

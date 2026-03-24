@@ -213,6 +213,34 @@ class _Profile extends State<Profile> {
                                   ),
                                 ],
                               ),
+                              child: GestureDetector(
+                              onTap: () {
+                                // Navigate to story viewer or creation
+                                Navigator.pushNamed(context, '/StoryViewer', arguments: {
+                                  'userId': _userAccount?.id,
+                                  'username': _userAccount?.acct ?? '',
+                                  'avatarUrl': avatarUrl(),
+                                }).catchError((_) {
+                                  // StoryViewer route may not exist yet - show avatar fullscreen instead
+                                  showDialog(
+                                    context: context,
+                                    builder: (ctx) => Dialog(
+                                      backgroundColor: Colors.transparent,
+                                      insetPadding: const EdgeInsets.all(16),
+                                      child: GestureDetector(
+                                        onTap: () => Navigator.pop(ctx),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(16),
+                                          child: CachedNetworkImage(
+                                            imageUrl: avatarUrl(),
+                                            fit: BoxFit.contain,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                });
+                              },
                               child: Padding(
                                 padding: const EdgeInsets.all(3),
                                 child: CircleAvatar(
@@ -221,6 +249,7 @@ class _Profile extends State<Profile> {
                                   backgroundImage: CachedNetworkImageProvider(avatarUrl()),
                                 ),
                               ),
+                            ),
                             ),
                             const SizedBox(width: 24),
                             // Stats

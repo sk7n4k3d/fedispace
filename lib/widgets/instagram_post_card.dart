@@ -114,6 +114,21 @@ class _InstagramPostCardState extends State<InstagramPostCard>
     );
   }
 
+  void _openFullScreenImage(String imageUrl) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        barrierColor: Colors.black87,
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return _FullScreenImageView(imageUrl: imageUrl, heroTag: 'post_image_${widget.status.id}');
+        },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
+  }
+
   Future<void> _translateContent() async {
     if (_isTranslating) return;
     
@@ -389,11 +404,122 @@ class _InstagramPostCardState extends State<InstagramPostCard>
     );
   }
 
+  int _mediaPageIndex = 0;
+
   Widget _buildMedia(BuildContext context) {
+    final allMedia = widget.status.getAllMedia();
     final firstMedia = widget.status.getFirstMedia();
     final isVideoType = firstMedia != null && (firstMedia['type'] == 'video' || firstMedia['type'] == 'gifv');
     final isVideoExtension = widget.status.attach.toLowerCase().contains('.mp4') || widget.status.attach.toLowerCase().contains('.mov');
     final isVideo = isVideoType || isVideoExtension;
+
+    // Multi-image carousel
+    if (allMedia.length > 1) {
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          SizedBox(
+            height: 400,
+            child: PageView.builder(
+              itemCount: allMedia.length,
+              onPageChanged: (index) => setState(() => _mediaPageIndex = index),
+              itemBuilder: (context, index) {
+                final media = allMedia[index];
+                final url = media['url'] ?? '';
+                final type = media['type'] ?? 'image';
+                final isVid = type == 'video' || type == 'gifv';
+                if (isVid) {
+                  return SimpleVideoPlayer(url: url);
+                }
+                return GestureDetector(
+                  onDoubleTap: _handleDoubleTap,
+                  onTap: () => _openFullScreenImage(url),
+                  child: CachedNetworkImage(
+                    imageUrl: url,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    placeholder: (context, url) => Container(
+                      color: CyberpunkTheme.cardDark,
+                      child: const Center(child: InstagramLoadingIndicator()),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      color: CyberpunkTheme.cardDark,
+                      child: const Icon(Icons.broken_image_outlined, color: CyberpunkTheme.textTertiary, size: 32),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          // Counter chip top-right
+          Positioned(
+            top: 12,
+            right: 12,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '${_mediaPageIndex + 1}/${allMedia.length}',
+                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
+          // Dots at bottom
+          Positioned(
+            bottom: 12,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(allMedia.length, (i) {
+                return Container(
+                  width: _mediaPageIndex == i ? 8 : 6,
+                  height: _mediaPageIndex == i ? 8 : 6,
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _mediaPageIndex == i
+                        ? CyberpunkTheme.neonCyan
+                        : CyberpunkTheme.textTertiary.withOpacity(0.5),
+                    boxShadow: _mediaPageIndex == i
+                        ? [BoxShadow(color: CyberpunkTheme.neonCyan.withOpacity(0.5), blurRadius: 4)]
+                        : null,
+                  ),
+                );
+              }),
+            ),
+          ),
+          // Like animation
+          AnimatedBuilder(
+            animation: _likeAnimation,
+            builder: (context, child) {
+              if (_likeAnimation.value == 0) return const SizedBox.shrink();
+              final progress = _likeAnimation.value;
+              double scale;
+              double opacity;
+              if (progress < 0.3) {
+                scale = (progress / 0.3) * 1.2;
+                opacity = 1.0;
+              } else if (progress < 0.5) {
+                scale = 1.2 - ((progress - 0.3) / 0.2) * 0.2;
+                opacity = 1.0;
+              } else {
+                scale = 1.0;
+                opacity = 1.0 - ((progress - 0.5) / 0.5);
+              }
+              return Opacity(
+                opacity: opacity.clamp(0.0, 1.0),
+                child: Transform.scale(
+                  scale: scale.clamp(0.0, 1.5),
+                  child: const Icon(Icons.favorite, color: Color(0xFFFF00FF), size: 100),
+                ),
+              );
+            },
+          ),
+        ],
+      );
+    }
 
     if (isVideo) {
       return SizedBox(
@@ -405,7 +531,7 @@ class _InstagramPostCardState extends State<InstagramPostCard>
 
     return GestureDetector(
       onDoubleTap: _handleDoubleTap,
-      onTap: _handleTap,
+      onTap: () => _openFullScreenImage(widget.status.attach),
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -690,6 +816,99 @@ class _ActionIcon extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(4),
         child: Icon(icon, size: 24, color: color ?? CyberpunkTheme.textWhite),
+      ),
+    );
+  }
+}
+
+
+// ── Full-screen image viewer with pinch-to-zoom ──────────────────────────
+class _FullScreenImageView extends StatefulWidget {
+  final String imageUrl;
+  final String heroTag;
+
+  const _FullScreenImageView({
+    required this.imageUrl,
+    required this.heroTag,
+  });
+
+  @override
+  State<_FullScreenImageView> createState() => _FullScreenImageViewState();
+}
+
+class _FullScreenImageViewState extends State<_FullScreenImageView> {
+  final TransformationController _transformController = TransformationController();
+  TapDownDetails? _doubleTapDetails;
+
+  @override
+  void dispose() {
+    _transformController.dispose();
+    super.dispose();
+  }
+
+  void _handleDoubleTap() {
+    if (_transformController.value != Matrix4.identity()) {
+      _transformController.value = Matrix4.identity();
+    } else {
+      final position = _doubleTapDetails!.localPosition;
+      _transformController.value = Matrix4.identity()
+        ..translate(-position.dx * 1.5, -position.dy * 1.5)
+        ..scale(2.5);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: GestureDetector(
+        onVerticalDragEnd: (details) {
+          if (details.primaryVelocity != null && details.primaryVelocity!.abs() > 300) {
+            Navigator.of(context).pop();
+          }
+        },
+        child: Stack(
+          children: [
+            Center(
+              child: GestureDetector(
+                onDoubleTapDown: (details) => _doubleTapDetails = details,
+                onDoubleTap: _handleDoubleTap,
+                child: InteractiveViewer(
+                  transformationController: _transformController,
+                  minScale: 0.5,
+                  maxScale: 4.0,
+                  child: CachedNetworkImage(
+                    imageUrl: widget.imageUrl,
+                    fit: BoxFit.contain,
+                    placeholder: (_, __) => const Center(
+                      child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan),
+                    ),
+                    errorWidget: (_, __, ___) => const Icon(
+                      Icons.broken_image_rounded,
+                      color: CyberpunkTheme.textTertiary,
+                      size: 48,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 8,
+              right: 16,
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close_rounded, color: Colors.white, size: 24),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

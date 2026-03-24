@@ -37,6 +37,7 @@ class _UserProfilePageState extends State<UserProfilePage>
   bool _isLoadingPosts = false;
   bool _isFollowing = false;
   bool _isPinned = false;
+  bool _isOwnProfile = false;
   
   late TabController _tabController;
   int _currentTab = 0;
@@ -68,10 +69,18 @@ class _UserProfilePageState extends State<UserProfilePage>
         appLogger.error('Error loading relationships', e);
       }
 
+      // Detect if this is the user's own profile
+      bool isOwn = false;
+      try {
+        final currentAcc = await widget.apiService.getCurrentAccount();
+        isOwn = currentAcc.id == widget.userId;
+      } catch (_) {}
+
       if (!mounted) return;
       setState(() {
         _account = account;
         _isFollowing = following;
+        _isOwnProfile = isOwn;
         _isLoading = false;
       });
       _loadPosts();
@@ -178,34 +187,40 @@ class _UserProfilePageState extends State<UserProfilePage>
           ),
         ),
         actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: CyberpunkTheme.textWhite),
-            onSelected: (value) async {
-              if (value == 'block') {
-                 await widget.apiService.blockUser(widget.userId);
-                 if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).block)));
-              } else if (value == 'mute') {
-                 await widget.apiService.muteUser(widget.userId);
-                 if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).mute)));
-              } else if (value == 'report') {
-                 _showReportDialog();
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              PopupMenuItem<String>(
-                value: 'mute',
-                child: Text(S.of(context).mute),
-              ),
-              PopupMenuItem<String>(
-                value: 'block',
-                child: Text(S.of(context).block),
-              ),
-              PopupMenuItem<String>(
-                value: 'report',
-                child: Text(S.of(context).report),
-              ),
-            ],
-          ),
+          if (!_isOwnProfile)
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert, color: CyberpunkTheme.textWhite),
+              onSelected: (value) async {
+                if (value == 'block') {
+                   await widget.apiService.blockUser(widget.userId);
+                   if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).block)));
+                } else if (value == 'mute') {
+                   await widget.apiService.muteUser(widget.userId);
+                   if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).mute)));
+                } else if (value == 'report') {
+                   _showReportDialog();
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                PopupMenuItem<String>(
+                  value: 'mute',
+                  child: Text(S.of(context).mute),
+                ),
+                PopupMenuItem<String>(
+                  value: 'block',
+                  child: Text(S.of(context).block),
+                ),
+                PopupMenuItem<String>(
+                  value: 'report',
+                  child: Text(S.of(context).report),
+                ),
+              ],
+            )
+          else
+            IconButton(
+              icon: const Icon(Icons.settings_outlined, size: 22, color: CyberpunkTheme.textWhite),
+              onPressed: () => Navigator.pushNamed(context, '/Settings'),
+            ),
         ],
       ),
       body: NestedScrollView(
@@ -443,6 +458,7 @@ class _UserProfilePageState extends State<UserProfilePage>
   }
 
   void _showMoreOptions() {
+    if (_isOwnProfile) return; // Own profile doesn't need these actions
     showModalBottomSheet(
       context: context,
       backgroundColor: CyberpunkTheme.surfaceDark,

@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -105,6 +107,72 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
     _loadVideos();
   }
 
+  /// Direct HTTP fetch for Loops public feed using dart:io HttpClient
+  /// This bypasses the http package which has issues with Cloudflare
+  Future<List<LoopsVideo>> _fetchPublicFeedDirect() async {
+    final client = HttpClient();
+    client.connectionTimeout = const Duration(seconds: 15);
+    client.userAgent = 'Mozilla/5.0 (Linux; Android 14) FediSpace/0.1.5';
+    try {
+      final request = await client.getUrl(Uri.parse('https://loops.video/api/v1/timeline/public'));
+      request.headers.set('Accept', 'application/json');
+      if (_loopsApi?.accessToken != null) {
+        request.headers.set('Authorization', 'Bearer ${_loopsApi!.accessToken}');
+      }
+      final response = await request.close().timeout(const Duration(seconds: 20));
+      final body = await response.transform(utf8.decoder).join();
+      debugPrint('[REELS] Direct fetch status: ${response.statusCode}, body length: ${body.length}');
+
+      if (response.statusCode >= 200 && response.statusCode < 300 && body.isNotEmpty) {
+        final decoded = jsonDecode(body);
+        List<dynamic> data;
+        if (decoded is List) {
+          data = decoded;
+        } else if (decoded is Map<String, dynamic>) {
+          data = decoded['data'] as List? ?? decoded['videos'] as List? ?? [];
+        } else {
+          data = [];
+        }
+        return data.map((e) => LoopsVideo.fromJson(e as Map<String, dynamic>)).toList();
+      }
+    } catch (e) {
+      debugPrint('[REELS] Direct fetch error: $e');
+    } finally {
+      client.close();
+    }
+
+    // Try alternative endpoint
+    final client2 = HttpClient();
+    client2.connectionTimeout = const Duration(seconds: 15);
+    client2.userAgent = 'Mozilla/5.0 (Linux; Android 14) FediSpace/0.1.5';
+    try {
+      final request = await client2.getUrl(Uri.parse('https://loops.video/api/web/feed'));
+      request.headers.set('Accept', 'application/json');
+      final response = await request.close().timeout(const Duration(seconds: 20));
+      final body = await response.transform(utf8.decoder).join();
+      debugPrint('[REELS] Direct fetch /api/web/feed status: ${response.statusCode}, body length: ${body.length}');
+
+      if (response.statusCode >= 200 && response.statusCode < 300 && body.isNotEmpty) {
+        final decoded = jsonDecode(body);
+        List<dynamic> data;
+        if (decoded is List) {
+          data = decoded;
+        } else if (decoded is Map<String, dynamic>) {
+          data = decoded['data'] as List? ?? decoded['videos'] as List? ?? [];
+        } else {
+          data = [];
+        }
+        return data.map((e) => LoopsVideo.fromJson(e as Map<String, dynamic>)).toList();
+      }
+    } catch (e) {
+      debugPrint('[REELS] Direct fetch /api/web/feed error: $e');
+    } finally {
+      client2.close();
+    }
+
+    return [];
+  }
+
   Future<void> _loadVideos() async {
     try {
       if (_isAuthenticated && _selectedFeedTab == 1) {
@@ -128,27 +196,39 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
           });
         }
       } else {
-        // Public feed fallback
-        final response = await _loopsApi!.getPublicFeed();
+        // Public feed - try LoopsApi first, then direct HTTP fallback
+        try {
+          final response = await _loopsApi!.getPublicFeed();
+          if (response.isNotEmpty && mounted) {
+            setState(() {
+              _videos.clear();
+              _videos.addAll(response);
+              _isLoading = false;
+            });
+            return;
+          }
+        } catch (e) {
+          debugPrint('[REELS] LoopsApi.getPublicFeed failed: $e');
+        }
+        // Direct HTTP fallback
+        final videos = await _fetchPublicFeedDirect();
         if (mounted) {
           setState(() {
             _videos.clear();
-            _videos.addAll(response);
+            _videos.addAll(videos);
             _isLoading = false;
           });
         }
       }
     } catch (e) {
       debugPrint('Reels load error: $e');
-      // Fallback to public feed
+      // Fallback to direct HTTP
       try {
-        final publicApi = LoopsApi(instanceUrl: 'https://loops.video');
-        final response = await publicApi.getPublicFeed();
-        publicApi.dispose();
+        final videos = await _fetchPublicFeedDirect();
         if (mounted) {
           setState(() {
             _videos.clear();
-            _videos.addAll(response);
+            _videos.addAll(videos);
             _isLoading = false;
           });
         }
@@ -429,7 +509,22 @@ class _ReelsPageState extends State<ReelsPage> with TickerProviderStateMixin {
               top: MediaQuery.of(context).padding.top + 8,
               left: 0,
               right: 0,
-              child: _buildFeedTabs(),
+              child: GestureDetector(
+                onHorizontalDragEnd: (details) {
+                  if (details.primaryVelocity != null) {
+                    if (details.primaryVelocity! < -100 && _selectedFeedTab == 0) {
+                      _feedTabController.animateTo(1);
+                    } else if (details.primaryVelocity! > 100 && _selectedFeedTab == 1) {
+                      _feedTabController.animateTo(0);
+                    }
+                  }
+                },
+                child: Container(
+                  color: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: _buildFeedTabs(),
+                ),
+              ),
             ),
 
           // Double-tap heart animation

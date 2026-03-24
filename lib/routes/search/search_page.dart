@@ -46,6 +46,9 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 
   late AnimationController _pulseController;
 
+  /// Strip leading '#' from hashtag names to avoid double-hash display
+  String _cleanTag(String name) => name.startsWith('#') ? name.substring(1) : name;
+
   @override
   void initState() {
     super.initState();
@@ -218,7 +221,9 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
   }
 
   void _navigateToHashtag(String tag) {
-    Navigator.pushNamed(context, '/TagTimeline', arguments: {'tag': tag});
+    // Strip leading '#' if present to avoid double-hash issues
+    final cleanTag = tag.startsWith('#') ? tag.substring(1) : tag;
+    Navigator.pushNamed(context, '/TagTimeline', arguments: {'tag': cleanTag});
   }
 
   @override
@@ -525,7 +530,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    '#$name',
+                    '#${name.startsWith('#') ? name.substring(1) : name}',
                     style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: CyberpunkTheme.textWhite),
                   ),
                 ),
@@ -591,7 +596,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: CyberpunkTheme.neonPink.withOpacity(0.3)),
                     ),
-                    child: Text('#$name', style: const TextStyle(color: CyberpunkTheme.neonPink, fontSize: 13, fontWeight: FontWeight.w600)),
+                    child: Text('#${name.startsWith('#') ? name.substring(1) : name}', style: const TextStyle(color: CyberpunkTheme.neonPink, fontSize: 13, fontWeight: FontWeight.w600)),
                   ),
                 );
               }).toList(),
@@ -624,7 +629,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('#$name', style: const TextStyle(color: CyberpunkTheme.neonCyan, fontSize: 13, fontWeight: FontWeight.w600)),
+                        Text('#${_cleanTag(name)}', style: const TextStyle(color: CyberpunkTheme.neonCyan, fontSize: 13, fontWeight: FontWeight.w600)),
                         if (uses.toString().isNotEmpty) ...[
                           const SizedBox(width: 4),
                           Text('$uses', style: TextStyle(color: CyberpunkTheme.textTertiary, fontSize: 11)),
