@@ -117,12 +117,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         // Create post (modal - technically unreachable via tab tap now)
         return Container();
       case 3:
-        // Reels - vertical video feed
-        return const ReelsPage();
-      case 4:
         // Direct Messages & Stories
         return DirectMessagesPage(apiService: widget.apiService);
-      case 5:
+      case 4:
         // Profile
         return Profile(apiService: widget.apiService);
       default:
