@@ -1645,7 +1645,7 @@ class _SendPostsState extends State<SendPosts> {
                       GestureDetector(
                         onTap: _showMediaSourceSheet,
                         child: Container(
-                          height: 260,
+                          height: 140,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             gradient: RadialGradient(
@@ -1661,7 +1661,7 @@ class _SendPostsState extends State<SendPosts> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(24),
+                                padding: const EdgeInsets.all(14),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   gradient: LinearGradient(
@@ -1695,7 +1695,7 @@ class _SendPostsState extends State<SendPosts> {
                                   ).createShader(bounds),
                                   child: const Icon(
                                     Icons.add_a_photo_rounded,
-                                    size: 36,
+                                    size: 24,
                                     color: Colors.white,
                                   ),
                                 ),
