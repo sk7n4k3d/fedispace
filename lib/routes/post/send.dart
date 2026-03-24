@@ -1704,13 +1704,37 @@ class _SendPostsState extends State<SendPosts> {
                               const SizedBox(height: 8),
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                child: Column(
                                   children: [
-                                    _compactSourceButton(Icons.photo_library_outlined, 'Gallery', CyberpunkTheme.neonCyan, _pickFromGallery),
-                                    _compactSourceButton(Icons.camera_alt_outlined, 'Camera', CyberpunkTheme.neonPink, () => _pickFromCamera(ImageSource.camera)),
-                                    _compactSourceButton(Icons.videocam_outlined, 'Video', const Color(0xFFFF9800), _pickVideoFromCamera),
-                                    _compactSourceButton(Icons.auto_stories_rounded, 'Story', const Color(0xFF9C27B0), _createStoryFromGallery),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        _compactSourceButton(Icons.photo_library_outlined, 'Gallery', CyberpunkTheme.neonCyan, _pickFromGallery),
+                                        _compactSourceButton(Icons.camera_alt_outlined, 'Camera', CyberpunkTheme.neonPink, () => _pickFromCamera(ImageSource.camera)),
+                                        _compactSourceButton(Icons.videocam_outlined, 'Video', const Color(0xFFFF9800), _pickVideoFromCamera),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 14),
+                                    GestureDetector(
+                                      onTap: _createStoryFromGallery,
+                                      child: Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(vertical: 14),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF9C27B0).withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(16),
+                                          border: Border.all(color: const Color(0xFF9C27B0).withOpacity(0.3), width: 1),
+                                        ),
+                                        child: const Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(Icons.auto_stories_rounded, color: Color(0xFF9C27B0), size: 22),
+                                            SizedBox(width: 10),
+                                            Text('Create a Story', style: TextStyle(color: CyberpunkTheme.textWhite, fontSize: 15, fontWeight: FontWeight.w600)),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -1970,16 +1994,16 @@ class _SendPostsState extends State<SendPosts> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 52, height: 52,
+            width: 64, height: 64,
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: color.withOpacity(0.3), width: 1),
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: 30),
           ),
           const SizedBox(height: 6),
-          Text(label, style: TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 11, fontWeight: FontWeight.w500)),
+          Text(label, style: TextStyle(color: CyberpunkTheme.textSecondary, fontSize: 13, fontWeight: FontWeight.w500)),
         ],
       ),
     );
