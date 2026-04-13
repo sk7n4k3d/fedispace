@@ -78,7 +78,7 @@ dependencies:
   google_fonts: ^8.0.1
   receive_sharing_intent: ^1.8.1
   image: ^4.0.0
-  flutter_web_auth_2: ^4.0.0
+  flutter_web_auth_2: ^5.0.2
 
 
 flutter_icons:
