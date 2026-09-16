@@ -28,7 +28,6 @@ import 'package:fedispace/models/status.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:oauth2_client/access_token_response.dart';
 import 'package:oauth2_client/oauth2_helper.dart';
 
 /// Simple in-memory cache with TTL for frequently accessed API responses
