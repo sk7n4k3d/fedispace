@@ -36,14 +36,14 @@ dependencies:
   shared_preferences: ^2.0.15
   url_launcher: ^6.1.2
   http: ^1.2.0
-  flutter_secure_storage: ^10.0.0
-  oauth2_client: ^4.2.3
+  flutter_secure_storage: ^11.2.0
+  oauth2_client: ^5.0.0
   flutter_html: ^3.0.0
   infinite_scroll_pagination: ^5.1.1
   cached_network_image: ^3.4.1
   font_awesome_flutter: ^10.1.0
   unifiedpush: ^5.0.0
-  intl: ^0.20.2
+  intl: ^0.20.3
   flutter_svg: ^2.0.9
   flutter_blurhash: ^0.8.2
 
@@ -52,7 +52,7 @@ dependencies:
   permission_handler: ^12.0.1
   like_button: ^2.0.4
   floating_action_bubble: ^1.1.4
-  share_plus: ^12.0.1
+  share_plus: ^13.3.1
   better_video_player:
     path: packages/better_video_player
 
@@ -78,7 +78,7 @@ dependencies:
   google_fonts: ^8.0.1
   receive_sharing_intent: ^1.8.1
   image: ^4.0.0
-  flutter_web_auth_2: ^4.0.0
+  flutter_web_auth_2: ^6.1.0
 
 
 flutter_icons:
